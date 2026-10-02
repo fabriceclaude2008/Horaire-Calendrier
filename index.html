@@ -591,7 +591,7 @@ async function refreshDocuments(){
 async function uploadDocuments(files){
   if(!currentUser){$('#accountBtn').click();return}
   const category=$('#docCategory').value,status=$('#docStatus');
-  for(const file of files){
+  for(const file of Array.from(files)){
     const ext=(file.name.split('.').pop()||'').toLowerCase();
     if(!DOC_TYPES[ext]){status.textContent=`Format non pris en charge : ${file.name}`;continue}
     if(file.size>20*1024*1024){status.textContent=`${file.name} dépasse la limite de 20 Mo.`;continue}
@@ -605,9 +605,11 @@ async function uploadDocuments(files){
   await refreshDocuments();
 }
 async function openDocument(path){
+  const tab=window.open('about:blank','_blank');
+  if(!tab){toast('Autorise les fenêtres contextuelles pour ouvrir le document');return}
   const {data,error}=await sb.storage.from(DOC_BUCKET).createSignedUrl(`${currentUser.id}/${path}`,60);
-  if(error){toast('Impossible d’ouvrir le document');return}
-  window.open(data.signedUrl,'_blank','noopener');
+  if(error){tab.close();toast('Impossible d’ouvrir le document');return}
+  tab.location=data.signedUrl;
 }
 async function deleteDocument(path){
   if(!confirm('Supprimer ce document de ton espace ?'))return;

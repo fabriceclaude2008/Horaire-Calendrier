@@ -949,9 +949,6 @@ function render(){
     if(input)input.onchange=()=>{uploadDocuments(input.files);input.value=''};
     $('#docChoose')?.addEventListener('click',e=>{e.stopPropagation();input.click()});
     $('#docsLogin')?.addEventListener('click',()=>$('#accountBtn').click());
-    document.querySelectorAll('[data-doc-analyze]').forEach(b=>b.onclick=()=>reanalyzeDocument(b.dataset.docAnalyze));
-    document.querySelectorAll('[data-doc-download]').forEach(b=>b.onclick=()=>openDocument(b.dataset.docDownload));
-    document.querySelectorAll('[data-doc-delete]').forEach(b=>b.onclick=()=>deleteDocument(b.dataset.docDelete));
   }
 }
 
@@ -1035,6 +1032,12 @@ fAuth.addEventListener('submit',async e=>{
 // Events
 document.addEventListener('click',e=>{
   const t=e.target;
+  const analyzeButton=t.closest('[data-doc-analyze]');
+  if(analyzeButton){reanalyzeDocument(analyzeButton.dataset.docAnalyze);return}
+  const downloadButton=t.closest('[data-doc-download]');
+  if(downloadButton){openDocument(downloadButton.dataset.docDownload);return}
+  const deleteButton=t.closest('[data-doc-delete]');
+  if(deleteButton){deleteDocument(deleteButton.dataset.docDelete);return}
   const tab=t.closest('.tab'); if(tab){view=tab.dataset.v;render();return}
   if(t.closest('#add')){openEv(null);return}
   if(t.closest('#addBl')){openBl(null);return}

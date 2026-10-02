@@ -49,7 +49,7 @@ nav .sp{flex:1}
 .day:hover{background:color-mix(in srgb,var(--ink) 4%,var(--sf))}
 .day.out{opacity:.6}
 .day.rel{background:repeating-linear-gradient(135deg,transparent 0 6px,color-mix(in srgb,var(--mute) 12%,transparent) 6px 12px)}
-.day .n{font-weight:700;font-size:12px;padding:1px 4px;align-self:flex-start;border-radius:6px}
+.day .n{font-weight:700;font-size:12px;padding:1px 4px;align-self:flex-start;border-radius:6px}.classchip{border-left-style:dashed;background:color-mix(in srgb,var(--acc) 8%,var(--sf));font-weight:500}.classMore{font-size:10px;color:var(--mute);padding:0 5px}.dh small{display:block;color:var(--mute);font-size:10px;font-weight:500}.dayItem{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:left;padding:10px 12px;margin:4px 0;border:1px solid var(--line);border-radius:9px;background:var(--sf);color:var(--ink)}.dayItem span{font-size:12px;color:var(--mute);text-align:right}.dayItem b{font-size:14px}
 .day.today .n{background:var(--acc);color:var(--onacc)}
 .chip{display:block;width:100%;text-align:left;border:0;border-left:3px solid var(--c);background:color-mix(in srgb,var(--c) 15%,var(--sf));border-radius:4px;padding:2px 5px;font-size:11.5px;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .chip.exam{background:var(--c);color:var(--on);font-weight:700}
@@ -70,9 +70,9 @@ nav .sp{flex:1}
 .sched{display:grid;grid-template-columns:44px repeat(5,minmax(110px,1fr));min-width:650px}
 .sched .dh{padding:8px;text-align:center;font-weight:700;border-bottom:1px solid var(--line)}
 .sched .dh.today{color:var(--acc)}
-.hrs{position:relative;height:572px}
+.hrs{position:relative;height:728px}
 .hrs i{position:absolute;right:6px;font-style:normal;font-size:11px;color:var(--mute);transform:translateY(-50%)}
-.col{position:relative;height:572px;border-left:1px solid var(--line);background:repeating-linear-gradient(var(--line) 0 1px,transparent 1px 52px)}
+.col{position:relative;height:728px;border-left:1px solid var(--line);background:repeating-linear-gradient(var(--line) 0 1px,transparent 1px 52px)}
 .blk{position:absolute;left:3px;right:3px;text-align:left;border:0;border-left:4px solid var(--c);background:color-mix(in srgb,var(--c) 18%,var(--sf));border-radius:6px;padding:4px 7px;overflow:hidden;font-size:12.5px;line-height:1.3}
 .blk b{display:block}
 .blk span{color:var(--mute)}
@@ -161,7 +161,7 @@ nav .th select{width:auto;margin:0;padding:6px 8px;border:1px solid var(--line);
 .docIcon{width:38px;height:42px;border-radius:9px;background:var(--bg);display:grid;place-items:center;font-size:11px;font-weight:800;color:var(--acc);flex:none}
 .docMeta{flex:1;min-width:0}.docMeta b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .docMeta small{color:var(--mute)}
-@media(max-width:640px){.noteIntro{grid-template-columns:1fr}.noteGuide{grid-template-columns:1fr}}
+@media(max-width:640px){.noteIntro{grid-template-columns:1fr}.noteGuide{grid-template-columns:1fr}.dayItem{align-items:flex-start;flex-direction:column}.dayItem span{text-align:left}}
 </style>
 </head>
 <body>
@@ -225,6 +225,8 @@ nav .th select{width:auto;margin:0;padding:6px 8px;border:1px solid var(--line);
     <div class="acts"><button type="button" class="btn del l" id="evDel">Supprimer</button><button type="button" class="btn" data-close>Annuler</button><button class="btn pri" value="ok">Enregistrer</button></div>
   </form>
 </dialog>
+
+<dialog id="dDay"><div class="bar"><h3 id="dayTitle" style="flex:1;margin:0">Détails de la journée</h3><button type="button" class="btn" data-day-close>Fermer</button></div><div id="dayDetails"></div><div class="acts"><button type="button" class="btn pri" id="dayAdd">Ajouter une évaluation ce jour-là</button></div></dialog>
 
 <dialog id="dBl">
   <form method="dialog" id="fBl">
@@ -296,6 +298,8 @@ const supabaseConfigured=!SUPABASE_URL.includes('COLLE_')&&!SUPABASE_ANON_KEY.in
 const sb=supabaseConfigured?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
 let currentUser=null, cloudSaveTimer=null;
 let st=load(), view='cal', cur=new Date(); cur.setDate(1);
+const mondayOf=d=>new Date(d.getFullYear(),d.getMonth(),d.getDate()-((d.getDay()+6)%7));
+let schedMonday=mondayOf(new Date()),dayDialogDate=todayS();
 let tt;function toast(m){const t=document.querySelector('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),1800)}
 let fCourse='', fPer='up';
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.ev&&s.bl)return norm(s)}catch(e){}return fresh()}
@@ -385,24 +389,35 @@ function hero(){
 }
 
 function calView(){
-  const y=cur.getFullYear(), m=cur.getMonth(), first=new Date(y,m,1);
+  const y=cur.getFullYear(),m=cur.getMonth(),first=new Date(y,m,1);
   const start=new Date(y,m,1-((first.getDay()+6)%7));
-  let h=`<div class="card"><div class="bar"><h2>${first.toLocaleDateString('fr-CA',{month:'long',year:'numeric'})}</h2><button class="btn" data-nav="-1" aria-label="Mois précédent">‹</button><button class="btn" data-nav="0">Aujourd'hui</button><button class="btn" data-nav="1" aria-label="Mois suivant">›</button></div><div class="cal"><div class="h"></div>`;
-  ['lun','mar','mer','jeu','ven','sam','dim'].forEach(d=>h+=`<div class="h">${d}</div>`);
+  let h='<div class="card"><div class="bar"><h2>'+first.toLocaleDateString('fr-CA',{month:'long',year:'numeric'})+'</h2><button class="btn" data-nav="-1" aria-label="Mois précédent">‹</button><button class="btn" data-nav="0">Aujourd’hui</button><button class="btn" data-nav="1" aria-label="Mois suivant">›</button></div><div class="cal"><div class="h"></div>';
+  ['lun','mar','mer','jeu','ven','sam','dim'].forEach(d=>h+='<div class="h">'+d+'</div>');
   for(let r=0;r<6;r++){
     const ws=new Date(start.getFullYear(),start.getMonth(),start.getDate()+r*7);
-    const wk=Math.floor((Math.round((ws-S0)/864e5))/7)+1, isRel=wk===8;
-    h+=`<div class="wk">${wk>=1&&wk<=16?(isRel?'Relâche':'S'+wk):''}</div>`;
+    const wk=Math.floor((Math.round((ws-S0)/864e5))/7)+1,isRel=wk===8;
+    h+='<div class="wk">'+(wk>=1&&wk<=16?(isRel?'Relâche':'S'+wk):'')+'</div>';
     for(let c=0;c<7;c++){
-      const d=new Date(ws.getFullYear(),ws.getMonth(),ws.getDate()+c), s=iso(d);
-      const evs=sorted().filter(e=>e.date===s);
-      h+=`<div class="day${d.getMonth()!==m?' out':''}${s===todayS()?' today':''}${isRel&&c<5?' rel':''}" data-date="${s}"><span class="n">${d.getDate()}</span>${evs.map(e=>`<button class="chip${e.type==='exam'?' exam':''}${e.done?' done':''}" data-c="${e.course}" data-id="${e.id}" title="${esc(evTitle(e))}">${e.approx?'~ ':''}${esc(e.title)}</button>`).join('')}</div>`;
+      const d=new Date(ws.getFullYear(),ws.getMonth(),ws.getDate()+c),s=iso(d),dow=(d.getDay()+6)%7+1;
+      const evs=sorted().filter(e=>e.date===s),inSession=d>=S0&&d<addD(S0,112),blocks=inSession?st.bl.filter(b=>b.day===dow).sort((a,b)=>a.start.localeCompare(b.start)):[];
+      const shown=blocks.slice(0,2).map(b=>'<button class="chip classchip" data-bid="'+esc(b.id)+'" title="'+esc(b.title+' · '+b.start+'–'+b.end)+'">Cours · '+esc(b.title)+'</button>').join('');
+      const more=blocks.length>2?'<span class="classMore">+'+(blocks.length-2)+' cours</span>':'';
+      h+='<div class="day'+(d.getMonth()!==m?' out':'')+(s===todayS()?' today':'')+(isRel&&c<5?' rel':'')+'" data-date="'+s+'"><span class="n">'+d.getDate()+'</span>'+shown+more+evs.map(e=>'<button class="chip'+(e.type==='exam'?' exam':'')+(e.done?' done':'')+'" data-c="'+esc(e.course)+'" data-id="'+esc(e.id)+'" title="'+esc(evTitle(e))+'">'+(e.approx?'~ ':'')+esc(e.title)+'</button>').join('')+'</div>';
     }
   }
-  h+='</div></div><p class="foot">Clique sur un jour pour ajouter un élément. Les éléments avec ~ ont une date à confirmer. Le motif rayé indique la semaine de relâche.</p>';
+  h+='</div></div><p class="foot">Sélectionne une journée pour voir ses cours et ses évaluations. Les cours de l’horaire hebdomadaire apparaissent aussi ici.</p>';
   return h;
 }
-
+function openDay(date){
+  dayDialogDate=date;
+  const d=parse(date),dow=(d.getDay()+6)%7+1,inSession=d>=S0&&d<addD(S0,112),blocks=inSession?st.bl.filter(b=>b.day===dow).sort((a,b)=>a.start.localeCompare(b.start)):[],events=sorted().filter(e=>e.date===date);
+  $('#dayTitle').textContent=fmtD(date,{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  let html='';
+  if(blocks.length){html+='<h4 class="ct">Cours</h4>'+blocks.map(b=>'<button class="dayItem" type="button" data-day-block="'+esc(b.id)+'"><b>'+esc(b.title)+'</b><span>'+b.start+'–'+b.end+(b.room?' · '+esc(b.room):'')+'</span></button>').join('')}
+  if(events.length){html+='<h4 class="ct">Examens et devoirs</h4>'+events.map(e=>'<button class="dayItem" type="button" data-day-event="'+esc(e.id)+'"><b>'+esc(e.title)+'</b><span>'+TY[e.type]+' · '+esc(CO[e.course])+(e.time?' · '+e.time:'')+(e.approx?' · date à confirmer':'')+'</span></button>').join('')}
+  if(!blocks.length&&!events.length)html='<p class="empty">Aucun cours ni élément prévu. Tu peux en ajouter à cette journée.</p>';
+  $('#dayDetails').innerHTML=html;$('#dDay').showModal();
+}
 function listView(){
   const t=todayS();
   let evs=sorted().filter(e=>(!fCourse||e.course===fCourse)&&(fPer==='all'||(fPer==='up'?e.date>=t||(!e.done&&e.date<t):e.date<t)));
@@ -418,24 +433,21 @@ function listView(){
 }
 
 function schedView(){
-  const H0=8, PX=52, now=new Date(), monday=new Date(now.getFullYear(),now.getMonth(),now.getDate()-((now.getDay()+6)%7));
-  const study=plan().list.filter(l=>{
-    const d=parse(l.date);
-    return d>=monday && d<addD(monday,5);
-  });
-  let h=`<div class="card"><div class="bar"><h2>Horaire de la semaine</h2><button class="btn pri" id="addBl">Ajouter un cours</button></div>
-  <p class="hint">Les périodes d'étude sont maintenant affichées directement dans l'horaire. Elles sont calculées à partir de tes évaluations et des plages libres de tes cours.</p>
-  <div class="sw"><div class="sched"><div class="dh"></div>${DJ.map((d,i)=>`<div class="dh${i+1===((now.getDay()+6)%7+1)?' today':''}">${d}</div>`).join('')}<div class="hrs">${Array.from({length:14},(_,i)=>`<i style="top:${i*PX}px">${H0+i}h</i>`).join('')}</div>`;
+  const H0=8,PX=52,now=new Date(),monday=schedMonday;
+  const study=plan().list.filter(l=>{const d=parse(l.date);return d>=monday&&d<addD(monday,5)});
+  const end=addD(monday,4),label=fmtD(iso(monday),{day:'numeric',month:'long'})+' – '+fmtD(iso(end),{day:'numeric',month:'long',year:'numeric'});
+  let h='<div class="card"><div class="bar"><button class="btn" data-week="-1" aria-label="Semaine précédente">‹</button><button class="btn" data-week="0">Cette semaine</button><button class="btn" data-week="1" aria-label="Semaine suivante">›</button><h2>Horaire · '+label+'</h2><button class="btn pri" id="addBl">Ajouter un cours</button></div><p class="hint">Utilise les flèches pour parcourir les semaines. Les cours réguliers et les périodes d’étude apparaissent dans chaque journée.</p><div class="sw"><div class="sched"><div class="dh"></div>';
+  for(let i=0;i<5;i++){const date=addD(monday,i);h+='<div class="dh'+(iso(date)===todayS()?' today':'')+'"><b>'+DJ[i]+'</b><small>'+fmtD(iso(date),{day:'numeric',month:'short'})+'</small></div>'}
+  h+='<div class="hrs">'+Array.from({length:15},(_,i)=>'<i style="top:'+(i*PX)+'px">'+(H0+i)+'h</i>').join('')+'</div>';
   for(let d=1;d<=5;d++){
-    h+=`<div class="col">`;
-    st.bl.filter(b=>b.day===d).forEach(b=>{
-      const top=(tm(b.start)-H0)*PX, ht=(tm(b.end)-tm(b.start))*PX-2;
-      h+=`<button class="blk" data-c="${b.course}" data-bid="${b.id}" style="top:${top}px;height:${ht}px"><b>${esc(b.title)}</b><span>${b.start}–${b.end}${b.room?' · '+esc(b.room):''}</span></button>`;
+    const date=addD(monday,d-1);h+='<div class="col">';
+    (monday>=S0&&monday<addD(S0,112)?st.bl.filter(b=>b.day===d):[]).sort((a,b)=>a.start.localeCompare(b.start)).forEach(b=>{
+      const top=(tm(b.start)-H0)*PX,ht=(tm(b.end)-tm(b.start))*PX-2;
+      h+='<button class="blk" data-c="'+esc(b.course)+'" data-bid="'+esc(b.id)+'" style="top:'+top+'px;height:'+ht+'px"><b>'+esc(b.title)+'</b><span>'+b.start+'–'+b.end+(b.room?' · '+esc(b.room):'')+'</span></button>';
     });
     study.filter(l=>((parse(l.date).getDay()+6)%7+1)===d).forEach(l=>{
-      const top=(l.s-H0)*PX, ht=(l.f-l.s)*PX-2;
-      const k=`${l.date}|${l.s}|${l.x.e.id}`, done=!!st.sd[k];
-      h+=`<button class="blk study${done?' done':''}" data-study="${esc(k)}" style="top:${top}px;height:${ht}px" title="Période d'étude"><b>📚 Étude · ${esc(l.x.e.title)}</b><span>${fh(l.s)}–${fh(l.f)} · ${esc(CO[l.x.e.course])}</span></button>`;
+      const top=(l.s-H0)*PX,ht=(l.f-l.s)*PX-2,k=l.date+'|'+l.s+'|'+l.x.e.id,done=!!st.sd[k];
+      h+='<button class="blk study'+(done?' done':'')+'" data-study="'+esc(k)+'" style="top:'+top+'px;height:'+ht+'px" title="Période d’étude"><b>📚 Étude · '+esc(l.x.e.title)+'</b><span>'+fh(l.s)+'–'+fh(l.f)+' · '+esc(CO[l.x.e.course])+'</span></button>';
     });
     h+='</div>';
   }
@@ -567,7 +579,7 @@ function studyView(){
 }
 
 const DOC_BUCKET='documents-etudiants';
-const DOC_TYPES={pdf:'application/pdf',doc:'application/msword',docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',ics:'text/calendar',png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg'};
+const DOC_TYPES={pdf:'application/pdf',doc:'application/msword',docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',ics:'text/calendar',png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',webp:'image/webp'};
 const DOC_CATEGORIES={plan:'Plan de cours',calendrier:'Calendrier',autre:'Autre document'};
 const months={janvier:0,janv:0,jan:0,fevrier:1,fevr:1,fev:1,mars:2,avril:3,avr:3,mai:4,juin:5,juillet:6,juil:6,aout:7,septembre:8,sept:8,sep:8,octobre:9,oct:9,novembre:10,nov:10,decembre:11,dec:11};
 const foldText=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
@@ -621,6 +633,75 @@ function textEvents(text,fileName){
   }
   return out;
 }
+function identifyDocumentCourse(text){
+  const raw=String(text||''),folded=foldText(raw);
+  let course=st.co.find(c=>c.id!=='autre'&&foldText(c.name).length>3&&folded.includes(foldText(c.name)));
+  if(course)return course;
+  const code=raw.match(/\b\d{3}-\d{3}-[A-Z]{2}\s+([^\r\n]+)/);
+  let name=code?code[1].replace(/\s{2,}.*/,'').trim():'';
+  if(!name){
+    const aliases=[['gestion','gest'],['philosophie','philo'],['algèbre','alg']];
+    const alias=aliases.find(x=>folded.includes(foldText(x[0])));
+    if(alias)course=st.co.find(c=>c.id===alias[1]);
+  }
+  if(course)return course;
+  if(name.length<4)return null;
+  const id='doc'+uid().slice(1).replace(/[^a-z0-9]/gi,'').toLowerCase();
+  course={id,name:name.slice(0,60),color:PAL[st.co.length%PAL.length],units:'2.33',ifgz:'',idgz:'',fm:'',fs:'',ev:[{id:id+'-0',name:'',w:'',grade:'',mean:'',sd:''}]};
+  st.co.splice(Math.max(0,st.co.length-1),0,course);
+  return course;
+}
+function coursePlanEvents(text,fileName,courseId){
+  const raw=String(text||''),start=raw.search(/Calendrier des activités/i);
+  if(start<0)return [];
+  const endMatch=raw.slice(start).search(/Évaluation formative/i),section=raw.slice(start,endMatch<0?undefined:start+endMatch);
+  const marks=[...section.matchAll(/(?:^|\n)\s*(1[0-6]|[1-9])\s+(?=(?:Cours\s+[AB]\b|Cours levés\b|Semaine de lecture\b))/gim)];
+  if(!marks.length)return [];
+  const out=[],seen=new Set();
+  for(let i=0;i<marks.length;i++){
+    const week=+marks[i][1],begin=marks[i].index+marks[i][0].lastIndexOf(marks[i][1])+marks[i][1].length;
+    const stop=i+1<marks.length?marks[i+1].index:section.length,block=section.slice(begin,stop);
+    const items=[];
+    for(const m of block.matchAll(/\bExamen\s*(\d+)\b/gi))items.push({key:'exam-'+m[1],title:'Examen '+m[1],type:'exam'});
+    for(const m of block.matchAll(/\bTravail\s+court\s*(\d+)\b/gi))items.push({key:'travail-'+m[1],title:'Travail court '+m[1],type:'devoir'});
+    for(const m of block.matchAll(/\b(?:remise\s+du\s+)?journal\s+de\s+lecture\s*(\d+)\b/gi))items.push({key:'journal-'+m[1],title:'Remise du journal de lecture '+m[1],type:'devoir'});
+    if(/\btexte argumentatif\b|\brédaction\b/i.test(block))items.push({key:'texte-argumentatif',title:'Rédaction du texte argumentatif',type:'devoir'});
+    const explicit=findDateAndTime(block);
+    for(const item of items){
+      const key=item.key+'|'+(explicit?explicit.date:week);
+      if(seen.has(key))continue;seen.add(key);
+      const date=explicit||makeEventDate(S0.getFullYear(),S0.getMonth(),S0.getDate()+(week-1)*7);
+      if(!date)continue;
+      out.push({id:uid(),title:item.title+' (semaine '+week+')',course:courseId||'autre',type:item.type,date:date.date,time:date.time||'',notes:'Repéré dans '+fileName+(explicit?'':' · semaine '+week+' à confirmer'),approx:!explicit,done:false});
+    }
+  }
+  return out;
+}
+function parseWeeklyClasses(text,courseId){
+  const days=[['dimanche',7],['samedi',6],['vendredi',5],['jeudi',4],['mercredi',3],['mardi',2],['lundi',1],['dim',7],['sam',6],['ven',5],['jeu',4],['mer',3],['mar',2],['lun',1]],lines=String(text||'').replace(/\u00a0/g,' ').split(/\r?\n/).map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean),out=[],seen=new Set();
+  for(let i=0;i<lines.length;i++){
+    const chunks=[lines[i]];if(i+1<lines.length)chunks.push(lines[i]+' '+lines[i+1]);
+    for(const line of chunks){
+      const folded=foldText(line),day=days.find(x=>new RegExp('\\b'+x[0]+'\\b').test(folded));if(!day)continue;
+      const timeMatch=line.match(/\b([01]?\d|2[0-3])\s*(?:h|:)\s*([0-5]\d)?\s*(?:-|–|—|à|a)\s*([01]?\d|2[0-3])\s*(?:h|:)\s*([0-5]\d)?\b/i);if(!timeMatch)continue;
+      const start=String(+timeMatch[1]).padStart(2,'0')+':'+(timeMatch[2]||'00'),end=String(+timeMatch[3]).padStart(2,'0')+':'+(timeMatch[4]||'00');
+      if(tm(start)>=tm(end))continue;
+      let c=courseId?st.co.find(x=>x.id===courseId):null;
+      if(!c)c=st.co.find(x=>x.id!=='autre'&&folded.includes(foldText(x.name)));
+      if(!c&&/\bgestion\b/.test(folded))c=st.co.find(x=>x.id==='gest');
+      const cleaned=line.replace(new RegExp('\\b'+day[0]+'\\b','i'),' ').replace(timeMatch[0],' ').replace(/^\s*[:·,-]+|[:·,-]+\s*$/g,'').replace(/\s+/g,' ').trim();
+      const title=(c&&foldText(cleaned).length<4?c.name:cleaned)|| (c?c.name:'Cours importé');
+      const course=c?c.id:'autre',key=day[1]+'|'+start+'|'+end+'|'+course;
+      if(!seen.has(key)){seen.add(key);out.push({id:uid(),day:day[1],start,end,title:title.slice(0,70),course,room:''})}
+    }
+  }
+  return out;
+}
+function documentEvents(text,fileName,courseId){
+  const planned=coursePlanEvents(text,fileName,courseId);
+  const ordinary=textEvents(text,fileName).filter(e=>!planned.some(p=>!p.approx&&p.date===e.date&&p.type===e.type));
+  return ordinary.concat(planned);
+}
 function icsEvents(text,fileName){
   const unfolded=String(text||'').replace(/\r?\n[ \t]/g,'');
   return unfolded.split(/BEGIN:VEVENT/i).slice(1).map(block=>{
@@ -657,17 +738,21 @@ async function getOcrWorker(status){
 async function releaseOcrWorker(){if(ocrWorker){await ocrWorker.terminate();ocrWorker=null;ocrWorkerPromise=null}}
 async function recognizeImage(source,status){const worker=await getOcrWorker(status),result=await worker.recognize(source);return result.data?.text||''}
 async function extractDocumentText(file,ext,status){
-  if(ext==='ics')return {events:icsEvents(await file.text(),file.name),supported:true};
-  if(ext==='png'||ext==='jpg'||ext==='jpeg')return {events:textEvents(await recognizeImage(file,status),file.name),supported:true,ocr:true};
+  if(ext==='ics')return {events:icsEvents(await file.text(),file.name),classes:[],supported:true};
+  if(ext==='png'||ext==='jpg'||ext==='jpeg'||ext==='webp'){
+    const text=await recognizeImage(file,status),course=identifyDocumentCourse(text);
+    return {events:documentEvents(text,file.name,course?.id),classes:parseWeeklyClasses(text,course?.id),supported:true,ocr:true};
+  }
   if(ext==='docx'){
-    const mammoth=await getMammoth(),result=await mammoth.extractRawText({arrayBuffer:await file.arrayBuffer()});
-    return {events:textEvents(result.value,file.name),supported:true};
+    const mammoth=await getMammoth(),result=await mammoth.extractRawText({arrayBuffer:await file.arrayBuffer()}),text=result.value,course=identifyDocumentCourse(text);
+    return {events:documentEvents(text,file.name,course?.id),classes:parseWeeklyClasses(text,course?.id),supported:true};
   }
   if(ext==='pdf'){
-    if(!pdfLoading)pdfLoading=import('https://cdn.jsdelivr.net/npm/pdfjs-dist@6.0.0/build/pdf.mjs');
-    const pdfjs=await pdfLoading;pdfjs.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@6.0.0/build/pdf.worker.mjs';
+    if(!pdfLoading)pdfLoading=import('https://cdn.jsdelivr.net/npm/pdfjs-dist@6.3.289/build/pdf.mjs');
+    const pdfjs=await pdfLoading;pdfjs.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@6.3.289/build/pdf.worker.mjs';
     const doc=await pdfjs.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise,lines=[];
     for(let n=1;n<=doc.numPages;n++){
+      status.textContent='Lecture de la page '+n+' sur '+doc.numPages+'…';
       const page=await doc.getPage(n),content=await page.getTextContent(),rows=[];
       for(const item of content.items){if(!item.str?.trim())continue;const y=Math.round(item.transform?.[5]||0);let row;
         for(let j=rows.length-1;j>=0;j--){if(Math.abs(rows[j].y-y)<=3){row=rows[j];break}}
@@ -682,13 +767,14 @@ async function extractDocumentText(file,ext,status){
       }
       lines.push(pageText);
     }
-    return {events:textEvents(lines.join('\n'),file.name),supported:true};
+    const text=lines.join('\n'),course=identifyDocumentCourse(text);
+    return {events:documentEvents(text,file.name,course?.id),classes:parseWeeklyClasses(text,course?.id),supported:true};
   }
-  return {events:[],supported:false};
+  return {events:[],classes:[],supported:false};
 }
 function documentsView(){
   if(!currentUser)return '<div class="card"><h2>Documents de cours</h2><p class="hint">Connecte-toi pour déposer et retrouver tes plans de cours et calendriers dans ton espace privé.</p><button class="btn pri" id="docsLogin">Se connecter</button></div>';
-  return '<div class="card"><div class="bar"><h2>Documents de cours</h2></div><p class="hint">Dépose un plan de cours ou un calendrier. Les examens et devoirs datés seront ajoutés automatiquement à ton calendrier.</p><label>Type de document<select id="docCategory"><option value="plan">Plan de cours</option><option value="calendrier">Calendrier</option><option value="autre">Autre document</option></select></label><input id="docFiles" type="file" accept=".pdf,.doc,.docx,.ics,.png,.jpg,.jpeg" multiple hidden><div class="dropbox" id="dropZone" role="button" tabindex="0" aria-label="Choisir ou déposer des documents"><strong>Dépose tes fichiers ici</strong><p>ou choisis-les sur ton appareil · PDF, Word, calendrier .ics ou image · 20 Mo maximum par fichier</p><button class="btn pri" type="button" id="docChoose">Choisir des fichiers</button></div><p id="docStatus" class="hint" role="status"></p><h3 class="ct">Mes documents</h3><div id="docList" class="empty">Chargement…</div><p class="hint">Les photos JPG/PNG et les pages numérisées des PDF sont lues en français par OCR dans ton navigateur; le texte des PDF, Word .docx et calendriers .ics est aussi analysé. Les anciens fichiers .doc sont conservés, mais ne sont pas lus automatiquement. L’OCR peut confondre des caractères ou des dates : vérifie les éléments ajoutés dans Calendrier.</p></div>';
+  return '<div class="card"><div class="bar"><h2>Documents de cours</h2></div><p class="hint">Dépose un plan de cours ou un calendrier. Les examens et devoirs datés seront ajoutés automatiquement à ton calendrier.</p><label>Type de document<select id="docCategory"><option value="plan">Plan de cours</option><option value="calendrier">Calendrier</option><option value="autre">Autre document</option></select></label><input id="docFiles" type="file" accept=".pdf,.doc,.docx,.ics,.png,.jpg,.jpeg,.webp" multiple hidden><div class="dropbox" id="dropZone" role="button" tabindex="0" aria-label="Choisir ou déposer des documents"><strong>Dépose tes fichiers ici</strong><p>ou choisis-les sur ton appareil · PDF, Word, calendrier .ics ou image · 20 Mo maximum par fichier</p><button class="btn pri" type="button" id="docChoose">Choisir des fichiers</button></div><p id="docStatus" class="hint" role="status"></p><h3 class="ct">Mes documents</h3><div id="docList" class="empty">Chargement…</div><p class="hint">Les photos JPG/PNG/WebP et les pages numérisées des PDF sont lues en français dans ton navigateur. Les évaluations datées, les évaluations indiquées par semaine dans un plan de cours, et les plages hebdomadaires avec jour et heures lisibles peuvent être ajoutées automatiquement. Les fichiers .doc sont conservés, mais ne sont pas analysés. Vérifie les dates signalées « à confirmer » et les cours importés.</p></div>';
 }
 async function refreshDocuments(){
   if(!sb||!currentUser||view!=='docs')return;
@@ -708,7 +794,7 @@ async function refreshDocuments(){
 }
 async function uploadDocuments(files){
   if(!currentUser){$('#accountBtn').click();return}
-  const category=$('#docCategory').value,status=$('#docStatus'),imported=[],details=[];
+  const category=$('#docCategory').value,status=$('#docStatus'),imported=[],importedClasses=[],initialCourseCount=st.co.length,details=[];
   for(const file of Array.from(files)){
     const ext=(file.name.split('.').pop()||'').toLowerCase();
     if(!DOC_TYPES[ext]){details.push('Format non pris en charge : '+file.name);continue}
@@ -718,15 +804,30 @@ async function uploadDocuments(files){
     status.textContent='Envoi de '+file.name+'…';
     const {error}=await sb.storage.from(DOC_BUCKET).upload(path,file,{contentType:DOC_TYPES[ext],upsert:false});
     if(error){console.error(error);details.push('Échec de l’envoi de '+file.name+'. Vérifie la configuration du stockage.');continue}
-    try{const result=await extractDocumentText(file,ext,status);imported.push(...result.events);if(!result.supported)details.push(file.name+' est conservé, mais son format n’est pas analysé automatiquement.');else if(!result.events.length)details.push('Aucun examen ou devoir daté repéré dans '+file.name+'. Vérifie le texte détecté avant de le ressaisir.')}
-    catch(err){console.error(err);details.push(file.name+' est conservé, mais son texte n’a pas pu être analysé.')}
+    try{
+      const result=await extractDocumentText(file,ext,status);
+      imported.push(...result.events);importedClasses.push(...(result.classes||[]));
+      if(!result.supported)details.push(file.name+' est conservé, mais son format n’est pas analysé automatiquement.');
+      else if(!result.events.length&&!(result.classes||[]).length)details.push('Fichier lu, mais aucune date, évaluation ou plage de cours reconnue dans '+file.name+'. Vérifie que le calendrier montre clairement les jours et les heures.');
+    }catch(err){
+      console.error(err);
+      details.push(file.name+' est conservé, mais la lecture a échoué ('+(err?.message||'erreur inconnue')+'). Essaie un PDF texte ou une photo plus nette.');
+    }
   }
   await releaseOcrWorker();
-  const keys=new Set(st.ev.map(e=>foldText(e.title)+'|'+e.date)),unique=[];
-  imported.forEach(ev=>{const key=foldText(ev.title)+'|'+ev.date;if(!keys.has(key)){keys.add(key);unique.push(ev)}});
-  if(unique.length){st.ev.push(...unique);save({silent:true});render();toast(unique.length+' examen(s) ou devoir(s) ajouté(s) au calendrier ✓')}
-  else if(details.length)status.textContent=details.join(' ');
-  if(details.length&&unique.length)$('#docStatus').textContent=details.join(' ');
+  const eventKeys=new Set(st.ev.map(e=>foldText(e.title)+'|'+e.date)),unique=[];
+  imported.forEach(ev=>{const key=foldText(ev.title)+'|'+ev.date;if(!eventKeys.has(key)){eventKeys.add(key);unique.push(ev)}});
+  const classKeys=new Set(st.bl.map(b=>b.day+'|'+b.start+'|'+b.end+'|'+b.course)),uniqueClasses=[];
+  importedClasses.forEach(b=>{const key=b.day+'|'+b.start+'|'+b.end+'|'+b.course;if(!classKeys.has(key)){classKeys.add(key);uniqueClasses.push(b)}});
+  if(unique.length||uniqueClasses.length||st.co.length>initialCourseCount){
+    st.ev.push(...unique);st.bl.push(...uniqueClasses);save({silent:true});render();
+    const added=[];
+    if(unique.length)added.push(unique.length+' évaluation(s)');
+    if(uniqueClasses.length)added.push(uniqueClasses.length+' cours à l’horaire');
+    if(st.co.length>initialCourseCount)added.push((st.co.length-initialCourseCount)+' cours ajouté(s)');
+    toast(added.join(' · ')+' ✓');
+  }
+  if(details.length&&$('#docStatus'))$('#docStatus').textContent=details.join(' ');
   await refreshDocuments();
 }
 async function openDocument(path){
@@ -797,7 +898,7 @@ fBl.addEventListener('submit',e=>{
 });
 $('#evDel').onclick=()=>{if(confirm('Supprimer cet élément ?')){st.ev=st.ev.filter(x=>x.id!==editId);save();dEv.close();render()}};
 $('#blDel').onclick=()=>{if(confirm('Supprimer ce cours ?')){st.bl=st.bl.filter(x=>x.id!==editBl);save();dBl.close();render()}};
-document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());
+document.querySelectorAll('[data-close],[data-day-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());
 
 // Authentification
 const dAuth=$('#dAuth'), fAuth=$('#fAuth');
@@ -855,14 +956,18 @@ document.addEventListener('click',e=>{
     return;
   }
   const nv=t.closest('[data-nav]'); if(nv){const n=+nv.dataset.nav;if(n===0){cur=new Date();cur.setDate(1)}else cur=new Date(cur.getFullYear(),cur.getMonth()+n,1);render();return}
-  const bid=t.closest('[data-bid]'); if(bid){openBl(bid.dataset.bid);return}
+  const wv=t.closest('[data-week]');if(wv){const n=+wv.dataset.week;schedMonday=n===0?mondayOf(new Date()):addD(schedMonday,n*7);render();return}
+  const de=t.closest('[data-day-event]');if(de){const id=de.dataset.dayEvent;$('#dDay').close();openEv(id);return}
+  const db=t.closest('[data-day-block]');if(db){const id=db.dataset.dayBlock;$('#dDay').close();openBl(id);return}
+  if(t.closest('#dayAdd')){$('#dDay').close();openEv(null,dayDialogDate);return}
+  const bid=t.closest('[data-bid]'); if(bid){const day=bid.closest('.day');if(day){openDay(day.dataset.date);return}if($('#dDay').open)return;openBl(bid.dataset.bid);return}
   const sbk=t.closest('[data-study]'); if(sbk){
     const k=sbk.dataset.study;
     if(st.sd[k])delete st.sd[k];else st.sd[k]=1;
     save();render();return;
   }
-  const id=t.closest('[data-id]'); if(id){openEv(id.dataset.id);return}
-  const dy=t.closest('.day'); if(dy){openEv(null,dy.dataset.date)}
+  const id=t.closest('[data-id]'); if(id){const day=id.closest('.day');if(day){openDay(day.dataset.date);return}openEv(id.dataset.id);return}
+  const dy=t.closest('.day'); if(dy){openDay(dy.dataset.date)}
 });
 document.addEventListener('change',e=>{
   const t=e.target;

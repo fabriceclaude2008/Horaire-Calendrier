@@ -6,9 +6,9 @@ L'application tient dans un seul fichier, `index.html`. Il n'y a rien à install
 
 ## Fonctionnalités
 
-- **Calendrier mensuel** : numéros de semaine de session (S1 à S16), semaine de relâche, ajout et modification d'un examen ou d'un devoir en un clic.
+- **Calendrier mensuel** : numéros de semaine de session (S1 à S16), semaine de relâche, cours récurrents, détails d’une journée, ajout et modification d'un examen ou d'un devoir.
 - **À faire** : liste triée par date, cases à cocher, modification directe des dates, filtres par cours et par période, éléments en retard en rouge.
-- **Horaire** : grille du lundi au vendredi, cours modifiables.
+- **Horaire** : grille du lundi au vendredi, navigation entre les semaines et cours modifiables.
 - **Notes et cote R** : saisie des notes, de la moyenne et de l'écart type du groupe pour estimer la cote R par cours et globale, avec indicateurs et explications.
 - **Documents de cours** : dépôt privé de plans de cours, calendriers et autres fichiers pour les utilisateurs connectés.
 - **Compte à rebours** jusqu'au prochain examen.
@@ -96,7 +96,7 @@ using (
 );
 ```
 
-Le dépôt stocke les fichiers de façon privée. Après l’envoi, les calendriers `.ics`, PDF, Word `.docx`, photos JPG/PNG et pages numérisées de PDF sont analysés dans le navigateur; l’OCR français (Tesseract.js) sert à lire les images. Les examens et devoirs datés repérés sont ajoutés au calendrier. Les anciens fichiers `.doc` sont conservés, mais pas analysés automatiquement. Vérifie les dates, car l’OCR peut confondre des caractères ou échéances.
+Le dépôt stocke les fichiers de façon privée. Après l’envoi, les calendriers `.ics`, PDF, Word `.docx` et images JPG/PNG/WebP sont analysés dans le navigateur. L’OCR français lit les images et les pages PDF numérisées; les évaluations datées et celles indiquées par semaine dans un plan de cours sont ajoutées au calendrier. Les lignes d’horaire où un jour et une plage horaire sont lisibles peuvent aussi créer des cours récurrents. Le `.doc` ancien est conservé, mais n’est pas analysé. Les dates calculées depuis une semaine sont marquées « à confirmer » et les cours importés doivent être vérifiés.
 
 ## Structure du projet
 

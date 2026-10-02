@@ -286,8 +286,8 @@ function norm(s){
   }
   s.p=Object.assign(SEED_P(),s.p||{});s.sd=s.sd||{};return s;
 }
-const SUPABASE_URL='COLLE_TON_URL_SUPABASE_ICI';
-const SUPABASE_ANON_KEY='COLLE_TA_CLE_ANON_SUPABASE_ICI';
+const SUPABASE_URL='https://nizoozaydlsibwlwzgys.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5pem9vemF5ZGxzaWJ3bHd6Z3lzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA5MDY5NTgsImV4cCI6MjEwNjQ4Mjk1OH0.eNcVhjYCJuT76ywLlv7t2cde7HTmY1W7i25eA337S48';
 const supabaseConfigured=!SUPABASE_URL.includes('COLLE_')&&!SUPABASE_ANON_KEY.includes('COLLE_');
 const sb=supabaseConfigured?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
 let currentUser=null, cloudSaveTimer=null;

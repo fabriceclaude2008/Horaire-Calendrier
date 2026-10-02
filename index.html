@@ -299,7 +299,7 @@ const sb=supabaseConfigured?window.supabase.createClient(SUPABASE_URL,SUPABASE_A
 let currentUser=null, cloudSaveTimer=null;
 let st=load(), view='cal', cur=new Date(); cur.setDate(1);
 const mondayOf=d=>new Date(d.getFullYear(),d.getMonth(),d.getDate()-((d.getDay()+6)%7));
-let schedMonday=mondayOf(new Date()),dayDialogDate=todayS();
+let schedMonday=mondayOf(new Date()),dayDialogDate='';
 let tt;function toast(m){const t=document.querySelector('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),1800)}
 let fCourse='', fPer='up';
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.ev&&s.bl)return norm(s)}catch(e){}return fresh()}
@@ -370,6 +370,7 @@ const $=s=>document.querySelector(s), p2=n=>String(n).padStart(2,'0');
 const iso=d=>`${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`;
 const parse=s=>{const[a,b,c]=s.split('-');return new Date(+a,b-1,+c)};
 const todayS=()=>iso(new Date());
+dayDialogDate=todayS();
 const diff=s=>Math.round((parse(s)-parse(todayS()))/864e5);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>'x'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);

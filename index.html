@@ -142,6 +142,24 @@ nav .th select{width:auto;margin:0;padding:6px 8px;border:1px solid var(--line);
 .bar select{padding:6px 8px;border:1px solid var(--line);border-radius:8px}
 @media(max-width:640px){main{padding:10px}.hero .r{text-align:left}.day{min-height:70px}.chip{font-size:10.5px;padding:1px 3px}}
 @media(prefers-reduced-motion:no-preference){.hero .big{animation:pop .5s ease-out}@keyframes pop{from{opacity:0;transform:translateY(8px)}}}
+.noteIntro{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(220px,.8fr);gap:18px;align-items:center;background:linear-gradient(120deg,color-mix(in srgb,var(--acc) 9%,var(--sf)),var(--sf));border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px}
+.noteIntro h2{font-size:24px;margin:0 0 5px;letter-spacing:-.03em}
+.noteIntro p{margin:0;color:var(--mute)}
+.noteGuide{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.noteGuide div{background:var(--sf);border:1px solid var(--line);border-radius:10px;padding:10px}
+.noteGuide b{display:block;font-size:13px}.noteGuide span{font-size:12px;color:var(--mute)}
+.precBar{height:7px;background:var(--bg);border-radius:9px;overflow:hidden;margin-top:7px}
+.precBar i{display:block;height:100%;background:var(--acc);border-radius:inherit}
+.noteIntro+.card{border-color:color-mix(in srgb,var(--acc) 24%,var(--line))}
+.dropbox{border:2px dashed var(--line);border-radius:14px;padding:26px;text-align:center;background:color-mix(in srgb,var(--acc) 4%,var(--sf));transition:.18s}
+.dropbox.over{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 10%,var(--sf))}
+.dropbox strong{display:block;font-size:17px;margin-bottom:4px}
+.dropbox p{color:var(--mute);margin:4px 0 12px}
+.docRow{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid var(--line)}
+.docIcon{width:38px;height:42px;border-radius:9px;background:var(--bg);display:grid;place-items:center;font-size:11px;font-weight:800;color:var(--acc);flex:none}
+.docMeta{flex:1;min-width:0}.docMeta b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.docMeta small{color:var(--mute)}
+@media(max-width:640px){.noteIntro{grid-template-columns:1fr}.noteGuide{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -154,6 +172,7 @@ nav .th select{width:auto;margin:0;padding:6px 8px;border:1px solid var(--line);
     <button class="tab" role="tab" data-v="sched">Horaire</button>
     <button class="tab" role="tab" data-v="notes">Notes et cote R</button>
     <button class="tab" role="tab" data-v="study">Étude</button>
+    <button class="tab" role="tab" data-v="docs">Documents</button>
     <span class="sp"></span>
     <label class="th">Thème<select id="themeSel"></select></label>
     <button class="btn pri" id="add">Ajouter un examen ou devoir</button>
@@ -226,25 +245,7 @@ const PAL=['#2563eb','#9333ea','#059669','#d97706','#0891b2','#db2777','#65a30d'
 const TY={exam:'Examen',devoir:'Devoir',labo:'Laboratoire',test:'Test en ligne',autre:'Autre'};
 const DJ=['Lundi','Mardi','Mercredi','Jeudi','Vendredi'];
 const E=(title,course,type,date,notes='',approx=false)=>({title,course,type,date,notes,approx,time:'',done:false});
-const SEED_EV=()=>[
- E('Examen 1','alg','exam','2026-09-24','25 %'),
- E('Laboratoire Excel','alg','labo','2026-10-26','6 % – local A-2153'),
- E('Examen 2','alg','exam','2026-11-12','25 %'),
- E('Minitest historique','alg','test','2026-12-03','3 %'),
- E('Examen 3 – synthèse','alg','exam','2026-12-18','35 % – entre le 18 et le 22 décembre',true),
- E('Examen 1','philo','exam','2026-10-05','20 % – semaine 7 (cours B)',true),
- E('Examen 2','philo','exam','2026-11-16','30 % – semaine 13 (cours A)',true),
- E('Texte argumentatif final','philo','exam','2026-12-08','25 % – en classe'),
- E('Examen 1','eco','exam','2026-09-22','25 % – semaine 5',true),
- E('Test Moodle 1','eco','test','2026-09-08','5 % – semaine 3',true),
- E('Résumé vidéo','eco','devoir','2026-10-12','5 % – semaine 8',true),
- E('Test Moodle 2','eco','test','2026-10-12','5 % – semaine 8',true),
- E('Examen 2','eco','exam','2026-10-27','25 % – semaine 10',true),
- E('Test Moodle 3','eco','test','2026-11-17','5 % – semaine 13',true),
- E('Examen 3 – synthèse','eco','exam','2026-12-01','30 % – semaine 15',true),
- E('Date limite de désinscription','eco','devoir','2026-09-18'),
- E("Date limite d'abandon",'eco','devoir','2026-11-03')
-].map((e,i)=>({...e,id:'e'+i}));
+const SEED_EV=()=>[];
 const B=(day,start,end,title,course,room='')=>({day,start,end,title,course,room});
 const SEED_BL=()=>[
  B(1,'10:00','11:50','Philosophie et rationalité','philo','A-2132'),
@@ -277,14 +278,14 @@ const SEED_CO=()=>[
 ];
 const SEED_P=()=>({dm:'',ds:'',rho:'',ifgz:'',idgz:'',obj:'',tgt:'',smax:'3',sh:'14'});
 const fixBl=bl=>{const T=[['Écriture','ecr'],['gestion','gest'],['Méthodes','meth'],['Activités','ash'],['Multisports','eps'],['Vie étudiante','vie']];bl.forEach(b=>{if(b.course==='autre'){const m=T.find(x=>b.title.includes(x[0]));if(m)b.course=m[1]}});return bl};
-const fresh=()=>({ev:SEED_EV(),bl:fixBl(SEED_BL()),co:SEED_CO(),p:SEED_P(),sd:{}});
+const fresh=()=>({ev:[],bl:fixBl(SEED_BL()),co:SEED_CO(),p:SEED_P(),sd:{}});
 function norm(s){
   if(!s.co){
     const co=SEED_CO(),M={g1:'alg',g2:'philo',g3:'eco'},old=(s.gr&&s.gr.p)||{};
     ((s.gr&&s.gr.c)||[]).forEach(c=>{const t=co.find(x=>x.id===M[c.id]);if(t)Object.assign(t,{units:c.units,ifgz:c.ifgz,idgz:c.idgz,fm:c.fm,fs:c.fs,ev:c.ev});else co.push({...c,color:'#6b7280'})});
     s.co=co;fixBl(s.bl);s.p={rho:old.rho&&old.rho!=='0.7'?old.rho:''};delete s.gr;
   }
-  s.p=Object.assign(SEED_P(),s.p||{});s.sd=s.sd||{};return s;
+  s.ev=(s.ev||[]).filter(e=>!/^e\d+$/.test(e.id));s.p=Object.assign(SEED_P(),s.p||{});s.sd=s.sd||{};return s;
 }
 const SUPABASE_URL='https://nizoozaydlsibwlwzgys.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5pem9vemF5ZGxzaWJ3bHd6Z3lzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA5MDY5NTgsImV4cCI6MjEwNjQ4Mjk1OH0.eNcVhjYCJuT76ywLlv7t2cde7HTmY1W7i25eA337S48';
@@ -469,7 +470,7 @@ function agg(){
 }
 function notesView(){
   const P=st.p,inp=(a,v,x='')=>`<input ${a} value="${esc(v)}" inputmode="decimal" ${x}>`;
-  let h=`<div class="card"><div class="bar"><h2>Notes et cote R</h2><button class="btn pri" id="addCo">Ajouter un cours</button></div><div id="dash"></div></div>
+  let h=`<section class="noteIntro"><div><h2>Ta progression, en un coup d’œil</h2><p>Compare tes résultats aux moyennes du groupe, repère l’effet des évaluations restantes et suis une estimation de ta cote R. Les résultats restent des estimations tant que les données officielles du groupe ne sont pas disponibles.</p></div><div class="noteGuide"><div><b>Note actuelle</b><span>Selon les évaluations saisies et leur pondération.</span></div><div><b>Cote Z</b><span>Écart à la moyenne, mesuré en écarts types.</span></div><div><b>Précision</b><span>Indique la quantité d’informations renseignées.</span></div></div></section><div class="card"><div class="bar"><h2>Notes et cote R</h2><button class="btn pri" id="addCo">Ajouter un cours</button></div><div id="dash"></div><p class="hint">Une cote R officielle est calculée par le ministère après la session. Cette estimation utilise tes notes, les moyennes et les écarts types entrés ici. Le percentile est indicatif et n’est pas un rang officiel.</p></div>
   <div class="card"><h2 style="margin:0 0 4px;font-size:17px">Paramètres de l'estimation</h2><p class="hint">Entre au moins ta note : sans moyenne ni écart type du groupe, l'app utilise les valeurs par défaut ci-dessous. Plus tu ajoutes d'information réelle (moyenne, écart type, IFGZ, IDGZ), plus l'estimation est précise. Formule : R = (Z × IDGZ + IFGZ + 5) × 5.</p><div class="par">${[['dm','Moyenne du groupe par défaut %',75],['ds','Écart type par défaut',12],['rho','Corrélation entre évaluations (0 à 1)',0.7],['ifgz','IFGZ (facultatif)',0],['idgz','IDGZ (facultatif)',1],['obj','Objectif de cote R',30],['tgt','Objectif de note finale %',85]].map(([k,l,d])=>`<label>${l}${inp('data-p="'+k+'"',P[k],'placeholder="'+d+'"')}</label>`).join('')}</div></div>`;
   st.co.filter(c=>c.id!=='autre').forEach(c=>{
     h+=`<div class="card co" data-co="${c.id}" data-c="${c.id}"><div class="bar"><input type="color" data-f="color" value="${esc(c.color)}" aria-label="Couleur du cours"><input class="nm" data-f="name" value="${esc(c.name)}" aria-label="Nom du cours"><label class="u">Unités (ex. 3-1-3)<input data-f="units" value="${esc(c.units)}"></label><button class="btn del" data-delco>Supprimer</button></div>
@@ -497,7 +498,7 @@ function results(){
   const G=agg(),dash=document.querySelector('#dash');
   if(!G){dash.innerHTML=`<div class="rg"><div><span>Entre ta note dans au moins un cours (avec ses unités) pour voir ta cote R globale estimée.</span></div></div>`;return}
   const lb=G.prec<35?'faible':G.prec<70?'moyenne':'bonne',d=G.R-obj,srt=[...G.rows].sort((a,b)=>b.r.R-a.r.R);
-  dash.innerHTML=`<div class="rg"><div><b>${f1(G.R)}</b><span>Cote R globale estimée${G.hi-G.lo>.1?` (${f1(G.lo)} à ${f1(G.hi)})`:''}</span></div><div><b>${f1(G.note)} %</b><span>Moyenne pondérée</span></div><div><b>${f1(pctl((G.R-25)/5),0)} %</b><span>Percentile estimé</span></div><div><b>${G.prec} %</b><span>Précision (${lb})</span></div><div><b>${d>=0?'+':''}${f1(d)}</b><span>Écart avec l'objectif de ${f1(obj,0)}</span></div></div>
+  dash.innerHTML=`<div class="rg"><div><b>${f1(G.R)}</b><span>Cote R globale estimée${G.hi-G.lo>.1?` (${f1(G.lo)} à ${f1(G.hi)})`:''}</span></div><div><b>${f1(G.note)} %</b><span>Moyenne pondérée</span></div><div><b>${f1(pctl((G.R-25)/5),0)} %</b><span>Percentile estimé</span></div><div><b>${G.prec} %</b><span>Précision (${lb})<span class="precBar"><i style="width:${G.prec}%"></i></span></span></div><div><b>${d>=0?'+':''}${f1(d)}</b><span>${d>=0?'Au-dessus':'Sous'} de l’objectif (${f1(obj,0)})</span></div></div>
   ${srt.length>1?`<p class="hint">Meilleur cours : ${esc(srt[0].c.name)} (R ${f1(srt[0].r.R)}). À améliorer en priorité : ${esc(srt[srt.length-1].c.name)} (R ${f1(srt[srt.length-1].r.R)}). ${srt.length} cours inclus, pondérés par leurs unités.</p>`:''}
   <h3 class="ct">Cote R estimée par cours</h3><div class="ch">${srt.map(x=>bar(x.c.id,x.c.name,(x.r.R-10)/30*100,f1(x.r.R),(obj-10)/30*100)).join('')}</div><p class="hint">Trait vertical : ton objectif de cote R. Échelle de 10 à 40.</p>
   <h3 class="ct">Ma note et moyenne du groupe</h3><div class="ch">${G.rows.map(x=>pair(x.c.id,x.c.name,x.r.note,x.r.mean)).join('')}</div>
@@ -547,11 +548,72 @@ function studyView(){
   return h+'</div>';
 }
 
+const DOC_BUCKET='documents-etudiants';
+const DOC_TYPES={pdf:'application/pdf',doc:'application/msword',docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',ics:'text/calendar',png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg'};
+const DOC_CATEGORIES={plan:'Plan de cours',calendrier:'Calendrier',autre:'Autre document'};
+function documentsView(){
+  if(!currentUser)return `<div class="card"><h2>Documents de cours</h2><p class="hint">Connecte-toi pour déposer et retrouver tes plans de cours, calendriers et autres documents dans ton espace privé.</p><button class="btn pri" id="docsLogin">Se connecter</button></div>`;
+  return `<div class="card"><div class="bar"><h2>Documents de cours</h2></div><p class="hint">Dépose un plan de cours, un calendrier ou un autre document. Tes fichiers restent privés et accessibles avec ton compte.</p><label>Type de document<select id="docCategory"><option value="plan">Plan de cours</option><option value="calendrier">Calendrier</option><option value="autre">Autre document</option></select></label><input id="docFiles" type="file" accept=".pdf,.doc,.docx,.ics,.png,.jpg,.jpeg" multiple hidden><div class="dropbox" id="dropZone" role="button" tabindex="0" aria-label="Choisir ou déposer des documents"><strong>Dépose tes fichiers ici</strong><p>ou choisis-les sur ton appareil · PDF, Word, calendrier .ics ou image · 20 Mo maximum par fichier</p><button class="btn pri" type="button" id="docChoose">Choisir des fichiers</button></div><p id="docStatus" class="hint" role="status"></p><h3 class="ct">Mes documents</h3><div id="docList" class="empty">Chargement…</div><p class="hint">Le dépôt conserve les documents dans ton compte. Les dates et devoirs doivent encore être ajoutés manuellement dans Calendrier.</p></div>`;
+}
+async function refreshDocuments(){
+  if(!sb||!currentUser||view!=='docs')return;
+  const box=$('#docList');if(!box)return;
+  box.textContent='Chargement…';
+  const folders=Object.keys(DOC_CATEGORIES);
+  const results=await Promise.all(folders.map(category=>sb.storage.from(DOC_BUCKET).list(`${currentUser.id}/${category}`,{limit:100,sortBy:{column:'created_at',order:'desc'}})));
+  if(!currentUser||view!=='docs')return;
+  const failed=results.find(x=>x.error);
+  if(failed){console.error(failed.error);box.innerHTML='<p class="hint">Le stockage de documents n’est pas configuré. Réessaie plus tard ou contacte la personne qui gère le site.</p>';return}
+  const files=results.flatMap((res,i)=>res.data.filter(f=>f.name&&!f.name.startsWith('.')).map(f=>({file:f,category:folders[i]}))).sort((a,b)=>(b.file.created_at||'').localeCompare(a.file.created_at||''));
+  if(!files.length){box.innerHTML='<div class="empty">Aucun document pour le moment.</div>';return}
+  box.innerHTML=files.map(({file,category})=>{const label=file.name.replace(/^[^-]+-[^-]+-/,'').replace(/[-_]/g,' '),ext=(file.name.split('.').pop()||'DOC').toUpperCase(),date=file.created_at?new Date(file.created_at).toLocaleDateString('fr-CA'):'';
+    return `<div class="docRow"><div class="docIcon">${esc(ext.slice(0,4))}</div><div class="docMeta"><b title="${esc(label)}">${esc(label)}</b><small>${DOC_CATEGORIES[category]} · ${date}${file.metadata?.size?` · ${(file.metadata.size/1048576).toFixed(1)} Mo`:''}</small></div><button class="btn" type="button" data-doc-download="${esc(category+'/'+file.name)}">Ouvrir</button><button class="btn del" type="button" data-doc-delete="${esc(category+'/'+file.name)}">Supprimer</button></div>`;
+  }).join('');
+}
+async function uploadDocuments(files){
+  if(!currentUser){$('#accountBtn').click();return}
+  const category=$('#docCategory').value,status=$('#docStatus');
+  for(const file of Array.from(files)){
+    const ext=(file.name.split('.').pop()||'').toLowerCase();
+    if(!DOC_TYPES[ext]){status.textContent=`Format non pris en charge : ${file.name}`;continue}
+    if(file.size>20*1024*1024){status.textContent=`${file.name} dépasse la limite de 20 Mo.`;continue}
+    const safe=file.name.normalize('NFKD').replace(/[^a-zA-Z0-9._-]+/g,'-').replace(/-+/g,'-').slice(-100)||'document.'+ext;
+    const path=`${currentUser.id}/${category}/${Date.now()}-${uid()}-${safe}`;
+    status.textContent=`Envoi de ${file.name}…`;
+    const {error}=await sb.storage.from(DOC_BUCKET).upload(path,file,{contentType:DOC_TYPES[ext],upsert:false});
+    if(error){console.error(error);status.textContent=`Échec de l’envoi de ${file.name}. Vérifie la configuration du stockage.`;continue}
+    status.textContent=`${file.name} ajouté.`;
+  }
+  await refreshDocuments();
+}
+async function openDocument(path){
+  const tab=window.open('about:blank','_blank');
+  if(!tab){toast('Autorise les fenêtres contextuelles pour ouvrir le document');return}
+  const {data,error}=await sb.storage.from(DOC_BUCKET).createSignedUrl(`${currentUser.id}/${path}`,60);
+  if(error){tab.close();toast('Impossible d’ouvrir le document');return}
+  tab.location=data.signedUrl;
+}
+async function deleteDocument(path){
+  if(!confirm('Supprimer ce document de ton espace ?'))return;
+  const {error}=await sb.storage.from(DOC_BUCKET).remove([`${currentUser.id}/${path}`]);
+  if(error){toast('Impossible de supprimer le document');return}
+  toast('Document supprimé');refreshDocuments();
+}
 function render(){
   hero();
   document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.v===view));
-  paint();$('#view').innerHTML=view==='cal'?calView():view==='list'?listView():view==='sched'?schedView():view==='study'?studyView():notesView();
+  paint();$('#view').innerHTML=view==='cal'?calView():view==='list'?listView():view==='sched'?schedView():view==='study'?studyView():view==='docs'?documentsView():notesView();
   results();
+  if(view==='docs'&&currentUser)refreshDocuments();
+  if(view==='docs'){
+    const zone=$('#dropZone'),input=$('#docFiles');
+    if(zone){zone.onclick=e=>{if(e.target.closest('button'))return;input.click()};zone.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();input.click()}};zone.ondragover=e=>{e.preventDefault();zone.classList.add('over')};zone.ondragleave=()=>zone.classList.remove('over');zone.ondrop=e=>{e.preventDefault();zone.classList.remove('over');uploadDocuments(e.dataTransfer.files)}}
+    if(input)input.onchange=()=>{uploadDocuments(input.files);input.value=''};
+    $('#docChoose')?.addEventListener('click',e=>{e.stopPropagation();input.click()});
+    $('#docsLogin')?.addEventListener('click',()=>$('#accountBtn').click());
+    document.querySelectorAll('[data-doc-download]').forEach(b=>b.onclick=()=>openDocument(b.dataset.docDownload));
+    document.querySelectorAll('[data-doc-delete]').forEach(b=>b.onclick=()=>deleteDocument(b.dataset.docDelete));
+  }
 }
 
 // Dialogs

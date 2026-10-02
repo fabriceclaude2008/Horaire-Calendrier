@@ -9,7 +9,8 @@ L'application tient dans un seul fichier, `index.html`. Il n'y a rien à install
 - **Calendrier mensuel** : numéros de semaine de session (S1 à S16), semaine de relâche, ajout et modification d'un examen ou d'un devoir en un clic.
 - **À faire** : liste triée par date, cases à cocher, modification directe des dates, filtres par cours et par période, éléments en retard en rouge.
 - **Horaire** : grille du lundi au vendredi, cours modifiables.
-- **Notes et cote R** : saisie des notes, de la moyenne et de l'écart type du groupe pour estimer la cote R par cours et globale.
+- **Notes et cote R** : saisie des notes, de la moyenne et de l'écart type du groupe pour estimer la cote R par cours et globale, avec indicateurs et explications.
+- **Documents de cours** : dépôt privé de plans de cours, calendriers et autres fichiers pour les utilisateurs connectés.
 - **Compte à rebours** jusqu'au prochain examen.
 - **Sauvegarde automatique** dans le navigateur, avec exportation et importation en JSON.
 - Thème clair ou sombre.
@@ -47,6 +48,55 @@ Les données sont enregistrées dans le `localStorage` du navigateur, donc sépa
 2. Sur l'autre appareil, clique sur **Importer** et choisis ce fichier.
 
 Vider les données du navigateur efface l'agenda. Exporte régulièrement une copie de sauvegarde.
+
+## Comptes et dépôt privé de documents
+
+L'authentification et les données de compte utilisent le projet Supabase configuré dans `index.html`. Pour activer le dépôt de documents, ouvre le SQL Editor de ce projet Supabase et exécute une fois :
+
+```sql
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  'documents-etudiants',
+  'documents-etudiants',
+  false,
+  20971520,
+  array[
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'text/calendar',
+    'image/png',
+    'image/jpeg'
+  ]
+)
+on conflict (id) do update set
+  public = false,
+  file_size_limit = excluded.file_size_limit,
+  allowed_mime_types = excluded.allowed_mime_types;
+
+create policy "Chaque étudiant dépose ses propres documents"
+on storage.objects for insert to authenticated
+with check (
+  bucket_id = 'documents-etudiants'
+  and (storage.foldername(name))[1] = auth.uid()::text
+);
+
+create policy "Chaque étudiant consulte ses propres documents"
+on storage.objects for select to authenticated
+using (
+  bucket_id = 'documents-etudiants'
+  and (storage.foldername(name))[1] = auth.uid()::text
+);
+
+create policy "Chaque étudiant supprime ses propres documents"
+on storage.objects for delete to authenticated
+using (
+  bucket_id = 'documents-etudiants'
+  and (storage.foldername(name))[1] = auth.uid()::text
+);
+```
+
+Le dépôt stocke les fichiers de façon privée. Il ne détecte pas encore automatiquement les dates et les devoirs dans un document; ceux-ci doivent être ajoutés dans le calendrier.
 
 ## Structure du projet
 

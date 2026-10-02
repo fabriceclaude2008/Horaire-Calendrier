@@ -41,17 +41,18 @@ nav .sp{flex:1}
 .card{background:var(--sf);border:1px solid var(--line);border-radius:12px;padding:14px}
 .bar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
 .bar h2{margin:0;font-size:22px;font-weight:800;letter-spacing:-.02em;flex:1;min-width:150px;text-transform:capitalize}
+.calWrap{overflow-x:auto}
 .cal{display:grid;grid-template-columns:34px repeat(7,minmax(0,1fr));border-top:1px solid var(--line);border-left:1px solid var(--line);font-size:12px}
 .cal>*{border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
 .cal .h{padding:6px 4px;font-weight:700;color:var(--mute);text-align:center;background:var(--bg)}
 .cal .wk{color:var(--mute);font-size:10px;font-weight:700;padding:4px 2px;text-align:center;background:var(--bg);writing-mode:vertical-rl;transform:rotate(180deg)}
-.day{min-height:92px;padding:3px;cursor:pointer;display:flex;flex-direction:column;gap:2px;min-width:0}
+.day{min-height:144px;padding:6px;cursor:pointer;display:flex;flex-direction:column;gap:4px;min-width:0}
 .day:hover{background:color-mix(in srgb,var(--ink) 4%,var(--sf))}
 .day.out{opacity:.6}
 .day.rel{background:repeating-linear-gradient(135deg,transparent 0 6px,color-mix(in srgb,var(--mute) 12%,transparent) 6px 12px)}
 .day .n{font-weight:700;font-size:12px;padding:1px 4px;align-self:flex-start;border-radius:6px}.classchip{border-left-style:dashed;background:color-mix(in srgb,var(--acc) 8%,var(--sf));font-weight:500}.classMore{font-size:10px;color:var(--mute);padding:0 5px}.dh small{display:block;color:var(--mute);font-size:10px;font-weight:500}.dayItem{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:left;padding:10px 12px;margin:4px 0;border:1px solid var(--line);border-radius:9px;background:var(--sf);color:var(--ink)}.dayItem span{font-size:12px;color:var(--mute);text-align:right}.dayItem b{font-size:14px}
 .day.today .n{background:var(--acc);color:var(--onacc)}
-.chip{display:block;width:100%;text-align:left;border:0;border-left:3px solid var(--c);background:color-mix(in srgb,var(--c) 15%,var(--sf));border-radius:4px;padding:2px 5px;font-size:11.5px;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip{display:block;flex:none;width:100%;text-align:left;border:0;border-left:3px solid var(--c);background:color-mix(in srgb,var(--c) 15%,var(--sf));border-radius:4px;padding:3px 5px;font-size:11.5px;line-height:1.3;overflow-wrap:anywhere;white-space:normal}
 .chip.exam{background:var(--c);color:var(--on);font-weight:700}
 .chip.done{opacity:.45;text-decoration:line-through}
 .grp{margin:18px 0 6px;font-weight:700;display:flex;gap:10px;align-items:baseline}
@@ -141,7 +142,7 @@ input[type=color]{width:44px;height:36px;padding:2px;border:1px solid var(--line
 nav label.th{display:flex;align-items:center;gap:6px;margin:0;font-size:13px;color:var(--mute);font-weight:500}
 nav .th select{width:auto;margin:0;padding:6px 8px;border:1px solid var(--line);border-radius:8px}
 .bar select{padding:6px 8px;border:1px solid var(--line);border-radius:8px}
-@media(max-width:640px){main{padding:10px}.hero{padding:20px;border-radius:16px}.hero .r{text-align:left}.day{min-height:70px}.chip{font-size:10.5px;padding:1px 3px}}
+@media(max-width:640px){main{padding:10px}.hero{padding:20px;border-radius:16px}.hero .r{text-align:left}.day{min-height:116px;padding:4px}.chip{font-size:11px;padding:3px 4px}.cal{min-width:700px}}
 .chartCard{border:1px solid var(--line);border-radius:12px;background:color-mix(in srgb,var(--acc) 3%,var(--sf));padding:12px;margin:10px 0}.chartCard h4{margin:0 0 8px;font-size:14px}.chartScroll{overflow-x:auto}.scoreChart{display:block;width:100%;min-width:360px;height:auto}.scoreChart text{font-family:inherit;fill:var(--mute);font-size:11px}.scoreChart .grid{stroke:var(--line);stroke-width:1}.scoreChart .mine{fill:var(--acc)}.scoreChart .group{fill:color-mix(in srgb,var(--acc) 28%,var(--sf))}.chartLegend{display:flex;gap:16px;color:var(--mute);font-size:12px;margin:6px 0 0}.chartLegend span{display:flex;gap:6px;align-items:center}.chartLegend i{width:10px;height:10px;border-radius:3px;background:var(--acc)}.chartLegend i.groupKey{background:color-mix(in srgb,var(--acc) 28%,var(--sf));border:1px solid color-mix(in srgb,var(--acc) 45%,var(--line))}
 @media(prefers-reduced-motion:no-preference){.hero .big{animation:pop .5s ease-out}@keyframes pop{from{opacity:0;transform:translateY(8px)}}}
 .noteIntro{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(220px,.8fr);gap:18px;align-items:center;background:linear-gradient(120deg,color-mix(in srgb,var(--acc) 9%,var(--sf)),var(--sf));border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px}
@@ -157,7 +158,7 @@ nav .th select{width:auto;margin:0;padding:6px 8px;border:1px solid var(--line);
 .dropbox.over{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 10%,var(--sf))}
 .dropbox strong{display:block;font-size:17px;margin-bottom:4px}
 .dropbox p{color:var(--mute);margin:4px 0 12px}
-.docRow{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid var(--line)}
+.docRow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:12px 4px;border-bottom:1px solid var(--line)}
 .docIcon{width:38px;height:42px;border-radius:9px;background:var(--bg);display:grid;place-items:center;font-size:11px;font-weight:800;color:var(--acc);flex:none}
 .docMeta{flex:1;min-width:0}.docMeta b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .docMeta small{color:var(--mute)}
@@ -392,7 +393,10 @@ function hero(){
 function calView(){
   const y=cur.getFullYear(),m=cur.getMonth(),first=new Date(y,m,1);
   const start=new Date(y,m,1-((first.getDay()+6)%7));
-  let h='<div class="card"><div class="bar"><h2>'+first.toLocaleDateString('fr-CA',{month:'long',year:'numeric'})+'</h2><button class="btn" data-nav="-1" aria-label="Mois précédent">‹</button><button class="btn" data-nav="0">Aujourd’hui</button><button class="btn" data-nav="1" aria-label="Mois suivant">›</button></div><div class="cal"><div class="h"></div>';
+  const sessionEvents=sorted().filter(e=>e.date>=iso(S0)&&e.date<iso(addD(S0,112))),examCount=sessionEvents.filter(e=>e.type==='exam').length,taskCount=sessionEvents.length-examCount;
+  const countLabel=(n,singular,plural)=>n+' '+(n===1?singular:plural);
+  const sessionSummary=sessionEvents.length?countLabel(sessionEvents.length,'événement','événements')+' dans la session · '+countLabel(examCount,'examen','examens')+' · '+countLabel(taskCount,'devoir ou activité','devoirs ou activités'):'Aucun événement dans la session. Dépose ou réanalyse un plan de cours pour remplir le calendrier.';
+  let h='<div class="card"><div class="bar"><h2>'+first.toLocaleDateString('fr-CA',{month:'long',year:'numeric'})+'</h2><button class="btn" data-nav="-1" aria-label="Mois précédent">‹</button><button class="btn" data-nav="0">Aujourd’hui</button><button class="btn" data-nav="1" aria-label="Mois suivant">›</button></div><p class="hint">'+sessionSummary+'</p><div class="calWrap"><div class="cal"><div class="h"></div>';
   ['lun','mar','mer','jeu','ven','sam','dim'].forEach(d=>h+='<div class="h">'+d+'</div>');
   for(let r=0;r<6;r++){
     const ws=new Date(start.getFullYear(),start.getMonth(),start.getDate()+r*7);
@@ -406,7 +410,7 @@ function calView(){
       h+='<div class="day'+(d.getMonth()!==m?' out':'')+(s===todayS()?' today':'')+(isRel&&c<5?' rel':'')+'" data-date="'+s+'"><span class="n">'+d.getDate()+'</span>'+shown+more+evs.map(e=>'<button class="chip'+(e.type==='exam'?' exam':'')+(e.done?' done':'')+'" data-c="'+esc(e.course)+'" data-id="'+esc(e.id)+'" title="'+esc(evTitle(e))+'">'+(e.approx?'~ ':'')+esc(e.title)+'</button>').join('')+'</div>';
     }
   }
-  h+='</div></div><p class="foot">Sélectionne une journée pour voir ses cours et ses évaluations. Les cours de l’horaire hebdomadaire apparaissent aussi ici.</p>';
+  h+='</div></div></div><p class="foot">Sélectionne une journée pour voir ses cours et ses évaluations. Les cours de l’horaire hebdomadaire apparaissent aussi ici.</p>';
   return h;
 }
 function openDay(date){
@@ -609,25 +613,38 @@ function eventKind(text){
   if(/\b(devoir|remise|travail|laboratoire|labo|rapport|projet|dissertation|redaction|lecture|presentation|expose|echeance|date limite)\b/.test(s))return /\b(laboratoire|labo)\b/.test(s)?'labo':'devoir';
   return null;
 }
-function importedEvent(line,date,fileName){
-  const kind=eventKind(line);if(!kind)return null;
+function importedEvent(line,date,fileName,includeGeneric=false){
+  const kind=eventKind(line)||(includeGeneric?'autre':null);if(!kind)return null;
   let title=String(line).replace(/(?:20\d{2}[-/.]\d{1,2}[-/.]\d{1,2}|\d{1,2}[-/.]\d{1,2}[-/.]20\d{2}|\d{1,2}(?:er)?\s+[\p{L}.]+\s*(?:20\d{2})?)/iu,' ')
     .replace(/\b([01]?\d|2[0-3])\s*(?:h|:)\s*[0-5]\d\b/ig,' ').replace(/[•*–—:;|]+/g,' ').replace(/\s+/g,' ').trim();
   if(title.length>80)title=title.slice(0,77).trim()+'…';
-  if(!title)title=kind==='exam'?'Examen':'Devoir';
+  if(!title)title=includeGeneric?'Événement importé':kind==='exam'?'Examen':'Devoir';
+  if(includeGeneric&&foldText(title).length<3)return null;
   const lineText=foldText(line),course=(st.co||[]).find(c=>c.id!=='autre'&&foldText(c.name).length>2&&lineText.includes(foldText(c.name)));
   return {id:uid(),title:title,course:course?.id||'autre',type:kind,date:date.date,time:date.time||'',notes:'Ajouté depuis '+fileName,approx:false,done:false};
 }
-function textEvents(text,fileName){
-  const out=[],seen=new Set(),lines=String(text||'').replace(/\u00a0/g,' ').split(/\r?\n/).map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean);
+function calendarGridContext(text){
+  const folded=foldText(text),keys=Object.keys(months).sort((a,b)=>b.length-a.length),m=folded.match(new RegExp('\\b('+keys.join('|')+')\\b\\s*(20\\d{2})?'));
+  if(!m)return null;
+  const weekdays=folded.match(/\b(?:lun(?:di)?|mar(?:di)?|mer(?:credi)?|jeu(?:di)?|ven(?:dredi)?|sam(?:edi)?|dim(?:anche)?)\b/g)||[];
+  if(new Set(weekdays).size<3)return null;
+  return {month:months[m[1]],year:+(m[2]||S0.getFullYear())};
+}
+function textEvents(text,fileName,includeGeneric=false,looseCalendar=false){
+  const out=[],seen=new Set(),monthContext=looseCalendar?calendarGridContext(text):null,lines=String(text||'').replace(/\u00a0/g,' ').split(/\r?\n/).map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean);
   for(let i=0;i<lines.length;i++){
     const chunks=[lines[i]];
     if(i+1<lines.length)chunks.push(lines[i]+' '+lines[i+1]);
     if(i>0)chunks.push(lines[i-1]+' '+lines[i]);
     for(const clean of chunks){
       if(clean.length>500)continue;
-      const dt=findDateAndTime(clean);if(!dt)continue;
-      const ev=importedEvent(clean,dt,fileName);if(!ev)continue;
+      let dt=findDateAndTime(clean),eventLine=clean;
+      if(!dt&&monthContext){
+        const day=clean.match(/^\s*(?:[•*·]\s*)?(\d{1,2})(?:er)?(?:[.)–—:-]\s*|\s+)(.+)$/);
+        if(day&&+day[1]>=1&&+day[1]<=31){dt=makeEventDate(monthContext.year,monthContext.month,+day[1]);eventLine=day[2].trim()}
+      }
+      if(!dt)continue;
+      const ev=importedEvent(eventLine,dt,fileName,includeGeneric||!!monthContext);if(!ev)continue;
       const key=foldText(ev.title)+'|'+ev.date;
       if(!seen.has(key)){seen.add(key);out.push(ev)}
     }
@@ -653,27 +670,50 @@ function identifyDocumentCourse(text){
   return course;
 }
 function coursePlanEvents(text,fileName,courseId){
-  const raw=String(text||''),start=raw.search(/Calendrier des activités/i);
+  const raw=String(text||'').replace(/\u00a0/g,' ').replace(/\r/g,'');
+  const start=raw.search(/Calendrier\s+des\s+activit(?:é|e)s/i);
   if(start<0)return [];
-  const endMatch=raw.slice(start).search(/Évaluation formative/i),section=raw.slice(start,endMatch<0?undefined:start+endMatch);
-  const marks=[...section.matchAll(/(?:^|\n)\s*(1[0-6]|[1-9])\s+(?=(?:Cours\s+[AB]\b|Cours levés\b|Semaine de lecture\b))/gim)];
+  const rest=raw.slice(start),endMatch=rest.search(/[ÉE]valuation formative/i),section=rest.slice(0,endMatch<0?undefined:endMatch);
+  const marks=[...section.matchAll(/(?:^|\n)\s*(1[0-6]|[1-9])\s+(?:[.•●▪◦·*–—:-]\s*)?(?=(?:Cours\s+[AB]\b|Cours levés\b|Semaine de lecture\b))/gim)];
   if(!marks.length)return [];
   const out=[],seen=new Set();
+  const capitalize=s=>s?s.charAt(0).toLocaleUpperCase('fr-CA')+s.slice(1):s;
   for(let i=0;i<marks.length;i++){
     const week=+marks[i][1],begin=marks[i].index+marks[i][0].lastIndexOf(marks[i][1])+marks[i][1].length;
-    const stop=i+1<marks.length?marks[i+1].index:section.length,block=section.slice(begin,stop);
-    const items=[];
-    for(const m of block.matchAll(/\bExamen\s*(\d+)\b/gi))items.push({key:'exam-'+m[1],title:'Examen '+m[1],type:'exam'});
-    for(const m of block.matchAll(/\bTravail\s+court\s*(\d+)\b/gi))items.push({key:'travail-'+m[1],title:'Travail court '+m[1],type:'devoir'});
-    for(const m of block.matchAll(/\b(?:remise\s+du\s+)?journal\s+de\s+lecture\s*(\d+)\b/gi))items.push({key:'journal-'+m[1],title:'Remise du journal de lecture '+m[1],type:'devoir'});
-    if(/\btexte argumentatif\b|\brédaction\b/i.test(block))items.push({key:'texte-argumentatif',title:'Rédaction du texte argumentatif',type:'devoir'});
-    const explicit=findDateAndTime(block);
-    for(const item of items){
-      const key=item.key+'|'+(explicit?explicit.date:week);
-      if(seen.has(key))continue;seen.add(key);
-      const date=explicit||makeEventDate(S0.getFullYear(),S0.getMonth(),S0.getDate()+(week-1)*7);
+    const stop=i+1<marks.length?marks[i+1].index:section.length,block=section.slice(begin,stop),items=new Map();
+    const addItem=(title,type,at)=>{
+      title=String(title||'').replace(/\s+/g,' ').trim();
+      if(!title)return;
+      const key=type+'|'+foldText(title);
+      if(!items.has(key))items.set(key,{key,title,type,at:Math.max(0,at||0)});
+    };
+    for(const m of block.matchAll(/\bExamen\s*(\d+)\b/gi))addItem('Examen '+m[1],'exam',m.index);
+    for(const m of block.matchAll(/\bTravail\s+court\s*(\d+)\b/gi))addItem('Travail court '+m[1],'devoir',m.index);
+    for(const m of block.matchAll(/\b(?:remise\s+du\s+)?journal\s+de\s+lecture\s*(\d+)\b/gi))addItem('Remise du journal de lecture '+m[1],'devoir',m.index);
+    const redaction=block.match(/\b(?:rédaction(?:\s+du\s+texte argumentatif)?|remise\s+(?:du\s+)?texte argumentatif)\b/i);
+    const weightedText=block.match(/\btexte argumentatif\b(?=[^.\n]{0,60}\b\d+(?:[.,]\d+)?\s*%)/i);
+    const essay=redaction||weightedText;
+    if(essay&&/\btexte argumentatif\b/i.test(block))addItem('Rédaction du texte argumentatif','devoir',essay.index);
+    else if(essay)addItem(capitalize(essay[0]),'devoir',essay.index);
+    const generic=[
+      {re:/\b(?:examen(?:\s+(?:final|de\s+mi-session))?|intra|quiz|test|évaluation)\s*(?:(?:n[°oº]?)\s*)?\d*\b/gi,type:'exam'},
+      {re:/\b(?:devoir|labo(?:ratoire)?|rapport|projet|dissertation)\s*(?:(?:n[°oº]?)\s*)?\d*\b/gi,type:'devoir'},
+      {re:/\btravail\s+(?:court|pratique|écrit)\s*(?:(?:n[°oº]?)\s*)?\d*\b/gi,type:'devoir'},
+      {re:/\bjournal\s+de\s+lecture\s*\d*\b/gi,type:'devoir'}
+    ];
+    for(const pattern of generic)for(const m of block.matchAll(pattern.re)){
+      let title=capitalize(m[0].replace(/\s+/g,' ').trim());
+      if(/^journal\b/i.test(title)&&!/^(?:remise\s+du\s+)/i.test(title))title='Remise du '+title.toLowerCase();
+      addItem(title,pattern.type,m.index);
+    }
+    for(const item of items.values()){
+      const context=block.slice(Math.max(0,item.at-100),Math.min(block.length,item.at+220));
+      const explicit=findDateAndTime(context),fallback=makeEventDate(S0.getFullYear(),S0.getMonth(),S0.getDate()+(week-1)*7),date=explicit||fallback;
       if(!date)continue;
-      out.push({id:uid(),title:item.title+' (semaine '+week+')',course:courseId||'autre',type:item.type,date:date.date,time:date.time||'',notes:'Repéré dans '+fileName+(explicit?'':' · semaine '+week+' à confirmer'),approx:!explicit,done:false});
+      const key=foldText(item.title)+'|'+date.date+'|'+item.type;
+      if(seen.has(key))continue;
+      seen.add(key);
+      out.push({id:uid(),title:item.title+(explicit?'':' (semaine '+week+')'),course:courseId||'autre',type:item.type,date:date.date,time:date.time||'',notes:'Repéré dans '+fileName+(explicit?'':' · semaine '+week+' à confirmer'),approx:!explicit,done:false});
     }
   }
   return out;
@@ -698,9 +738,9 @@ function parseWeeklyClasses(text,courseId){
   }
   return out;
 }
-function documentEvents(text,fileName,courseId){
-  const planned=coursePlanEvents(text,fileName,courseId);
-  const ordinary=textEvents(text,fileName).filter(e=>!planned.some(p=>!p.approx&&p.date===e.date&&p.type===e.type));
+function documentEvents(text,fileName,courseId,includeGeneric=false,looseCalendar=false){
+  const planned=coursePlanEvents(text,fileName,courseId),cleanTitle=s=>foldText(s).replace(/\s*\(semaine\s+\d+\)$/,'').replace(/\s*\(?\s*\d+(?:[.,]\d+)?\s*%\s*\)?/g,'').trim();
+  const ordinary=textEvents(text,fileName,includeGeneric,looseCalendar).filter(e=>!planned.some(p=>p.date===e.date&&p.type===e.type&&cleanTitle(p.title)===cleanTitle(e.title)));
   return ordinary.concat(planned);
 }
 function icsEvents(text,fileName){
@@ -710,8 +750,10 @@ function icsEvents(text,fileName){
     const summary=prop('SUMMARY'),desc=prop('DESCRIPTION'),start=block.match(/^DTSTART(?:;[^:]*)?:(\d{8})(?:T(\d{6})Z?)?/im);
     if(!start)return null;
     const d=makeEventDate(+start[1].slice(0,4),+start[1].slice(4,6)-1,+start[1].slice(6,8),start[2]?start[2].slice(0,2)+':'+start[2].slice(2,4):'');
-    const ev=d?importedEvent(summary+' '+desc,d,fileName):null;
-    if(ev&&summary)ev.title=summary.slice(0,80);
+    if(!d)return null;
+    const event=importedEvent(summary+' '+desc,d,fileName,true);
+    const ev=event||{id:uid(),title:(summary||'Événement importé').slice(0,80),course:'autre',type:'autre',date:d.date,time:d.time||'',notes:'Ajouté depuis '+fileName,approx:false,done:false};
+    if(summary)ev.title=summary.slice(0,80);
     return ev;
   }).filter(Boolean);
 }
@@ -738,15 +780,15 @@ async function getOcrWorker(status){
 }
 async function releaseOcrWorker(){if(ocrWorker){await ocrWorker.terminate();ocrWorker=null;ocrWorkerPromise=null}}
 async function recognizeImage(source,status){const worker=await getOcrWorker(status),result=await worker.recognize(source);return result.data?.text||''}
-async function extractDocumentText(file,ext,status){
+async function extractDocumentText(file,ext,status,category='plan'){
   if(ext==='ics')return {events:icsEvents(await file.text(),file.name),classes:[],supported:true};
   if(ext==='png'||ext==='jpg'||ext==='jpeg'||ext==='webp'){
     const text=await recognizeImage(file,status),course=identifyDocumentCourse(text);
-    return {events:documentEvents(text,file.name,course?.id),classes:parseWeeklyClasses(text,course?.id),supported:true,ocr:true};
+    return {events:documentEvents(text,file.name,course?.id,true,category==='calendrier'||!!calendarGridContext(text)),classes:parseWeeklyClasses(text,course?.id),supported:true,ocr:true};
   }
   if(ext==='docx'){
     const mammoth=await getMammoth(),result=await mammoth.extractRawText({arrayBuffer:await file.arrayBuffer()}),text=result.value,course=identifyDocumentCourse(text);
-    return {events:documentEvents(text,file.name,course?.id),classes:parseWeeklyClasses(text,course?.id),supported:true};
+    return {events:documentEvents(text,file.name,course?.id,category==='calendrier',category==='calendrier'),classes:parseWeeklyClasses(text,course?.id),supported:true};
   }
   if(ext==='pdf'){
     if(!pdfLoading)pdfLoading=import('https://cdn.jsdelivr.net/npm/pdfjs-dist@6.3.289/build/pdf.mjs');
@@ -758,8 +800,8 @@ async function extractDocumentText(file,ext,status){
       for(const item of content.items){if(!item.str?.trim())continue;const y=Math.round(item.transform?.[5]||0);let row;
         for(let j=rows.length-1;j>=0;j--){if(Math.abs(rows[j].y-y)<=3){row=rows[j];break}}
         if(!row){row={y:y,text:''};rows.push(row)}row.text+=(row.text?' ':'')+item.str.trim()}
-      let pageText=rows.map(r=>r.text).join('\n');
-      if(pageText.replace(/\s/g,'').length<20&&n<=20){
+      let pageText=rows.sort((a,b)=>b.y-a.y).map(r=>r.text).join('\n');
+      if(pageText.replace(/\s/g,'').length<100&&n<=40){
         status.textContent='Lecture de la page '+n+' du PDF…';
         const viewport=page.getViewport({scale:1.5}),canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
         canvas.width=viewport.width;canvas.height=viewport.height;
@@ -769,13 +811,13 @@ async function extractDocumentText(file,ext,status){
       lines.push(pageText);
     }
     const text=lines.join('\n'),course=identifyDocumentCourse(text);
-    return {events:documentEvents(text,file.name,course?.id),classes:parseWeeklyClasses(text,course?.id),supported:true};
+    return {events:documentEvents(text,file.name,course?.id,category==='calendrier',category==='calendrier'),classes:parseWeeklyClasses(text,course?.id),supported:true};
   }
   return {events:[],classes:[],supported:false};
 }
 function documentsView(){
   if(!currentUser)return '<div class="card"><h2>Documents de cours</h2><p class="hint">Connecte-toi pour déposer et retrouver tes plans de cours et calendriers dans ton espace privé.</p><button class="btn pri" id="docsLogin">Se connecter</button></div>';
-  return '<div class="card"><div class="bar"><h2>Documents de cours</h2></div><p class="hint">Dépose un plan de cours ou un calendrier. Les examens et devoirs datés seront ajoutés automatiquement à ton calendrier.</p><label>Type de document<select id="docCategory"><option value="plan">Plan de cours</option><option value="calendrier">Calendrier</option><option value="autre">Autre document</option></select></label><input id="docFiles" type="file" accept=".pdf,.doc,.docx,.ics,.png,.jpg,.jpeg,.webp" multiple hidden><div class="dropbox" id="dropZone" role="button" tabindex="0" aria-label="Choisir ou déposer des documents"><strong>Dépose tes fichiers ici</strong><p>ou choisis-les sur ton appareil · PDF, Word, calendrier .ics ou image · 20 Mo maximum par fichier</p><button class="btn pri" type="button" id="docChoose">Choisir des fichiers</button></div><p id="docStatus" class="hint" role="status"></p><h3 class="ct">Mes documents</h3><div id="docList" class="empty">Chargement…</div><p class="hint">Les photos JPG/PNG/WebP et les pages numérisées des PDF sont lues en français dans ton navigateur. Les évaluations datées, les évaluations indiquées par semaine dans un plan de cours, et les plages hebdomadaires avec jour et heures lisibles peuvent être ajoutées automatiquement. Les fichiers .doc sont conservés, mais ne sont pas analysés. Vérifie les dates signalées « à confirmer » et les cours importés.</p></div>';
+  return '<div class="card"><div class="bar"><h2>Documents de cours</h2></div><p class="hint">Dépose un plan de cours ou un calendrier. Les examens, devoirs et événements datés seront ajoutés automatiquement à ton calendrier; les évaluations indiquées par semaine seront visibles avec une date à confirmer.</p><label>Type de document<select id="docCategory"><option value="plan">Plan de cours</option><option value="calendrier">Calendrier</option><option value="autre">Autre document</option></select></label><input id="docFiles" type="file" accept=".pdf,.doc,.docx,.ics,.png,.jpg,.jpeg,.webp" multiple hidden><div class="dropbox" id="dropZone" role="button" tabindex="0" aria-label="Choisir ou déposer des documents"><strong>Dépose tes fichiers ici</strong><p>ou choisis-les sur ton appareil · PDF, Word, calendrier .ics ou image · 20 Mo maximum par fichier</p><button class="btn pri" type="button" id="docChoose">Choisir des fichiers</button></div><p id="docStatus" class="hint" role="status"></p><h3 class="ct">Mes documents</h3><div id="docList" class="empty">Chargement…</div><p class="hint">Les photos JPG/PNG/WebP et les pages numérisées des PDF sont lues en français dans ton navigateur. Les évaluations datées, les évaluations indiquées par semaine dans un plan de cours, et les plages hebdomadaires avec jour et heures lisibles peuvent être ajoutées automatiquement. Les fichiers .doc sont conservés, mais ne sont pas analysés. Les documents déjà déposés peuvent être relus avec « Ré-analyser ». Vérifie les dates signalées « à confirmer » et les cours importés.</p></div>';
 }
 async function refreshDocuments(){
   if(!sb||!currentUser||view!=='docs')return;
@@ -790,45 +832,94 @@ async function refreshDocuments(){
   if(!files.length){box.innerHTML='<div class="empty">Aucun document pour le moment.</div>';return}
   box.innerHTML=files.map(({file,category})=>{
     const label=file.name.replace(/^[^-]+-[^-]+-/,'').replace(/[-_]/g,' '),ext=(file.name.split('.').pop()||'DOC').toUpperCase(),date=file.created_at?new Date(file.created_at).toLocaleDateString('fr-CA'):'';
-    return '<div class="docRow"><div class="docIcon">'+esc(ext.slice(0,4))+'</div><div class="docMeta"><b title="'+esc(label)+'">'+esc(label)+'</b><small>'+DOC_CATEGORIES[category]+' · '+date+(file.metadata?.size?' · '+(file.metadata.size/1048576).toFixed(1)+' Mo':'')+'</small></div><button class="btn" type="button" data-doc-download="'+esc(category+'/'+file.name)+'">Ouvrir</button><button class="btn del" type="button" data-doc-delete="'+esc(category+'/'+file.name)+'">Supprimer</button></div>';
+    const canAnalyze=!!DOC_TYPES[ext.toLowerCase()]&&ext.toLowerCase()!=='doc';
+    return '<div class="docRow"><div class="docIcon">'+esc(ext.slice(0,4))+'</div><div class="docMeta"><b title="'+esc(label)+'">'+esc(label)+'</b><small>'+DOC_CATEGORIES[category]+' · '+date+(file.metadata?.size?' · '+(file.metadata.size/1048576).toFixed(1)+' Mo':'')+'</small></div>'+(canAnalyze?'<button class="btn" type="button" data-doc-analyze="'+esc(category+'/'+file.name)+'">Ré-analyser</button>':'')+'<button class="btn" type="button" data-doc-download="'+esc(category+'/'+file.name)+'">Ouvrir</button><button class="btn del" type="button" data-doc-delete="'+esc(category+'/'+file.name)+'">Supprimer</button></div>';
   }).join('');
+}
+function mergeImportedData(imported,importedClasses,initialCourseCount){
+  const baseTitle=s=>foldText(s).replace(/\s*\(semaine\s+\d+\)\s*$/,'').trim();
+  const wasImported=e=>/^(?:repéré dans|ajouté depuis)\b/i.test(String(e?.notes||''));
+  let added=0,updated=0;
+  for(const ev of imported){
+    const exact=st.ev.find(e=>foldText(e.title)===foldText(ev.title)&&e.date===ev.date);
+    if(exact){
+      if(exact.approx&&!ev.approx&&wasImported(exact)){const id=exact.id,done=exact.done;Object.assign(exact,ev,{id,done});updated++}
+      continue;
+    }
+    const old=st.ev.find(e=>wasImported(e)&&e.approx&&e.course===ev.course&&baseTitle(e.title)===baseTitle(ev.title));
+    if(old){const id=old.id,done=old.done;Object.assign(old,ev,{id,done});updated++}
+    else st.ev.push(ev),added++;
+  }
+  const classKeys=new Set(st.bl.map(b=>b.day+'|'+b.start+'|'+b.end+'|'+b.course)),uniqueClasses=[];
+  for(const b of importedClasses){const key=b.day+'|'+b.start+'|'+b.end+'|'+b.course;if(!classKeys.has(key)){classKeys.add(key);uniqueClasses.push(b)}}
+  const coursesAdded=Math.max(0,st.co.length-initialCourseCount);
+  if(added||updated||uniqueClasses.length||coursesAdded){
+    st.bl.push(...uniqueClasses);
+    save({silent:true});
+    if(view!=='docs')render();
+  }
+  return {recognized:imported.length,added,updated,classesAdded:uniqueClasses.length,coursesAdded};
 }
 async function uploadDocuments(files){
   if(!currentUser){$('#accountBtn').click();return}
   const category=$('#docCategory').value,status=$('#docStatus'),imported=[],importedClasses=[],initialCourseCount=st.co.length,details=[];
-  for(const file of Array.from(files)){
+  for(const file of Array.from(files||[])){
     const ext=(file.name.split('.').pop()||'').toLowerCase();
     if(!DOC_TYPES[ext]){details.push('Format non pris en charge : '+file.name);continue}
     if(file.size>20*1024*1024){details.push(file.name+' dépasse la limite de 20 Mo.');continue}
     const safe=file.name.normalize('NFKD').replace(/[^a-zA-Z0-9._-]+/g,'-').replace(/-+/g,'-').slice(-100)||'document.'+ext;
     const path=currentUser.id+'/'+category+'/'+Date.now()+'-'+uid()+'-'+safe;
-    status.textContent='Envoi de '+file.name+'…';
-    const {error}=await sb.storage.from(DOC_BUCKET).upload(path,file,{contentType:DOC_TYPES[ext],upsert:false});
-    if(error){console.error(error);details.push('Échec de l’envoi de '+file.name+'. Vérifie la configuration du stockage.');continue}
+    if(status)status.textContent='Envoi de '+file.name+'…';
+    let uploadError=null;
+    try{const result=await sb.storage.from(DOC_BUCKET).upload(path,file,{contentType:DOC_TYPES[ext],upsert:false});uploadError=result.error}
+    catch(err){console.error(err);details.push('Échec de l’envoi de '+file.name+'. Réessaie lorsque ta connexion sera stable.');continue}
+    if(uploadError){console.error(uploadError);details.push('Échec de l’envoi de '+file.name+'. Vérifie la configuration du stockage.');continue}
     try{
-      const result=await extractDocumentText(file,ext,status);
+      const result=await extractDocumentText(file,ext,status,category);
       imported.push(...result.events);importedClasses.push(...(result.classes||[]));
       if(!result.supported)details.push(file.name+' est conservé, mais son format n’est pas analysé automatiquement.');
-      else if(!result.events.length&&!(result.classes||[]).length)details.push('Fichier lu, mais aucune date, évaluation ou plage de cours reconnue dans '+file.name+'. Vérifie que le calendrier montre clairement les jours et les heures.');
+      else if(!result.events.length&&!(result.classes||[]).length)details.push('Fichier lu, mais aucune date, évaluation ou plage de cours reconnue dans '+file.name+'. Tu peux réessayer avec « Ré-analyser » après avoir choisi le bon type de document.');
     }catch(err){
       console.error(err);
       details.push(file.name+' est conservé, mais la lecture a échoué ('+(err?.message||'erreur inconnue')+'). Essaie un PDF texte ou une photo plus nette.');
     }
   }
   await releaseOcrWorker();
-  const eventKeys=new Set(st.ev.map(e=>foldText(e.title)+'|'+e.date)),unique=[];
-  imported.forEach(ev=>{const key=foldText(ev.title)+'|'+ev.date;if(!eventKeys.has(key)){eventKeys.add(key);unique.push(ev)}});
-  const classKeys=new Set(st.bl.map(b=>b.day+'|'+b.start+'|'+b.end+'|'+b.course)),uniqueClasses=[];
-  importedClasses.forEach(b=>{const key=b.day+'|'+b.start+'|'+b.end+'|'+b.course;if(!classKeys.has(key)){classKeys.add(key);uniqueClasses.push(b)}});
-  if(unique.length||uniqueClasses.length||st.co.length>initialCourseCount){
-    st.ev.push(...unique);st.bl.push(...uniqueClasses);save({silent:true});render();
-    const added=[];
-    if(unique.length)added.push(unique.length+' évaluation(s)');
-    if(uniqueClasses.length)added.push(uniqueClasses.length+' cours à l’horaire');
-    if(st.co.length>initialCourseCount)added.push((st.co.length-initialCourseCount)+' cours ajouté(s)');
-    toast(added.join(' · ')+' ✓');
+  const merged=mergeImportedData(imported,importedClasses,initialCourseCount),added=[];
+  if(merged.added)added.push(merged.added+' nouvelle(s) évaluation(s)');
+  if(merged.updated)added.push(merged.updated+' date(s) mise(s) à jour');
+  if(merged.classesAdded)added.push(merged.classesAdded+' cours à l’horaire');
+  if(merged.coursesAdded)added.push(merged.coursesAdded+' cours ajouté(s)');
+  if(status){
+    status.textContent='Analyse terminée : '+merged.recognized+' évaluation(s) repérée(s), '+(merged.added+merged.updated)+' ajoutée(s) ou corrigée(s).'+(details.length?' '+details.join(' '):'');
   }
-  if(details.length&&$('#docStatus'))$('#docStatus').textContent=details.join(' ');
+  if(added.length)toast(added.join(' · ')+' ✓');
+  else if(merged.recognized)toast('Les évaluations détectées étaient déjà dans ton agenda.');
+  else if(details.length)toast('Import terminé; consulte les détails.');
+  await refreshDocuments();
+}
+async function reanalyzeDocument(path){
+  if(!currentUser)return;
+  const status=$('#docStatus'),parts=path.split('/'),category=parts.shift(),objectName=parts.join('/'),name=objectName.replace(/^\d+-[^-]+-/,'');
+  const ext=(name.split('.').pop()||'').toLowerCase();
+  if(!DOC_TYPES[ext]||ext==='doc'){if(status)status.textContent='Ce document ne peut pas être analysé automatiquement.';return}
+  try{
+    if(status)status.textContent='Téléchargement de '+name+'…';
+    const {data,error}=await sb.storage.from(DOC_BUCKET).download(currentUser.id+'/'+path);
+    if(error)throw error;
+    const file=new File([data],name,{type:DOC_TYPES[ext]}),initialCourseCount=st.co.length;
+    if(status)status.textContent='Ré-analyse de '+name+'…';
+    const result=await extractDocumentText(file,ext,status,category);
+    await releaseOcrWorker();
+    if(!result.supported){if(status)status.textContent='Ce format ne peut pas être analysé automatiquement.';return}
+    const merged=mergeImportedData(result.events,result.classes||[],initialCourseCount);
+    if(status)status.textContent='Ré-analyse terminée : '+merged.recognized+' évaluation(s) repérée(s), '+(merged.added+merged.updated)+' ajoutée(s) ou corrigée(s).';
+    if(merged.added||merged.updated)toast((merged.added+merged.updated)+' élément(s) ajouté(s) ou corrigé(s) ✓');
+    else toast(merged.recognized?'Les évaluations détectées étaient déjà dans ton agenda.':'Aucune évaluation reconnue dans ce document.');
+  }catch(err){
+    console.error(err);await releaseOcrWorker();
+    if(status)status.textContent='La ré-analyse a échoué ('+(err?.message||'erreur inconnue')+'). Essaie un autre format ou une image plus nette.';
+  }
   await refreshDocuments();
 }
 async function openDocument(path){
@@ -858,6 +949,7 @@ function render(){
     if(input)input.onchange=()=>{uploadDocuments(input.files);input.value=''};
     $('#docChoose')?.addEventListener('click',e=>{e.stopPropagation();input.click()});
     $('#docsLogin')?.addEventListener('click',()=>$('#accountBtn').click());
+    document.querySelectorAll('[data-doc-analyze]').forEach(b=>b.onclick=()=>reanalyzeDocument(b.dataset.docAnalyze));
     document.querySelectorAll('[data-doc-download]').forEach(b=>b.onclick=()=>openDocument(b.dataset.docDownload));
     document.querySelectorAll('[data-doc-delete]').forEach(b=>b.onclick=()=>deleteDocument(b.dataset.docDelete));
   }

@@ -8,9 +8,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
-:root{color-scheme:light;--c:var(--autre);--bg:#eef1f6;--sf:#fff;--ink:#101828;--mute:#5b667a;--line:#d9dfe9;--onc:#fff;--alg:#1f5fbf;--philo:#8a3d9c;--eco:#12805f;--autre:#6b7280;--warn:#b42318}
-@media(prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;--bg:#0c111b;--sf:#151c2a;--ink:#e7ebf3;--mute:#98a3b8;--line:#263046;--onc:#0c111b;--alg:#6aa0ff;--philo:#cf8be0;--eco:#4fcfa3;--autre:#9aa3b2;--warn:#ff8a7a}}
-:root[data-theme=dark]{color-scheme:dark;--bg:#0c111b;--sf:#151c2a;--ink:#e7ebf3;--mute:#98a3b8;--line:#263046;--onc:#0c111b;--alg:#6aa0ff;--philo:#cf8be0;--eco:#4fcfa3;--autre:#9aa3b2;--warn:#ff8a7a}
+:root{--c:#6b7280;--on:#fff;color-scheme:light;--bg:#eef1f6;--sf:#fff;--ink:#101828;--mute:#566179;--line:#d6dce8;--acc:#101828;--onacc:#fff;--warn:#b42318;--onc:#fff}
+[data-theme=sombre]{color-scheme:dark;--bg:#0c111b;--sf:#151c2a;--ink:#e7ebf3;--mute:#9aa6bb;--line:#263046;--acc:#e7ebf3;--onacc:#0c111b;--warn:#ff8a7a;--onc:#1a0a08}
+[data-theme=ocean]{color-scheme:dark;--bg:#071a2b;--sf:#0d2840;--ink:#e6f1fa;--mute:#8fb0c9;--line:#1c4262;--acc:#38bdf8;--onacc:#04202f;--warn:#ff8a7a;--onc:#1a0a08}
+[data-theme=foret]{color-scheme:light;--bg:#e9f1e9;--sf:#fbfffb;--ink:#14291b;--mute:#4b6653;--line:#cadccb;--acc:#1f6b3a;--onacc:#fff;--warn:#b42318;--onc:#fff}
+[data-theme=violet]{color-scheme:dark;--bg:#15101f;--sf:#20182f;--ink:#efe9fb;--mute:#a99cc6;--line:#38294f;--acc:#b794f6;--onacc:#1c1030;--warn:#ff8a7a;--onc:#1a0a08}
+[data-theme=papier]{color-scheme:light;--bg:#f6f1e7;--sf:#fffdf8;--ink:#2a2118;--mute:#6e6154;--line:#e2d9c8;--acc:#b45309;--onacc:#fff;--warn:#b42318;--onc:#fff}
 *{box-sizing:border-box}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.45 "Schibsted Grotesk",system-ui,sans-serif;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
@@ -19,19 +22,19 @@ button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
 select,input,textarea{background:var(--sf);color:var(--ink)}
 select,input[type=date],input[type=time]{min-height:34px}
-:focus-visible{outline:2px solid var(--alg);outline-offset:2px}
-[data-c=alg]{--c:var(--alg)}[data-c=philo]{--c:var(--philo)}[data-c=eco]{--c:var(--eco)}[data-c=autre]{--c:var(--autre)}
-.hero{background:var(--ink);color:var(--bg);border-radius:14px;padding:20px 22px;display:flex;gap:20px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+
+.hero{background:var(--acc);color:var(--onacc);border-radius:14px;padding:20px 22px;display:flex;gap:20px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 .hero .big{font-size:clamp(56px,12vw,96px);font-weight:800;line-height:.9;letter-spacing:-.04em}
 .hero h1{margin:0 0 4px;font-size:clamp(20px,3.4vw,30px);font-weight:800;letter-spacing:-.02em}
 .hero p{margin:0;opacity:.75}
 .hero .r{text-align:right}
 nav{display:flex;gap:6px;margin:16px 0;flex-wrap:wrap;align-items:center}
 nav .tab{border:1px solid var(--line);background:var(--sf);border-radius:999px;padding:7px 16px;font-weight:500}
-nav .tab[aria-selected=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+nav .tab[aria-selected=true]{background:var(--acc);color:var(--onacc);border-color:var(--acc)}
 nav .sp{flex:1}
 .btn{border:1px solid var(--line);background:var(--sf);border-radius:8px;padding:7px 12px;font-weight:500}
-.btn.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.pri{background:var(--acc);color:var(--onacc);border-color:var(--acc)}
 .btn.del{color:var(--warn)}
 .card{background:var(--sf);border:1px solid var(--line);border-radius:12px;padding:14px}
 .bar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
@@ -45,9 +48,9 @@ nav .sp{flex:1}
 .day.out{opacity:.6}
 .day.rel{background:repeating-linear-gradient(135deg,transparent 0 6px,color-mix(in srgb,var(--mute) 12%,transparent) 6px 12px)}
 .day .n{font-weight:700;font-size:12px;padding:1px 4px;align-self:flex-start;border-radius:6px}
-.day.today .n{background:var(--ink);color:var(--bg)}
+.day.today .n{background:var(--acc);color:var(--onacc)}
 .chip{display:block;width:100%;text-align:left;border:0;border-left:3px solid var(--c);background:color-mix(in srgb,var(--c) 15%,var(--sf));border-radius:4px;padding:2px 5px;font-size:11.5px;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.chip.exam{background:var(--c);color:var(--onc);font-weight:700}
+.chip.exam{background:var(--c);color:var(--on);font-weight:700}
 .chip.done{opacity:.45;text-decoration:line-through}
 .grp{margin:18px 0 6px;font-weight:700;display:flex;gap:10px;align-items:baseline}
 .grp small{color:var(--mute);font-weight:500}
@@ -57,14 +60,14 @@ nav .sp{flex:1}
 .it .t{flex:1;min-width:0}
 .it .t b{display:block;cursor:pointer}
 .it .t span{color:var(--mute);font-size:13px}
-.tag{display:inline-block;border:1.5px solid var(--c);color:var(--c);border-radius:6px;padding:0 6px;font-size:12px;font-weight:700;margin-right:4px}
-.tag.exam{background:var(--c);color:var(--onc)}
+.tag{display:inline-block;border:1.5px solid var(--c);color:var(--ink);border-radius:6px;padding:0 6px;font-size:12px;font-weight:700;margin-right:4px}
+.tag.exam{background:var(--c);color:var(--on)}
 .it.done b{text-decoration:line-through;opacity:.5}
 .empty{padding:30px;text-align:center;color:var(--mute)}
 .sw{overflow-x:auto}
 .sched{display:grid;grid-template-columns:44px repeat(5,minmax(110px,1fr));min-width:650px}
 .sched .dh{padding:8px;text-align:center;font-weight:700;border-bottom:1px solid var(--line)}
-.sched .dh.today{color:var(--alg)}
+.sched .dh.today{color:var(--acc)}
 .hrs{position:relative;height:572px}
 .hrs i{position:absolute;right:6px;font-style:normal;font-size:11px;color:var(--mute);transform:translateY(-50%)}
 .col{position:relative;height:572px;border-left:1px solid var(--line);background:repeating-linear-gradient(var(--line) 0 1px,transparent 1px 52px)}
@@ -83,7 +86,7 @@ label.ck input{width:auto;margin:0}
 .acts .l{margin-right:auto}
 .foot{margin:22px 0 8px;color:var(--mute);font-size:13px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .foot .sp{flex:1}
-.rg{display:flex;gap:28px;align-items:flex-end;flex-wrap:wrap;background:var(--ink);color:var(--bg);border-radius:10px;padding:14px 18px;margin-bottom:12px}
+.rg{display:flex;gap:28px;align-items:flex-end;flex-wrap:wrap;background:var(--acc);color:var(--onacc);border-radius:10px;padding:14px 18px;margin-bottom:12px}
 .rg b{display:block;font-size:44px;font-weight:800;line-height:1;letter-spacing:-.03em}
 .rg span{opacity:.8;font-size:13px}
 .par{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
@@ -100,14 +103,38 @@ table.ev{width:100%;border-collapse:collapse;min-width:560px}
 .kp div{border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 .kp b{display:block;font-size:20px}
 .kp span{color:var(--mute);font-size:12px}
-.kp .r{background:var(--ink);color:var(--bg)}
-.kp .r span{color:var(--bg);opacity:.8}
+.kp .r{background:var(--acc);color:var(--onacc)}
+.kp .r span{color:var(--onacc);opacity:.8}
 details{margin:10px 0}
 summary{cursor:pointer;font-weight:500}
 .it .dt{padding:4px 6px;border:1px solid var(--line);border-radius:6px;font-size:13px}
-#toast{position:fixed;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:999px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none}
+#toast{position:fixed;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));background:var(--acc);color:var(--onacc);padding:8px 14px;border-radius:999px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none}
 #toast.on{opacity:1}
 #warn{background:var(--warn);color:var(--onc);padding:10px 14px;border-radius:10px;margin-bottom:12px;font-weight:500}
+.card+.card{margin-top:14px}
+.ct{margin:16px 0 6px;font-size:15px;font-weight:800}
+.ch{display:grid;gap:6px}
+.br{display:grid;grid-template-columns:minmax(90px,30%) 1fr 66px;align-items:center;gap:8px;font-size:13px}
+.br .l{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.br b{text-align:right;font-variant-numeric:tabular-nums}
+.br .tr{position:relative;height:16px;background:var(--bg);border-radius:4px}
+.br .tr.p{height:22px}
+.br i{position:absolute;left:0;top:0;bottom:0;background:var(--c);border-radius:4px}
+.br .tr.p i{bottom:auto;height:10px}
+.br .tr.p i.b{top:12px;opacity:.4}
+.br i.mk{width:2px;top:-3px;bottom:-3px;background:var(--ink);border-radius:0}
+.hint.w{color:var(--warn);font-weight:500}
+input[type=color]{width:44px;height:36px;padding:2px;border:1px solid var(--line);border-radius:8px;flex:none}
+.co[data-c]{border-left:6px solid var(--c)}
+.ev td.z{font-weight:700;white-space:nowrap;padding:0 8px}
+.sd{display:flex;gap:10px;align-items:flex-start;padding:10px 4px;border-bottom:1px solid var(--line)}
+.sd input{width:20px;height:20px;margin-top:2px;accent-color:var(--acc)}
+.sd .tm{font-weight:700;min-width:112px;font-variant-numeric:tabular-nums}
+.sd .tx small{color:var(--mute)}
+.sd.done .tx{text-decoration:line-through;opacity:.5}
+nav label.th{display:flex;align-items:center;gap:6px;margin:0;font-size:13px;color:var(--mute);font-weight:500}
+nav .th select{width:auto;margin:0;padding:6px 8px;border:1px solid var(--line);border-radius:8px}
+.bar select{padding:6px 8px;border:1px solid var(--line);border-radius:8px}
 @media(max-width:640px){main{padding:10px}.hero .r{text-align:left}.day{min-height:70px}.chip{font-size:10.5px;padding:1px 3px}}
 @media(prefers-reduced-motion:no-preference){.hero .big{animation:pop .5s ease-out}@keyframes pop{from{opacity:0;transform:translateY(8px)}}}
 </style>
@@ -121,13 +148,15 @@ summary{cursor:pointer;font-weight:500}
     <button class="tab" role="tab" data-v="list">À faire</button>
     <button class="tab" role="tab" data-v="sched">Horaire</button>
     <button class="tab" role="tab" data-v="notes">Notes et cote R</button>
+    <button class="tab" role="tab" data-v="study">Étude</button>
     <span class="sp"></span>
+    <label class="th">Thème<select id="themeSel"></select></label>
     <button class="btn pri" id="add">Ajouter un examen ou devoir</button>
   </nav>
   <section id="view"></section>
   <div class="foot">
     <span>Données enregistrées dans ce navigateur.</span><span class="sp"></span>
-    <button class="btn" id="theme">Thème</button>
+    
     <button class="btn" id="exp">Exporter</button>
     <button class="btn" id="imp">Importer</button>
     <button class="btn del" id="rst">Réinitialiser</button>
@@ -170,7 +199,8 @@ summary{cursor:pointer;font-weight:500}
 
 <script>
 const KEY='agenda-garneau-a2026-v1', S0=new Date(2026,7,24);
-const CO={alg:'Algèbre linéaire',philo:'Philosophie',eco:'Économie globale',autre:'Autre'};
+const CO=new Proxy({},{get:(_,k)=>((st.co||[]).find(c=>c.id===k)||{}).name||'Autre',ownKeys:()=>st.co.map(c=>c.id),getOwnPropertyDescriptor:()=>({enumerable:true,configurable:true,value:''})});
+const PAL=['#2563eb','#9333ea','#059669','#d97706','#0891b2','#db2777','#65a30d','#dc2626','#64748b','#7c3aed'];
 const TY={exam:'Examen',devoir:'Devoir',labo:'Laboratoire',test:'Test en ligne',autre:'Autre'};
 const DJ=['Lundi','Mardi','Mercredi','Jeudi','Vendredi'];
 const E=(title,course,type,date,notes='',approx=false)=>({title,course,type,date,notes,approx,time:'',done:false});
@@ -210,15 +240,34 @@ const SEED_BL=()=>[
 ].map((b,i)=>({...b,id:'b'+i}));
 
 const EV=(name,w)=>({name,w,grade:'',mean:'',sd:''});
-const SEED_GR=()=>({p:{ifgz:'0',idgz:'1',rho:'0.7'},c:[
- {id:'g1',name:'Algèbre linéaire',units:'2.33',ifgz:'',idgz:'',fm:'',fs:'',ev:[EV('Examen 1',25),EV('Laboratoire Excel',6),EV('Examen 2',25),EV('Minitest historique',3),EV('Examen 3 – synthèse',35)]},
- {id:'g2',name:'Philosophie et rationalité',units:'2.33',ifgz:'',idgz:'',fm:'',fs:'',ev:[EV('Examen 1',20),EV('Examen 2',30),EV('Texte argumentatif final',25),EV('Travaux courts (5)',15),EV('Journaux de lecture (6)',10)]},
- {id:'g3',name:'Initiation à l’économie globale',units:'2.33',ifgz:'',idgz:'',fm:'',fs:'',ev:[EV('Examen 1',25),EV('Résumé vidéo',5),EV('Examen 2',25),EV('Examen 3 – synthèse',30),EV('Tests Moodle (3)',15)]}
-].map(c=>({...c,ev:c.ev.map((e,i)=>({...e,id:c.id+'-'+i}))}))});
+const mkc=(id,name,color,evs=[])=>({id,name,color,units:'2.33',ifgz:'',idgz:'',fm:'',fs:'',ev:(evs.length?evs:[EV('','')]).map((e,i)=>({...e,id:id+'-'+i}))});
+const SEED_CO=()=>[
+ mkc('alg','Algèbre linéaire','#2563eb',[EV('Examen 1',25),EV('Laboratoire Excel',6),EV('Examen 2',25),EV('Minitest historique',3),EV('Examen 3 – synthèse',35)]),
+ mkc('philo','Philosophie et rationalité','#9333ea',[EV('Examen 1',20),EV('Examen 2',30),EV('Texte argumentatif final',25),EV('Travaux courts (5)',15),EV('Journaux de lecture (6)',10)]),
+ mkc('eco','Initiation à l’économie globale','#059669',[EV('Examen 1',25),EV('Résumé vidéo',5),EV('Examen 2',25),EV('Examen 3 – synthèse',30),EV('Tests Moodle (3)',15)]),
+ mkc('ecr','Écriture et littérature','#d97706'),
+ mkc('gest','Introduction à la gestion','#0891b2'),
+ mkc('meth','Méthodes de travail','#db2777'),
+ mkc('ash','Activités sciences humaines','#65a30d'),
+ mkc('eps','Multisports','#dc2626'),
+ mkc('vie','Vie étudiante','#64748b'),
+ {id:'autre',name:'Autre',color:'#6b7280',units:'',ifgz:'',idgz:'',fm:'',fs:'',ev:[]}
+];
+const SEED_P=()=>({dm:'',ds:'',rho:'',ifgz:'',idgz:'',obj:'',tgt:'',smax:'3',sh:'14'});
+const fixBl=bl=>{const T=[['Écriture','ecr'],['gestion','gest'],['Méthodes','meth'],['Activités','ash'],['Multisports','eps'],['Vie étudiante','vie']];bl.forEach(b=>{if(b.course==='autre'){const m=T.find(x=>b.title.includes(x[0]));if(m)b.course=m[1]}});return bl};
+const fresh=()=>({ev:SEED_EV(),bl:fixBl(SEED_BL()),co:SEED_CO(),p:SEED_P(),sd:{}});
+function norm(s){
+  if(!s.co){
+    const co=SEED_CO(),M={g1:'alg',g2:'philo',g3:'eco'},old=(s.gr&&s.gr.p)||{};
+    ((s.gr&&s.gr.c)||[]).forEach(c=>{const t=co.find(x=>x.id===M[c.id]);if(t)Object.assign(t,{units:c.units,ifgz:c.ifgz,idgz:c.idgz,fm:c.fm,fs:c.fs,ev:c.ev});else co.push({...c,color:'#6b7280'})});
+    s.co=co;fixBl(s.bl);s.p={rho:old.rho&&old.rho!=='0.7'?old.rho:''};delete s.gr;
+  }
+  s.p=Object.assign(SEED_P(),s.p||{});s.sd=s.sd||{};return s;
+}
 let st=load(), view='cal', cur=new Date(); cur.setDate(1);
 let tt;function toast(m){const t=document.querySelector('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),1400)}
 let fCourse='', fPer='up';
-function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.ev&&s.bl){s.gr=s.gr||SEED_GR();return s}}catch(e){}return{ev:SEED_EV(),bl:SEED_BL(),gr:SEED_GR()}}
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.ev&&s.bl)return norm(s)}catch(e){}return fresh()}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(st));document.querySelector('#warn').hidden=true;toast('Enregistré ✓');return true}catch(e){document.querySelector('#warn').hidden=false;toast('Non enregistré');return false}}
 const $=s=>document.querySelector(s), p2=n=>String(n).padStart(2,'0');
 const iso=d=>`${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`;
@@ -290,52 +339,118 @@ function schedView(){
 
 const num=v=>{if(v==null||v==='')return null;const n=+String(v).replace(',','.');return isNaN(n)?null:n};
 const f1=(x,d=1)=>x==null||isNaN(x)?'–':x.toFixed(d).replace('.',',');
+const clamp=(x,a,b)=>Math.min(b,Math.max(a,x)), sum=(a,f)=>a.reduce((t,x)=>t+f(x),0);
 const U=v=>{v=String(v||'').trim().replace(',','.');if(v.includes('-')){const a=v.split('-').map(Number);return a.length===3&&a.every(x=>x>=0)?(a[0]+a[1]+a[2])/3:0}return +v||0};
-function calc(c){
-  const ds=c.ev.map(e=>({w:num(e.w),g:num(e.grade),m:num(e.mean),s:num(e.sd)})),
-    ok=ds.filter(e=>e.w>0&&e.g!=null&&e.m!=null&&e.s!=null),
-    ignored=ds.filter(e=>e.g!=null).length-ok.length, W=ok.reduce((a,e)=>a+e.w,0);
-  if(!W)return{n:0,ignored};
-  const P=st.gr.p, rho=Math.min(1,Math.max(0,num(P.rho)??.7)),
-    note=ok.reduce((a,e)=>a+e.w*e.g,0)/W,
-    mean=num(c.fm)??ok.reduce((a,e)=>a+e.w*e.m,0)/W,
-    A=ok.reduce((a,e)=>a+e.w*e.s,0)/W, B2=ok.reduce((a,e)=>a+(e.w*e.s/W)**2,0),
-    sd=num(c.fs)??Math.sqrt((1-rho)*B2+rho*A*A),
-    z=sd>0?(note-mean)/sd:0,
-    R=(z*(num(c.idgz)??num(P.idgz)??1)+(num(c.ifgz)??num(P.ifgz)??0)+5)*5;
-  return{n:ok.length,ignored,W,note,mean,sd,z,R};
+const erf=x=>{const g=x<0?-1:1;x=Math.abs(x);const t=1/(1+.3275911*x),p=((((1.061405429*t-1.453152027)*t+1.421413741)*t-.284496736)*t+.254829592)*t;return g*(1-p*Math.exp(-x*x))};
+const pctl=z=>50*(1+erf(z/Math.SQRT2));
+const lum=h=>{const n=parseInt(String(h).slice(1),16),f=v=>{v/=255;return v<=.03928?v/12.92:((v+.055)/1.055)**2.4};return .2126*f(n>>16)+.7152*f(n>>8&255)+.0722*f(n&255)};
+function paint(){let t=document.querySelector('#cs');if(!t){t=document.createElement('style');t.id='cs';document.head.appendChild(t)}t.textContent=st.co.map(c=>`[data-c="${c.id}"]{--c:${c.color};--on:${lum(c.color)>.2?'#101828':'#fff'}}`).join('')}
+const bar=(c,label,pct,val,m)=>`<div class="br" data-c="${c}"><span class="l">${esc(label)}</span><div class="tr"><i style="width:${clamp(pct,0,100)}%"></i>${m!=null?`<i class="mk" style="left:${clamp(m,0,100)}%"></i>`:''}</div><b>${val}</b></div>`;
+const pair=(c,label,a,b)=>`<div class="br" data-c="${c}"><span class="l">${esc(label)}</span><div class="tr p"><i style="width:${clamp(a,0,100)}%"></i><i class="b" style="width:${clamp(b,0,100)}%"></i></div><b>${f1(a,0)} · ${f1(b,0)}</b></div>`;
+
+function calc(c,dm=0){
+  const P=st.p,dmean=num(P.dm)??75,dsd=num(P.ds)??12,rho=clamp(num(P.rho)??.7,0,1);
+  const ev=c.ev.map(e=>({id:e.id,n:e.name,w:num(e.w),g:num(e.grade),m:num(e.mean),s:num(e.sd)})).filter(e=>e.w>0&&e.g!=null);
+  if(!ev.length)return null;
+  const W=sum(ev,e=>e.w),kM=ev.filter(e=>e.m!=null),kS=ev.filter(e=>e.s!=null);
+  const aM=kM.length?sum(kM,e=>e.w*e.m)/sum(kM,e=>e.w):dmean+dm,aS=kS.length?sum(kS,e=>e.w*e.s)/sum(kS,e=>e.w):dsd;
+  ev.forEach(e=>{e.am=e.m==null;e.as=e.s==null;e.m=e.m??aM;e.s=e.s??aS;e.z=e.s>0?(e.g-e.m)/e.s:0});
+  const note=sum(ev,e=>e.w*e.g)/W,A=sum(ev,e=>e.w*e.s)/W,B2=sum(ev,e=>(e.w*e.s/W)**2);
+  const mean=num(c.fm)??sum(ev,e=>e.w*e.m)/W,sd=num(c.fs)??Math.sqrt((1-rho)*B2+rho*A*A),z=sd>0?(note-mean)/sd:0;
+  const R=(z*(num(c.idgz)??num(P.idgz)??1)+(num(c.ifgz)??num(P.ifgz)??0)+5)*5;
+  return{ev,W,note,mean,sd,z,R,known:ev.filter(e=>!e.am&&!e.as).length/ev.length,est:num(c.fm)==null&&kM.length<ev.length};
+}
+function agg(){
+  const P=st.p,rows=[];
+  st.co.forEach(c=>{if(c.id==='autre')return;const r=calc(c),u=U(c.units);if(r&&u>0)rows.push({c,r,u,lo:calc(c,4).R,hi:calc(c,-4).R})});
+  if(!rows.length)return null;
+  const T=sum(rows,x=>x.u),g=f=>sum(rows,x=>x.u*f(x))/T,has=k=>num(P[k])!=null||rows.every(x=>num(x.c[k])!=null);
+  return{rows,R:g(x=>x.r.R),lo:g(x=>x.lo),hi:g(x=>x.hi),note:g(x=>x.r.note),prec:Math.round(100*(.6*g(x=>x.r.known)+.2*has('ifgz')+.2*has('idgz')))};
 }
 function notesView(){
-  const P=st.gr.p, inp=(a,v,x='')=>`<input ${a} value="${esc(v)}" inputmode="decimal" ${x}>`;
-  let h=`<div class="card"><div class="bar"><h2>Notes et cote R</h2><button class="btn pri" id="addCo">Ajouter un cours</button></div><div class="rg" id="glob"></div>
-  <div class="par"><label>IFGZ (force du groupe)${inp('data-p="ifgz"',P.ifgz)}</label><label>IDGZ (dispersion du groupe)${inp('data-p="idgz"',P.idgz)}</label><label>Corrélation entre évaluations (0 à 1)${inp('data-p="rho"',P.rho)}</label></div>
-  <p class="hint">Formule : R = (Z × IDGZ + IFGZ + 5) × 5, où Z = (ta note − moyenne du groupe) ÷ écart type du groupe. Le Ministère calcule l'IFGZ et l'IDGZ après la session : les valeurs de départ (0 et 1) représentent un groupe moyen, et tu peux les changer. L'écart type de la note finale est estimé à partir de celui de chaque évaluation et de la corrélation choisie. Seules les évaluations avec note, moyenne et écart type comptent. Le résultat reste une estimation.</p></div>`;
-  st.gr.c.forEach(c=>{
-    h+=`<div class="card co" data-co="${c.id}"><div class="bar"><input class="nm" data-f="name" value="${esc(c.name)}" aria-label="Nom du cours"><label class="u">Unités (ex. 3-1-3)<input data-f="units" value="${esc(c.units)}"></label><button class="btn del" data-delco>Supprimer</button></div>
-    <div class="sw"><table class="ev"><thead><tr><th>Évaluation</th><th>Pond. %</th><th>Ma note %</th><th>Moy. groupe %</th><th>Écart type</th><th></th></tr></thead><tbody>`;
-    c.ev.forEach(e=>{h+=`<tr data-ev="${e.id}"><td><input data-e="name" value="${esc(e.name)}" aria-label="Nom"></td>${['w','grade','mean','sd'].map(k=>`<td>${inp('data-e="'+k+'"',e[k])}</td>`).join('')}<td><button class="btn" data-delev aria-label="Supprimer l'évaluation">×</button></td></tr>`});
+  const P=st.p,inp=(a,v,x='')=>`<input ${a} value="${esc(v)}" inputmode="decimal" ${x}>`;
+  let h=`<div class="card"><div class="bar"><h2>Notes et cote R</h2><button class="btn pri" id="addCo">Ajouter un cours</button></div><div id="dash"></div></div>
+  <div class="card"><h2 style="margin:0 0 4px;font-size:17px">Paramètres de l'estimation</h2><p class="hint">Entre au moins ta note : sans moyenne ni écart type du groupe, l'app utilise les valeurs par défaut ci-dessous. Plus tu ajoutes d'information réelle (moyenne, écart type, IFGZ, IDGZ), plus l'estimation est précise. Formule : R = (Z × IDGZ + IFGZ + 5) × 5.</p><div class="par">${[['dm','Moyenne du groupe par défaut %',75],['ds','Écart type par défaut',12],['rho','Corrélation entre évaluations (0 à 1)',0.7],['ifgz','IFGZ (facultatif)',0],['idgz','IDGZ (facultatif)',1],['obj','Objectif de cote R',30],['tgt','Objectif de note finale %',85]].map(([k,l,d])=>`<label>${l}${inp('data-p="'+k+'"',P[k],'placeholder="'+d+'"')}</label>`).join('')}</div></div>`;
+  st.co.filter(c=>c.id!=='autre').forEach(c=>{
+    h+=`<div class="card co" data-co="${c.id}" data-c="${c.id}"><div class="bar"><input type="color" data-f="color" value="${esc(c.color)}" aria-label="Couleur du cours"><input class="nm" data-f="name" value="${esc(c.name)}" aria-label="Nom du cours"><label class="u">Unités (ex. 3-1-3)<input data-f="units" value="${esc(c.units)}"></label><button class="btn del" data-delco>Supprimer</button></div>
+    <div class="sw"><table class="ev"><thead><tr><th>Évaluation</th><th>Pond. %</th><th>Ma note %</th><th>Moy. groupe %</th><th>Écart type</th><th>Z</th><th></th></tr></thead><tbody>`;
+    c.ev.forEach(e=>{h+=`<tr data-ev="${e.id}"><td><input data-e="name" value="${esc(e.name)}" aria-label="Nom"></td><td>${inp('data-e="w"',e.w)}</td><td>${inp('data-e="grade"',e.grade)}</td><td>${inp('data-e="mean"',e.mean,'placeholder="'+f1(num(P.dm)??75,0)+'"')}</td><td>${inp('data-e="sd"',e.sd,'placeholder="'+f1(num(P.ds)??12,0)+'"')}</td><td class="z"></td><td><button class="btn" data-delev aria-label="Supprimer l'évaluation">×</button></td></tr>`});
     h+=`</tbody></table></div><button class="btn" data-addev>Ajouter une évaluation</button>
-    <details><summary>Si tu les connais : valeurs finales et paramètres de ce cours</summary><div class="par"><label>Moyenne finale du groupe %${inp('data-f="fm"',c.fm)}</label><label>Écart type final du groupe${inp('data-f="fs"',c.fs)}</label><label>IFGZ du cours${inp('data-f="ifgz"',c.ifgz)}</label><label>IDGZ du cours${inp('data-f="idgz"',c.idgz)}</label></div></details>
-    <div id="res-${c.id}"></div></div>`;
+    <details><summary>Valeurs officielles du cours (facultatif)</summary><div class="par"><label>Moyenne finale du groupe %${inp('data-f="fm"',c.fm)}</label><label>Écart type final du groupe${inp('data-f="fs"',c.fs)}</label><label>IFGZ du cours${inp('data-f="ifgz"',c.ifgz)}</label><label>IDGZ du cours${inp('data-f="idgz"',c.idgz)}</label></div></details><div id="res-${c.id}"></div></div>`;
   });
   return h;
 }
 function results(){
   if(view!=='notes')return;
-  let sr=0,sn=0,su=0,nc=0;
-  st.gr.c.forEach(c=>{
-    const r=calc(c),u=U(c.units),el=document.querySelector('#res-'+c.id); if(!el)return;
-    const ig=r.ignored?`<p class="hint">${r.ignored} évaluation(s) ignorée(s) : il manque la moyenne ou l'écart type du groupe.</p>`:'';
-    if(!r.n){el.innerHTML=`<p class="hint">Entre au moins une évaluation complète (pondération, note, moyenne et écart type du groupe) pour voir ta cote R.</p>${ig}`;return}
-    el.innerHTML=`<div class="kp"><div><b>${f1(r.note)} %</b><span>Note actuelle</span></div><div><b>${f1(r.mean)} %</b><span>Moyenne du groupe</span></div><div><b>${f1(r.sd)}</b><span>Écart type estimé</span></div><div><b>${f1(r.z,2)}</b><span>Cote Z</span></div><div class="r"><b>${f1(r.R)}</b><span>Cote R estimée</span></div></div><p class="hint">Basé sur ${f1(r.W,0)} % de la note finale (${r.n} évaluation(s)).${u?'':' Entre les unités du cours pour l\'inclure dans la cote R globale.'}</p>${ig}`;
-    if(u>0){sr+=r.R*u;sn+=r.note*u;su+=u;nc++}
+  const P=st.p,obj=num(P.obj)??30,tgt=num(P.tgt)??85;
+  document.querySelectorAll('.z').forEach(z=>z.textContent='');
+  st.co.forEach(c=>{
+    if(c.id==='autre')return;
+    const r=calc(c),el=document.querySelector('#res-'+c.id);if(!el)return;
+    if(!r){el.innerHTML=`<p class="hint">Entre la pondération et ta note d'au moins une évaluation pour voir les estimations de ce cours.</p>`;return}
+    r.ev.forEach(e=>{const tr=document.querySelector(`[data-ev="${e.id}"]`);if(!tr)return;tr.querySelector('.z').textContent=(e.am||e.as?'≈ ':'')+f1(e.z,2);tr.querySelector('[data-e=mean]').placeholder=f1(e.m,0);tr.querySelector('[data-e=sd]').placeholder=f1(e.s,0)});
+    const lo=calc(c,4).R,hi=calc(c,-4).R,rg=hi-lo>.1?` (${f1(lo)} à ${f1(hi)})`:'';
+    const tot=sum(c.ev,e=>num(e.w)||0),left=tot-r.W,need=left>.01?(tgt*tot-r.note*r.W)/left:null;
+    const nt=need==null?`Cours terminé : note finale de ${f1(r.note)} %.`:need>100?`Objectif de ${tgt} % hors d'atteinte (il faudrait ${f1(need,0)} % sur le reste).`:need<=0?`Objectif de ${tgt} % déjà assuré.`:`Il faut ${f1(need)} % en moyenne sur les ${f1(left,0)} % restants pour finir à ${tgt} %.`;
+    el.innerHTML=`<div class="kp"><div><b>${f1(r.note)} %</b><span>Note actuelle</span></div><div><b>${r.est?'≈ ':''}${f1(r.mean)} %</b><span>Moyenne du groupe (auto)</span></div><div><b>${f1(r.sd)}</b><span>Écart type estimé</span></div><div><b>${f1(r.z,2)}</b><span>Cote Z</span></div><div><b>${f1(pctl(r.z),0)} %</b><span>Percentile dans le groupe</span></div><div><b>${Math.round(r.known*100)} %</b><span>Précision</span></div><div class="r"><b>${f1(r.R)}</b><span>Cote R estimée${rg}</span></div></div><p class="hint">${nt}</p><div class="ch">${r.ev.map(e=>pair(c.id,e.n||'Évaluation',e.g,e.m)).join('')}</div><p class="hint">Barre pleine : ta note. Barre pâle : moyenne du groupe.</p>`;
   });
-  document.querySelector('#glob').innerHTML=su?`<div><b>${f1(sr/su)}</b><span>Cote R globale estimée</span></div><div><b>${f1(sn/su)} %</b><span>Moyenne pondérée</span></div><div><span>${nc} cours inclus, pondérés par les unités</span></div>`:`<div><span>La cote R globale apparaît dès qu'un cours a une évaluation complète et des unités.</span></div>`;
+  const G=agg(),dash=document.querySelector('#dash');
+  if(!G){dash.innerHTML=`<div class="rg"><div><span>Entre ta note dans au moins un cours (avec ses unités) pour voir ta cote R globale estimée.</span></div></div>`;return}
+  const lb=G.prec<35?'faible':G.prec<70?'moyenne':'bonne',d=G.R-obj,srt=[...G.rows].sort((a,b)=>b.r.R-a.r.R);
+  dash.innerHTML=`<div class="rg"><div><b>${f1(G.R)}</b><span>Cote R globale estimée${G.hi-G.lo>.1?` (${f1(G.lo)} à ${f1(G.hi)})`:''}</span></div><div><b>${f1(G.note)} %</b><span>Moyenne pondérée</span></div><div><b>${f1(pctl((G.R-25)/5),0)} %</b><span>Percentile estimé</span></div><div><b>${G.prec} %</b><span>Précision (${lb})</span></div><div><b>${d>=0?'+':''}${f1(d)}</b><span>Écart avec l'objectif de ${f1(obj,0)}</span></div></div>
+  ${srt.length>1?`<p class="hint">Meilleur cours : ${esc(srt[0].c.name)} (R ${f1(srt[0].r.R)}). À améliorer en priorité : ${esc(srt[srt.length-1].c.name)} (R ${f1(srt[srt.length-1].r.R)}). ${srt.length} cours inclus, pondérés par leurs unités.</p>`:''}
+  <h3 class="ct">Cote R estimée par cours</h3><div class="ch">${srt.map(x=>bar(x.c.id,x.c.name,(x.r.R-10)/30*100,f1(x.r.R),(obj-10)/30*100)).join('')}</div><p class="hint">Trait vertical : ton objectif de cote R. Échelle de 10 à 40.</p>
+  <h3 class="ct">Ma note et moyenne du groupe</h3><div class="ch">${G.rows.map(x=>pair(x.c.id,x.c.name,x.r.note,x.r.mean)).join('')}</div>
+  <h3 class="ct">Avancement des évaluations</h3><div class="ch">${G.rows.map(x=>{const t=sum(x.c.ev,e=>num(e.w)||0);const v=t?x.r.W/t*100:0;return bar(x.c.id,x.c.name,v,f1(v,0)+' %')}).join('')}</div>`;
 }
+
+const pct=e=>{const m=(e.notes||'').match(/(\d+(?:[.,]\d+)?)\s*%/);return m?+m[1].replace(',','.'):({exam:20,labo:6}[e.type]||5)};
+const LEAD={exam:10,test:3,devoir:5,labo:4,autre:3};
+const TIP={exam:'Révision active : refaire des exercices et d\'anciens examens',test:'Réviser la matière visée',devoir:'Avancer le travail',labo:'Préparer le laboratoire',autre:'Préparation'};
+const hrs=e=>e.type==='exam'?3+pct(e)/6:e.type==='test'?.75+pct(e)/8:e.type==='labo'?1.5+pct(e)/4:1+pct(e)/5;
+const addD=(d,n)=>new Date(d.getFullYear(),d.getMonth(),d.getDate()+n);
+const fh=x=>p2(Math.floor(x))+':'+p2(Math.round(x%1*60));
+function plan(){
+  const P=st.p,perDay=Math.round((+P.smax||3)/1.5),hor=+P.sh||14,now=new Date(),nowH=now.getHours()+now.getMinutes()/60;
+  const items=sorted().filter(e=>!e.done&&diff(e.date)>=1).map(e=>({e,d:diff(e.date),lead:LEAD[e.type]||3,n:Math.max(1,Math.round(hrs(e)/1.5))})).filter(x=>x.d-x.lead<hor);
+  items.forEach(x=>x.r=x.n);
+  const list=[];
+  for(let di=0;di<hor;di++){
+    const day=addD(now,di),dow=(day.getDay()+6)%7+1,busy=st.bl.filter(b=>b.day===dow).map(b=>[tm(b.start)-.25,tm(b.end)+.25]).sort((a,b)=>a[0]-b[0]);
+    const lo=dow>5?9:8,hi=dow>5?17:21,slots=[];let t=di?lo:Math.max(lo,Math.ceil((nowH+.25)*4)/4);
+    for(const[bs,be]of busy.concat([[hi+1,hi+1]])){while(Math.min(bs,hi)-t>=1.5){slots.push(t);t+=1.5}t=Math.max(t,be)}
+    let used=0;
+    for(const sl of slots){
+      if(used>=perDay)break;
+      const c=items.filter(x=>x.r>0&&di<x.d&&di>=x.d-x.lead).sort((a,b)=>b.r/(b.d-di)-a.r/(a.d-di)||pct(b.e)-pct(a.e))[0];
+      if(!c)break;
+      c.r--;used++;list.push({date:iso(day),s:sl,f:sl+1.5,x:c});
+    }
+  }
+  return{list,short:items.filter(x=>x.r>0&&x.d<=hor)};
+}
+function studyView(){
+  const P=st.p,{list,short}=plan(),hours={};
+  list.forEach(l=>{hours[l.x.e.course]=(hours[l.x.e.course]||0)+1.5});
+  const mx=Math.max(1,...Object.values(hours));
+  let h=`<div class="card"><div class="bar"><h2>Périodes d'étude</h2><select data-p="smax" aria-label="Maximum par jour">${[1.5,3,4.5,6].map(v=>`<option value="${v}"${(+P.smax||3)===v?' selected':''}>Max ${String(v).replace('.',',')} h par jour</option>`).join('')}</select><select data-p="sh" aria-label="Période">${[7,14,30].map(v=>`<option value="${v}"${(+P.sh||14)===v?' selected':''}>${v} prochains jours</option>`).join('')}</select></div>`;
+  if(!list.length)return h+'<div class="empty">Aucune évaluation à préparer pour le moment. Ajoute un examen ou un devoir dans le calendrier.</div></div>';
+  h+=`<p class="hint">Séances de 1 h 30 placées dans les plages libres de ton horaire, selon l'importance de chaque évaluation (la pondération en % des notes est utilisée) et sa proximité. Coche une séance quand elle est faite. Total prévu : ${f1(list.length*1.5)} h.</p>`;
+  short.forEach(x=>{h+=`<p class="hint w">Il manque environ ${x.r} séance(s) de 1 h 30 pour « ${esc(x.e.title)} » (${esc(CO[x.e.course])}). Augmente le maximum par jour ou libère des plages.</p>`});
+  h+=`<h3 class="ct">Heures prévues par cours</h3><div class="ch">${Object.entries(hours).sort((a,b)=>b[1]-a[1]).map(([c,v])=>bar(c,CO[c],v/mx*100,f1(v)+' h')).join('')}</div>`;
+  let last='';
+  list.forEach(l=>{
+    if(l.date!==last){last=l.date;h+=`<div class="grp">${fmtD(l.date,{weekday:'long',day:'numeric',month:'long'})}<small>${rel(diff(l.date))}</small></div>`}
+    const k=`${l.date}|${l.s}|${l.x.e.id}`,ev=l.x.e;
+    h+=`<div class="sd${st.sd[k]?' done':''}" data-c="${ev.course}"><input type="checkbox" data-sd="${k}"${st.sd[k]?' checked':''} aria-label="Séance terminée"><span class="tm">${fh(l.s)}–${fh(l.f)}</span><span class="tx"><span class="tag exam">${esc(CO[ev.course])}</span> ${esc(ev.title)} · ${TY[ev.type]}, ${rel(l.x.d)}<br><small>${TIP[ev.type]||'Préparation'}</small></span></div>`;
+  });
+  return h+'</div>';
+}
+
 function render(){
   hero();
   document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.v===view));
-  $('#view').innerHTML=view==='cal'?calView():view==='list'?listView():view==='sched'?schedView():notesView();
+  paint();$('#view').innerHTML=view==='cal'?calView():view==='list'?listView():view==='sched'?schedView():view==='study'?studyView():notesView();
   results();
 }
 
@@ -346,7 +461,7 @@ fEv.course.innerHTML=opts(CO); fEv.type.innerHTML=opts(TY);
 fBl.course.innerHTML=opts(CO); fBl.day.innerHTML=DJ.map((d,i)=>`<option value="${i+1}">${d}</option>`).join('');
 let editId=null, editBl=null;
 function openEv(id,date){
-  editId=id; const e=id&&st.ev.find(x=>x.id===id);
+  editId=id; fEv.course.innerHTML=opts(CO); const e=id&&st.ev.find(x=>x.id===id);
   $('#evT').textContent=e?"Modifier l'élément":'Nouvel élément';
   $('#evDel').hidden=!e;
   fEv.title.value=e?e.title:''; fEv.course.value=e?e.course:(fCourse||'alg'); fEv.type.value=e?e.type:'devoir';
@@ -354,7 +469,7 @@ function openEv(id,date){
   dEv.showModal();
 }
 function openBl(id){
-  editBl=id; const b=id&&st.bl.find(x=>x.id===id);
+  editBl=id; fBl.course.innerHTML=opts(CO); const b=id&&st.bl.find(x=>x.id===id);
   $('#blT').textContent=b?'Modifier le cours':'Nouveau cours';
   $('#blDel').hidden=!b;
   fBl.title.value=b?b.title:''; fBl.course.value=b?b.course:'autre'; fBl.day.value=b?b.day:1;
@@ -383,11 +498,11 @@ document.addEventListener('click',e=>{
   const tab=t.closest('.tab'); if(tab){view=tab.dataset.v;render();return}
   if(t.closest('#add')){openEv(null);return}
   if(t.closest('#addBl')){openBl(null);return}
-  if(t.closest('#addCo')){st.gr.c.push({id:uid(),name:'Nouveau cours',units:'2.33',ifgz:'',idgz:'',fm:'',fs:'',ev:[{id:uid(),name:'',w:'',grade:'',mean:'',sd:''}]});save();render();return}
+  if(t.closest('#addCo')){st.co.push({id:uid(),name:'Nouveau cours',color:PAL[st.co.length%PAL.length],units:'2.33',ifgz:'',idgz:'',fm:'',fs:'',ev:[{id:uid(),name:'',w:'',grade:'',mean:'',sd:''}]});save();render();return}
   const co=t.closest('[data-co]');
   if(co){
-    const c=st.gr.c.find(x=>x.id===co.dataset.co);
-    if(t.closest('[data-delco]')){if(confirm('Supprimer ce cours et ses notes ?')){st.gr.c=st.gr.c.filter(x=>x!==c);save();render()}return}
+    const c=st.co.find(x=>x.id===co.dataset.co);
+    if(t.closest('[data-delco]')){if(confirm('Supprimer ce cours et ses notes ?')){st.co=st.co.filter(x=>x!==c);st.ev.concat(st.bl).forEach(z=>{if(z.course===c.id)z.course='autre'});save();render()}return}
     if(t.closest('[data-addev]')){c.ev.push({id:uid(),name:'',w:'',grade:'',mean:'',sd:''});save();render();return}
     const dv=t.closest('[data-delev]');
     if(dv){c.ev=c.ev.filter(x=>x.id!==dv.closest('[data-ev]').dataset.ev);save();render();return}
@@ -404,28 +519,35 @@ document.addEventListener('change',e=>{
   else if(t.dataset.date){const ev=st.ev.find(x=>x.id===t.dataset.date);if(ev&&t.value){ev.date=t.value;save();render()}}
   else if(t.id==='fPer'){fPer=t.value;render()}
   else if(t.id==='fCo'){fCourse=t.value;render()}
+  else if(t.dataset.sd){if(t.checked)st.sd[t.dataset.sd]=1;else delete st.sd[t.dataset.sd];save();render()}
+  else if(t.dataset.p&&view==='study'){render()}
 });
 document.addEventListener('input',e=>{
   const t=e.target, co=t.closest('[data-co]');
-  if(t.dataset.p){st.gr.p[t.dataset.p]=t.value}
+  if(t.dataset.p){st.p[t.dataset.p]=t.value}
   else if(co){
-    const c=st.gr.c.find(x=>x.id===co.dataset.co), r=t.closest('[data-ev]');
+    const c=st.co.find(x=>x.id===co.dataset.co), r=t.closest('[data-ev]');
     if(r&&t.dataset.e){c.ev.find(x=>x.id===r.dataset.ev)[t.dataset.e]=t.value}
     else if(t.dataset.f){c[t.dataset.f]=t.value}
     else return;
   }else return;
-  save();results();
+  save();paint();results();
 });
 $('#exp').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(st,null,2)],{type:'application/json'}));a.download='agenda-automne-2026.json';a.click();URL.revokeObjectURL(a.href)};
 $('#imp').onclick=()=>$('#file').click();
 $('#file').onchange=async e=>{
   const f=e.target.files[0]; if(!f)return;
-  try{const d=JSON.parse(await f.text());if(!Array.isArray(d.ev)||!Array.isArray(d.bl))throw 0;st={ev:d.ev,bl:d.bl,gr:d.gr||st.gr};save();render()}
+  try{const d=JSON.parse(await f.text());if(!Array.isArray(d.ev)||!Array.isArray(d.bl))throw 0;st=norm(d);save();render()}
   catch(x){alert("Fichier invalide. Importe un fichier exporté par cette application.")}
   e.target.value='';
 };
-$('#rst').onclick=()=>{if(confirm('Remettre toutes les données de départ ? Tes modifications seront perdues.')){st={ev:SEED_EV(),bl:SEED_BL(),gr:SEED_GR()};save();render()}};
-$('#theme').onclick=()=>{const r=document.documentElement,d=r.dataset.theme==='dark'||(!r.dataset.theme&&matchMedia('(prefers-color-scheme:dark)').matches);r.dataset.theme=d?'light':'dark'};
+$('#rst').onclick=()=>{if(confirm('Remettre toutes les données de départ ? Tes modifications seront perdues.')){st=fresh();save();render()}};
+const THEMES={clair:'Clair',sombre:'Sombre',ocean:'Océan',foret:'Forêt',violet:'Crépuscule',papier:'Papier'};
+const tSel=$('#themeSel');tSel.innerHTML=opts(THEMES);
+let th=null;try{th=localStorage.getItem(KEY+'-theme')}catch(e){}
+if(!THEMES[th])th=matchMedia('(prefers-color-scheme:dark)').matches?'sombre':'clair';
+tSel.value=th;document.documentElement.dataset.theme=th;
+tSel.onchange=()=>{document.documentElement.dataset.theme=tSel.value;try{localStorage.setItem(KEY+'-theme',tSel.value)}catch(e){}};
 try{localStorage.setItem(KEY+'-t','1')}catch(e){document.querySelector('#warn').hidden=false}
 render();
 </script>

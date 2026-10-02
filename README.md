@@ -96,7 +96,7 @@ using (
 );
 ```
 
-Le dépôt stocke les fichiers de façon privée. Il ne détecte pas encore automatiquement les dates et les devoirs dans un document; ceux-ci doivent être ajoutés dans le calendrier.
+Le dépôt stocke les fichiers de façon privée. Après l'envoi, les fichiers `.ics`, PDF avec texte sélectionnable et Word `.docx` sont analysés dans le navigateur; les examens et devoirs avec une date reconnue sont ajoutés automatiquement au calendrier. Les images, PDF numérisés sans couche texte et anciens fichiers `.doc` ne sont pas analysés. Vérifie les dates repérées dans le calendrier.
 
 ## Structure du projet
 

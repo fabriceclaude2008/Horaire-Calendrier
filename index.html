@@ -552,7 +552,7 @@ const DOC_BUCKET='documents-etudiants';
 const DOC_TYPES={pdf:'application/pdf',doc:'application/msword',docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',ics:'text/calendar',png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg'};
 const DOC_CATEGORIES={plan:'Plan de cours',calendrier:'Calendrier',autre:'Autre document'};
 const months={janvier:0,janv:0,jan:0,fevrier:1,fevr:1,fev:1,mars:2,avril:3,avr:3,mai:4,juin:5,juillet:6,juil:6,aout:7,septembre:8,sept:8,sep:8,octobre:9,oct:9,novembre:10,nov:10,decembre:11,dec:11};
-const foldText=s=>String(s||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase();
+const foldText=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 function makeEventDate(year,month,day,time=''){
   const d=new Date(year,month,day);
   if(d.getFullYear()!==year||d.getMonth()!==month||d.getDate()!==day)return null;
@@ -560,29 +560,29 @@ function makeEventDate(year,month,day,time=''){
 }
 function findDateAndTime(line){
   const s=foldText(line),now=new Date(),yearNow=now.getFullYear();
-  let date=null,m=s.match(/\\b(20\\d{2})[-/.](\\d{1,2})[-/.](\\d{1,2})\\b/);
+  let date=null,m=s.match(/\b(20\d{2})[-/.](\d{1,2})[-/.](\d{1,2})\b/);
   if(m)date=makeEventDate(+m[1],+m[2]-1,+m[3]);
-  if(!date&&(m=s.match(/\\b(\\d{1,2})[/.](\\d{1,2})[/.](20\\d{2})\\b/)))date=makeEventDate(+m[3],+m[2]-1,+m[1]);
-  if(!date&&(m=s.match(/\\b(\\d{1,2})(?:er)?\\s+(janv(?:ier)?|fevr?(?:ier)?|mars|avr(?:il)?|mai|juin|juil(?:let)?|aout|sept?(?:embre)?|oct(?:obre)?|nov(?:embre)?|dec(?:embre)?)\\.?\\s*(20\\d{2})?\\b/))){
-    const key=m[2].replace(/\\.$/,'');let mon=months[key];
+  if(!date&&(m=s.match(/\b(\d{1,2})[/.](\d{1,2})[/.](20\d{2})\b/)))date=makeEventDate(+m[3],+m[2]-1,+m[1]);
+  if(!date&&(m=s.match(/\b(\d{1,2})(?:er)?\s+(janv(?:ier)?|fevr?(?:ier)?|mars|avr(?:il)?|mai|juin|juil(?:let)?|aout|sept?(?:embre)?|oct(?:obre)?|nov(?:embre)?|dec(?:embre)?)\.?\s*(20\d{2})?\b/))){
+    const key=m[2].replace(/\.$/,'');let mon=months[key];
     if(mon==null)mon=months[key.slice(0,4)]??months[key.slice(0,3)];
     if(mon!=null)date=makeEventDate(+(m[3]||yearNow),mon,+m[1]);
   }
   if(!date)return null;
-  const tm=s.match(/\\b([01]?\\d|2[0-3])\\s*(?:h|:)\\s*([0-5]\\d)\\b/);
+  const tm=s.match(/\b([01]?\d|2[0-3])\s*(?:h|:)\s*([0-5]\d)\b/);
   if(tm)date.time=`${String(+tm[1]).padStart(2,'0')}:${tm[2]}`;
   return date;
 }
 function eventKind(text){
   const s=foldText(text);
-  if(/\\b(examen|examens|exam|intra|final|evaluation|quiz|test)\\b/.test(s))return 'exam';
-  if(/\\b(devoir|remise|travail|laboratoire|labo|rapport|projet|dissertation|redaction|lecture|presentation|expose|echeance|date limite)\\b/.test(s))return /\\b(laboratoire|labo)\\b/.test(s)?'labo':'devoir';
+  if(/\b(examen|examens|exam|intra|final|evaluation|quiz|test)\b/.test(s))return 'exam';
+  if(/\b(devoir|remise|travail|laboratoire|labo|rapport|projet|dissertation|redaction|lecture|presentation|expose|echeance|date limite)\b/.test(s))return /\b(laboratoire|labo)\b/.test(s)?'labo':'devoir';
   return null;
 }
 function importedEvent(line,date,fileName){
   const kind=eventKind(line);if(!kind)return null;
-  let title=String(line).replace(/(?:20\\d{2}[-/.]\\d{1,2}[-/.]\\d{1,2}|\\d{1,2}[/.]\\d{1,2}[/.]20\\d{2}|\\d{1,2}(?:er)?\\s+[\\p{L}.]+\\s*(?:20\\d{2})?)/iu,' ')
-    .replace(/\\b([01]?\\d|2[0-3])\\s*(?:h|:)\\s*[0-5]\\d\\b/ig,' ').replace(/[•*–—:;|]+/g,' ').replace(/\\s+/g,' ').trim();
+  let title=String(line).replace(/(?:20\d{2}[-/.]\d{1,2}[-/.]\d{1,2}|\d{1,2}[/.]\d{1,2}[/.]20\d{2}|\d{1,2}(?:er)?\s+[\p{L}.]+\s*(?:20\d{2})?)/iu,' ')
+    .replace(/\b([01]?\d|2[0-3])\s*(?:h|:)\s*[0-5]\d\b/ig,' ').replace(/[•*–—:;|]+/g,' ').replace(/\s+/g,' ').trim();
   if(title.length>80)title=title.slice(0,77).trim()+'…';
   if(!title)title=kind==='exam'?'Examen':'Devoir';
   const text=foldText(line),course=(st.co||[]).find(c=>c.id!=='autre'&&foldText(c.name).length>2&&text.includes(foldText(c.name)));
@@ -590,8 +590,8 @@ function importedEvent(line,date,fileName){
 }
 function textEvents(text,fileName){
   const out=[],seen=new Set();
-  for(const line of String(text||'').replace(/\\u00a0/g,' ').split(/\\r?\\n/)){
-    const clean=line.replace(/\\s+/g,' ').trim();if(!clean||clean.length>500)continue;
+  for(const line of String(text||'').replace(/\u00a0/g,' ').split(/\r?\n/)){
+    const clean=line.replace(/\s+/g,' ').trim();if(!clean||clean.length>500)continue;
     const dt=findDateAndTime(clean);if(!dt)continue;
     const ev=importedEvent(clean,dt,fileName);if(!ev)continue;
     const key=foldText(ev.title)+'|'+ev.date;
@@ -600,7 +600,7 @@ function textEvents(text,fileName){
   return out;
 }
 function icsEvents(text,fileName){
-  const unfolded=String(text||'').replace(/\\r?\\n[ \\t]/g,'');
+  const unfolded=String(text||'').replace(/\r?\n[ \t]/g,'');
   return unfolded.split(/BEGIN:VEVENT/i).slice(1).map(block=>{
     const prop=name=>{const m=block.match(new RegExp('^'+name+'(?:;[^:]*)?:(.*)
   if(!currentUser)return `<div class="card"><h2>Documents de cours</h2><p class="hint">Connecte-toi pour déposer et retrouver tes plans de cours, calendriers et autres documents dans ton espace privé.</p><button class="btn pri" id="docsLogin">Se connecter</button></div>`;
@@ -640,7 +640,7 @@ async function uploadDocuments(files){
   imported.forEach(ev=>{const key=foldText(ev.title)+'|'+ev.date;if(!keys.has(key)){keys.add(key);unique.push(ev)}});
   if(unique.length){st.ev.push(...unique);save({silent:true});render();toast(`${unique.length} examen(s) ou devoir(s) ajouté(s) au calendrier ✓`)}
   else if(details.length)status.textContent=details.join(' ');
-  if(details.length&&unique.length)status.textContent=details.join(' ');
+  if(details.length&&unique.length)$('#docStatus').textContent=details.join(' ');
   await refreshDocuments();
 }
 async function openDocument(path){
@@ -817,8 +817,8 @@ initAuth();
 </script>
 </body>
 </html>
-,'im'));return m?m[1].trim().replace(/\\\\n/gi,' ').replace(/\\\\,/g,',').replace(/\\\\;/g,';'):''};
-    const summary=prop('SUMMARY'),desc=prop('DESCRIPTION'),start=block.match(/^DTSTART(?:;[^:]*)?:(\\d{8})(?:T(\\d{6})Z?)?/im);
+,'im'));return m?m[1].trim().replace(/\\n/gi,' ').replace(/\\,/g,',').replace(/\\;/g,';'):''};
+    const summary=prop('SUMMARY'),desc=prop('DESCRIPTION'),start=block.match(/^DTSTART(?:;[^:]*)?:(\d{8})(?:T(\d{6})Z?)?/im);
     if(!start)return null;
     const d=makeEventDate(+start[1].slice(0,4),+start[1].slice(4,6)-1,+start[1].slice(6,8),start[2]?`${start[2].slice(0,2)}:${start[2].slice(2,4)}`:'');
     return d?importedEvent(summary+' '+desc,d,fileName):null;
@@ -843,11 +843,12 @@ async function extractDocumentText(file,ext){
     const doc=await pdfjs.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise,lines=[];
     for(let n=1;n<=doc.numPages;n++){
       const page=await doc.getPage(n),content=await page.getTextContent(),rows=[];
-      for(const item of content.items){if(!item.str?.trim())continue;const y=Math.round(item.transform?.[5]||0);let row=rows.findLast?.(r=>Math.abs(r.y-y)<=3);
+      for(const item of content.items){if(!item.str?.trim())continue;const y=Math.round(item.transform?.[5]||0);let row;
+        for(let j=rows.length-1;j>=0;j--){if(Math.abs(rows[j].y-y)<=3){row=rows[j];break}}
         if(!row){row={y,text:''};rows.push(row)}row.text+=(row.text?' ':'')+item.str.trim()}
-      lines.push(rows.map(r=>r.text).join('\\n'));
+      lines.push(rows.map(r=>r.text).join('\n'));
     }
-    return {events:textEvents(lines.join('\\n'),file.name),supported:true};
+    return {events:textEvents(lines.join('\n'),file.name),supported:true};
   }
   return {events:[],supported:false};
 }

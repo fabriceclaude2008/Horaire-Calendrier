@@ -551,9 +551,309 @@ function studyView(){
 const DOC_BUCKET='documents-etudiants';
 const DOC_TYPES={pdf:'application/pdf',doc:'application/msword',docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',ics:'text/calendar',png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg'};
 const DOC_CATEGORIES={plan:'Plan de cours',calendrier:'Calendrier',autre:'Autre document'};
+const months={janvier:0,janv:0,jan:0,fevrier:1,fevr:1,fev:1,mars:2,avril:3,avr:3,mai:4,juin:5,juillet:6,juil:6,aout:7,septembre:8,sept:8,sep:8,octobre:9,oct:9,novembre:10,nov:10,decembre:11,dec:11};
+const foldText=s=>String(s||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase();
+function makeEventDate(year,month,day,time=''){
+  const d=new Date(year,month,day);
+  if(d.getFullYear()!==year||d.getMonth()!==month||d.getDate()!==day)return null;
+  return {date:`${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`,time};
+}
+function findDateAndTime(line){
+  const s=foldText(line),now=new Date(),yearNow=now.getFullYear();
+  let date=null,m=s.match(/\\b(20\\d{2})[-/.](\\d{1,2})[-/.](\\d{1,2})\\b/);
+  if(m)date=makeEventDate(+m[1],+m[2]-1,+m[3]);
+  if(!date&&(m=s.match(/\\b(\\d{1,2})[/.](\\d{1,2})[/.](20\\d{2})\\b/)))date=makeEventDate(+m[3],+m[2]-1,+m[1]);
+  if(!date&&(m=s.match(/\\b(\\d{1,2})(?:er)?\\s+(janv(?:ier)?|fevr?(?:ier)?|mars|avr(?:il)?|mai|juin|juil(?:let)?|aout|sept?(?:embre)?|oct(?:obre)?|nov(?:embre)?|dec(?:embre)?)\\.?\\s*(20\\d{2})?\\b/))){
+    const key=m[2].replace(/\\.$/,'');let mon=months[key];
+    if(mon==null)mon=months[key.slice(0,4)]??months[key.slice(0,3)];
+    if(mon!=null)date=makeEventDate(+(m[3]||yearNow),mon,+m[1]);
+  }
+  if(!date)return null;
+  const tm=s.match(/\\b([01]?\\d|2[0-3])\\s*(?:h|:)\\s*([0-5]\\d)\\b/);
+  if(tm)date.time=`${String(+tm[1]).padStart(2,'0')}:${tm[2]}`;
+  return date;
+}
+function eventKind(text){
+  const s=foldText(text);
+  if(/\\b(examen|examens|exam|intra|final|evaluation|quiz|test)\\b/.test(s))return 'exam';
+  if(/\\b(devoir|remise|travail|laboratoire|labo|rapport|projet|dissertation|redaction|lecture|presentation|expose|echeance|date limite)\\b/.test(s))return /\\b(laboratoire|labo)\\b/.test(s)?'labo':'devoir';
+  return null;
+}
+function importedEvent(line,date,fileName){
+  const kind=eventKind(line);if(!kind)return null;
+  let title=String(line).replace(/(?:20\\d{2}[-/.]\\d{1,2}[-/.]\\d{1,2}|\\d{1,2}[/.]\\d{1,2}[/.]20\\d{2}|\\d{1,2}(?:er)?\\s+[\\p{L}.]+\\s*(?:20\\d{2})?)/iu,' ')
+    .replace(/\\b([01]?\\d|2[0-3])\\s*(?:h|:)\\s*[0-5]\\d\\b/ig,' ').replace(/[•*–—:;|]+/g,' ').replace(/\\s+/g,' ').trim();
+  if(title.length>80)title=title.slice(0,77).trim()+'…';
+  if(!title)title=kind==='exam'?'Examen':'Devoir';
+  const text=foldText(line),course=(st.co||[]).find(c=>c.id!=='autre'&&foldText(c.name).length>2&&text.includes(foldText(c.name)));
+  return {id:uid(),title,course:course?.id||'autre',type:kind,date:date.date,time:date.time||'',notes:`Ajouté depuis ${fileName}`,approx:false,done:false};
+}
+function textEvents(text,fileName){
+  const out=[],seen=new Set();
+  for(const line of String(text||'').replace(/\\u00a0/g,' ').split(/\\r?\\n/)){
+    const clean=line.replace(/\\s+/g,' ').trim();if(!clean||clean.length>500)continue;
+    const dt=findDateAndTime(clean);if(!dt)continue;
+    const ev=importedEvent(clean,dt,fileName);if(!ev)continue;
+    const key=foldText(ev.title)+'|'+ev.date;
+    if(!seen.has(key)){seen.add(key);out.push(ev)}
+  }
+  return out;
+}
+function icsEvents(text,fileName){
+  const unfolded=String(text||'').replace(/\\r?\\n[ \\t]/g,'');
+  return unfolded.split(/BEGIN:VEVENT/i).slice(1).map(block=>{
+    const prop=name=>{const m=block.match(new RegExp('^'+name+'(?:;[^:]*)?:(.*)
+  if(!currentUser)return `<div class="card"><h2>Documents de cours</h2><p class="hint">Connecte-toi pour déposer et retrouver tes plans de cours, calendriers et autres documents dans ton espace privé.</p><button class="btn pri" id="docsLogin">Se connecter</button></div>`;
+  return `<div class="card"><div class="bar"><h2>Documents de cours</h2></div><p class="hint">Dépose un plan de cours, un calendrier ou un autre document. Tes fichiers restent privés et accessibles avec ton compte.</p><label>Type de document<select id="docCategory"><option value="plan">Plan de cours</option><option value="calendrier">Calendrier</option><option value="autre">Autre document</option></select></label><input id="docFiles" type="file" accept=".pdf,.doc,.docx,.ics,.png,.jpg,.jpeg" multiple hidden><div class="dropbox" id="dropZone" role="button" tabindex="0" aria-label="Choisir ou déposer des documents"><strong>Dépose tes fichiers ici</strong><p>ou choisis-les sur ton appareil · PDF, Word, calendrier .ics ou image · 20 Mo maximum par fichier</p><button class="btn pri" type="button" id="docChoose">Choisir des fichiers</button></div><p id="docStatus" class="hint" role="status"></p><h3 class="ct">Mes documents</h3><div id="docList" class="empty">Chargement…</div><p class="hint">Les événements datés trouvés dans les fichiers .ics, PDF et Word .docx sont ajoutés automatiquement. Vérifie les dates dans Calendrier. Les images, scans et anciens fichiers .doc ne sont pas analysés.</p></div>`;
+}
+async function refreshDocuments(){
+  if(!sb||!currentUser||view!=='docs')return;
+  const box=$('#docList');if(!box)return;
+  box.textContent='Chargement…';
+  const folders=Object.keys(DOC_CATEGORIES);
+  const results=await Promise.all(folders.map(category=>sb.storage.from(DOC_BUCKET).list(`${currentUser.id}/${category}`,{limit:100,sortBy:{column:'created_at',order:'desc'}})));
+  if(!currentUser||view!=='docs')return;
+  const failed=results.find(x=>x.error);
+  if(failed){console.error(failed.error);box.innerHTML='<p class="hint">Le stockage de documents n’est pas configuré. Réessaie plus tard ou contacte la personne qui gère le site.</p>';return}
+  const files=results.flatMap((res,i)=>res.data.filter(f=>f.name&&!f.name.startsWith('.')).map(f=>({file:f,category:folders[i]}))).sort((a,b)=>(b.file.created_at||'').localeCompare(a.file.created_at||''));
+  if(!files.length){box.innerHTML='<div class="empty">Aucun document pour le moment.</div>';return}
+  box.innerHTML=files.map(({file,category})=>{const label=file.name.replace(/^[^-]+-[^-]+-/,'').replace(/[-_]/g,' '),ext=(file.name.split('.').pop()||'DOC').toUpperCase(),date=file.created_at?new Date(file.created_at).toLocaleDateString('fr-CA'):'';
+    return `<div class="docRow"><div class="docIcon">${esc(ext.slice(0,4))}</div><div class="docMeta"><b title="${esc(label)}">${esc(label)}</b><small>${DOC_CATEGORIES[category]} · ${date}${file.metadata?.size?` · ${(file.metadata.size/1048576).toFixed(1)} Mo`:''}</small></div><button class="btn" type="button" data-doc-download="${esc(category+'/'+file.name)}">Ouvrir</button><button class="btn del" type="button" data-doc-delete="${esc(category+'/'+file.name)}">Supprimer</button></div>`;
+  }).join('');
+}
+async function uploadDocuments(files){
+  if(!currentUser){$('#accountBtn').click();return}
+  const category=$('#docCategory').value,status=$('#docStatus'),imported=[],details=[];
+  for(const file of Array.from(files)){
+    const ext=(file.name.split('.').pop()||'').toLowerCase();
+    if(!DOC_TYPES[ext]){details.push(`Format non pris en charge : ${file.name}`);continue}
+    if(file.size>20*1024*1024){details.push(`${file.name} dépasse la limite de 20 Mo.`);continue}
+    const safe=file.name.normalize('NFKD').replace(/[^a-zA-Z0-9._-]+/g,'-').replace(/-+/g,'-').slice(-100)||'document.'+ext;
+    const path=`${currentUser.id}/${category}/${Date.now()}-${uid()}-${safe}`;
+    status.textContent=`Envoi de ${file.name}…`;
+    const {error}=await sb.storage.from(DOC_BUCKET).upload(path,file,{contentType:DOC_TYPES[ext],upsert:false});
+    if(error){console.error(error);details.push(`Échec de l’envoi de ${file.name}. Vérifie la configuration du stockage.`);continue}
+    try{const result=await extractDocumentText(file,ext);imported.push(...result.events);if(!result.supported)details.push(`${file.name} est conservé, mais son format n’est pas analysé automatiquement.`);else if(!result.events.length)details.push(`Aucun examen ou devoir daté repéré dans ${file.name}.`)}
+    catch(err){console.error(err);details.push(`${file.name} est conservé, mais son texte n’a pas pu être analysé.`)}
+  }
+  const keys=new Set(st.ev.map(e=>foldText(e.title)+'|'+e.date)),unique=[];
+  imported.forEach(ev=>{const key=foldText(ev.title)+'|'+ev.date;if(!keys.has(key)){keys.add(key);unique.push(ev)}});
+  if(unique.length){st.ev.push(...unique);save({silent:true});render();toast(`${unique.length} examen(s) ou devoir(s) ajouté(s) au calendrier ✓`)}
+  else if(details.length)status.textContent=details.join(' ');
+  if(details.length&&unique.length)status.textContent=details.join(' ');
+  await refreshDocuments();
+}
+async function openDocument(path){
+  const tab=window.open('about:blank','_blank');
+  if(!tab){toast('Autorise les fenêtres contextuelles pour ouvrir le document');return}
+  const {data,error}=await sb.storage.from(DOC_BUCKET).createSignedUrl(`${currentUser.id}/${path}`,60);
+  if(error){tab.close();toast('Impossible d’ouvrir le document');return}
+  tab.location=data.signedUrl;
+}
+async function deleteDocument(path){
+  if(!confirm('Supprimer ce document de ton espace ?'))return;
+  const {error}=await sb.storage.from(DOC_BUCKET).remove([`${currentUser.id}/${path}`]);
+  if(error){toast('Impossible de supprimer le document');return}
+  toast('Document supprimé');refreshDocuments();
+}
+function render(){
+  hero();
+  document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.v===view));
+  paint();$('#view').innerHTML=view==='cal'?calView():view==='list'?listView():view==='sched'?schedView():view==='study'?studyView():view==='docs'?documentsView():notesView();
+  results();
+  if(view==='docs'&&currentUser)refreshDocuments();
+  if(view==='docs'){
+    const zone=$('#dropZone'),input=$('#docFiles');
+    if(zone){zone.onclick=e=>{if(e.target.closest('button'))return;input.click()};zone.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();input.click()}};zone.ondragover=e=>{e.preventDefault();zone.classList.add('over')};zone.ondragleave=()=>zone.classList.remove('over');zone.ondrop=e=>{e.preventDefault();zone.classList.remove('over');uploadDocuments(e.dataTransfer.files)}}
+    if(input)input.onchange=()=>{uploadDocuments(input.files);input.value=''};
+    $('#docChoose')?.addEventListener('click',e=>{e.stopPropagation();input.click()});
+    $('#docsLogin')?.addEventListener('click',()=>$('#accountBtn').click());
+    document.querySelectorAll('[data-doc-download]').forEach(b=>b.onclick=()=>openDocument(b.dataset.docDownload));
+    document.querySelectorAll('[data-doc-delete]').forEach(b=>b.onclick=()=>deleteDocument(b.dataset.docDelete));
+  }
+}
+
+// Dialogs
+const dEv=$('#dEv'), fEv=$('#fEv'), dBl=$('#dBl'), fBl=$('#fBl');
+const opts=o=>Object.entries(o).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
+fEv.course.innerHTML=opts(CO); fEv.type.innerHTML=opts(TY);
+fBl.course.innerHTML=opts(CO); fBl.day.innerHTML=DJ.map((d,i)=>`<option value="${i+1}">${d}</option>`).join('');
+let editId=null, editBl=null;
+function openEv(id,date){
+  editId=id; fEv.course.innerHTML=opts(CO); const e=id&&st.ev.find(x=>x.id===id);
+  $('#evT').textContent=e?"Modifier l'élément":'Nouvel élément';
+  $('#evDel').hidden=!e;
+  fEv.title.value=e?e.title:''; fEv.course.value=e?e.course:(fCourse||'alg'); fEv.type.value=e?e.type:'devoir';
+  fEv.date.value=e?e.date:(date||todayS()); fEv.time.value=e?e.time||'':''; fEv.notes.value=e?e.notes||'':''; fEv.approx.checked=e?!!e.approx:false;
+  dEv.showModal();
+}
+function openBl(id){
+  editBl=id; fBl.course.innerHTML=opts(CO); const b=id&&st.bl.find(x=>x.id===id);
+  $('#blT').textContent=b?'Modifier le cours':'Nouveau cours';
+  $('#blDel').hidden=!b;
+  fBl.title.value=b?b.title:''; fBl.course.value=b?b.course:'autre'; fBl.day.value=b?b.day:1;
+  fBl.start.value=b?b.start:'08:00'; fBl.end.value=b?b.end:'09:50'; fBl.room.value=b?b.room||'':'';
+  dBl.showModal();
+}
+fEv.addEventListener('submit',()=>{
+  const v={title:fEv.title.value.trim(),course:fEv.course.value,type:fEv.type.value,date:fEv.date.value,time:fEv.time.value,notes:fEv.notes.value.trim(),approx:fEv.approx.checked};
+  if(!v.title||!v.date)return;
+  if(editId){Object.assign(st.ev.find(x=>x.id===editId),v)}else st.ev.push({...v,id:uid(),done:false});
+  save();render();
+});
+fBl.addEventListener('submit',e=>{
+  const v={title:fBl.title.value.trim(),course:fBl.course.value,day:+fBl.day.value,start:fBl.start.value,end:fBl.end.value,room:fBl.room.value.trim()};
+  if(!v.title||tm(v.end)<=tm(v.start)){e.preventDefault();alert("L'heure de fin doit être après l'heure de début.");return}
+  if(editBl){Object.assign(st.bl.find(x=>x.id===editBl),v)}else st.bl.push({...v,id:uid()});
+  save();render();
+});
+$('#evDel').onclick=()=>{if(confirm('Supprimer cet élément ?')){st.ev=st.ev.filter(x=>x.id!==editId);save();dEv.close();render()}};
+$('#blDel').onclick=()=>{if(confirm('Supprimer ce cours ?')){st.bl=st.bl.filter(x=>x.id!==editBl);save();dBl.close();render()}};
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());
+
+// Authentification
+const dAuth=$('#dAuth'), fAuth=$('#fAuth');
+let authSignup=false;
+$('#accountBtn').onclick=()=>{
+  if(currentUser){
+    if(sb)sb.auth.signOut();
+    return;
+  }
+  if(!sb){alert('Pour activer les comptes, ajoute ton URL et ta clé anon Supabase dans le code.');return}
+  authSignup=false;
+  $('#authT').textContent='Connexion';
+  $('#authSubmit').textContent='Se connecter';
+  $('#authMode').textContent='Créer un compte';
+  $('#authMsg').textContent='';
+  fAuth.reset();
+  dAuth.showModal();
+};
+$('#authMode').onclick=()=>{
+  authSignup=!authSignup;
+  $('#authT').textContent=authSignup?'Créer un compte':'Connexion';
+  $('#authSubmit').textContent=authSignup?'Créer mon compte':'Se connecter';
+  $('#authMode').textContent=authSignup?'J’ai déjà un compte':'Créer un compte';
+  $('#authMsg').textContent='';
+};
+document.querySelectorAll('[data-auth-close]').forEach(b=>b.onclick=()=>dAuth.close());
+fAuth.addEventListener('submit',async e=>{
+  e.preventDefault();
+  if(!sb)return;
+  const email=fAuth.email.value.trim(),password=fAuth.password.value;
+  $('#authMsg').textContent='Connexion en cours…';
+  const result=authSignup
+    ?await sb.auth.signUp({email,password})
+    :await sb.auth.signInWithPassword({email,password});
+  if(result.error){$('#authMsg').textContent=result.error.message;return}
+  dAuth.close();
+  if(authSignup && !result.data.session)toast('Compte créé. Vérifie ton courriel si demandé.');
+  else toast('Connexion réussie ✓');
+});
+
+// Events
+document.addEventListener('click',e=>{
+  const t=e.target;
+  const tab=t.closest('.tab'); if(tab){view=tab.dataset.v;render();return}
+  if(t.closest('#add')){openEv(null);return}
+  if(t.closest('#addBl')){openBl(null);return}
+  if(t.closest('#addCo')){st.co.push({id:uid(),name:'Nouveau cours',color:PAL[st.co.length%PAL.length],units:'2.33',ifgz:'',idgz:'',fm:'',fs:'',ev:[{id:uid(),name:'',w:'',grade:'',mean:'',sd:''}]});save();render();return}
+  const co=t.closest('[data-co]');
+  if(co){
+    const c=st.co.find(x=>x.id===co.dataset.co);
+    if(t.closest('[data-delco]')){if(confirm('Supprimer ce cours et ses notes ?')){st.co=st.co.filter(x=>x!==c);st.ev.concat(st.bl).forEach(z=>{if(z.course===c.id)z.course='autre'});save();render()}return}
+    if(t.closest('[data-addev]')){c.ev.push({id:uid(),name:'',w:'',grade:'',mean:'',sd:''});save();render();return}
+    const dv=t.closest('[data-delev]');
+    if(dv){c.ev=c.ev.filter(x=>x.id!==dv.closest('[data-ev]').dataset.ev);save();render();return}
+    return;
+  }
+  const nv=t.closest('[data-nav]'); if(nv){const n=+nv.dataset.nav;if(n===0){cur=new Date();cur.setDate(1)}else cur=new Date(cur.getFullYear(),cur.getMonth()+n,1);render();return}
+  const bid=t.closest('[data-bid]'); if(bid){openBl(bid.dataset.bid);return}
+  const sbk=t.closest('[data-study]'); if(sbk){
+    const k=sbk.dataset.study;
+    if(st.sd[k])delete st.sd[k];else st.sd[k]=1;
+    save();render();return;
+  }
+  const id=t.closest('[data-id]'); if(id){openEv(id.dataset.id);return}
+  const dy=t.closest('.day'); if(dy){openEv(null,dy.dataset.date)}
+});
+document.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.dataset.done){const ev=st.ev.find(x=>x.id===t.dataset.done);ev.done=t.checked;save();render()}
+  else if(t.dataset.date){const ev=st.ev.find(x=>x.id===t.dataset.date);if(ev&&t.value){ev.date=t.value;save();render()}}
+  else if(t.id==='fPer'){fPer=t.value;render()}
+  else if(t.id==='fCo'){fCourse=t.value;render()}
+  else if(t.dataset.sd){if(t.checked)st.sd[t.dataset.sd]=1;else delete st.sd[t.dataset.sd];save();render()}
+  else if(t.dataset.p&&view==='study'){st.p[t.dataset.p]=t.value;save();render()}
+});
+document.addEventListener('input',e=>{
+  const t=e.target, co=t.closest('[data-co]');
+  if(t.dataset.p){st.p[t.dataset.p]=t.value}
+  else if(co){
+    const c=st.co.find(x=>x.id===co.dataset.co), r=t.closest('[data-ev]');
+    if(r&&t.dataset.e){c.ev.find(x=>x.id===r.dataset.ev)[t.dataset.e]=t.value}
+    else if(t.dataset.f){c[t.dataset.f]=t.value}
+    else return;
+  }else return;
+  save();paint();results();
+});
+$('#exp').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(st,null,2)],{type:'application/json'}));a.download='agenda-automne-2026.json';a.click();URL.revokeObjectURL(a.href)};
+$('#imp').onclick=()=>$('#file').click();
+$('#file').onchange=async e=>{
+  const f=e.target.files[0]; if(!f)return;
+  try{const d=JSON.parse(await f.text());if(!Array.isArray(d.ev)||!Array.isArray(d.bl))throw 0;st=norm(d);save();render()}
+  catch(x){alert("Fichier invalide. Importe un fichier exporté par cette application.")}
+  e.target.value='';
+};
+$('#rst').onclick=()=>{if(confirm('Remettre toutes les données de départ ? Tes modifications seront perdues.')){st=fresh();save();render()}};
+const THEMES={clair:'Clair',sombre:'Sombre',ocean:'Océan',foret:'Forêt',violet:'Crépuscule',papier:'Papier'};
+const tSel=$('#themeSel');tSel.innerHTML=opts(THEMES);
+let th=null;try{th=localStorage.getItem(KEY+'-theme')}catch(e){}
+if(!THEMES[th])th=matchMedia('(prefers-color-scheme:dark)').matches?'sombre':'clair';
+tSel.value=th;document.documentElement.dataset.theme=th;
+tSel.onchange=()=>{document.documentElement.dataset.theme=tSel.value;try{localStorage.setItem(KEY+'-theme',tSel.value)}catch(e){}};
+try{localStorage.setItem(KEY+'-t','1')}catch(e){document.querySelector('#warn').hidden=false}
+render();
+initAuth();
+</script>
+</body>
+</html>
+,'im'));return m?m[1].trim().replace(/\\\\n/gi,' ').replace(/\\\\,/g,',').replace(/\\\\;/g,';'):''};
+    const summary=prop('SUMMARY'),desc=prop('DESCRIPTION'),start=block.match(/^DTSTART(?:;[^:]*)?:(\\d{8})(?:T(\\d{6})Z?)?/im);
+    if(!start)return null;
+    const d=makeEventDate(+start[1].slice(0,4),+start[1].slice(4,6)-1,+start[1].slice(6,8),start[2]?`${start[2].slice(0,2)}:${start[2].slice(2,4)}`:'');
+    return d?importedEvent(summary+' '+desc,d,fileName):null;
+  }).filter(Boolean);
+}
+let mammothLoading=null,pdfLoading=null;
+function getMammoth(){
+  if(window.mammoth)return Promise.resolve(window.mammoth);
+  if(mammothLoading)return mammothLoading;
+  mammothLoading=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/mammoth@1.13.0/mammoth.browser.min.js';s.onload=()=>window.mammoth?resolve(window.mammoth):reject(new Error('Mammoth indisponible'));s.onerror=()=>reject(new Error('Bibliothèque Word indisponible'));document.head.appendChild(s)});
+  return mammothLoading;
+}
+async function extractDocumentText(file,ext){
+  if(ext==='ics')return {events:icsEvents(await file.text(),file.name),supported:true};
+  if(ext==='docx'){
+    const mammoth=await getMammoth(),result=await mammoth.extractRawText({arrayBuffer:await file.arrayBuffer()});
+    return {events:textEvents(result.value,file.name),supported:true};
+  }
+  if(ext==='pdf'){
+    if(!pdfLoading)pdfLoading=import('https://cdn.jsdelivr.net/npm/pdfjs-dist@6.0.0/build/pdf.mjs');
+    const pdfjs=await pdfLoading;pdfjs.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@6.0.0/build/pdf.worker.mjs';
+    const doc=await pdfjs.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise,lines=[];
+    for(let n=1;n<=doc.numPages;n++){
+      const page=await doc.getPage(n),content=await page.getTextContent(),rows=[];
+      for(const item of content.items){if(!item.str?.trim())continue;const y=Math.round(item.transform?.[5]||0);let row=rows.findLast?.(r=>Math.abs(r.y-y)<=3);
+        if(!row){row={y,text:''};rows.push(row)}row.text+=(row.text?' ':'')+item.str.trim()}
+      lines.push(rows.map(r=>r.text).join('\\n'));
+    }
+    return {events:textEvents(lines.join('\\n'),file.name),supported:true};
+  }
+  return {events:[],supported:false};
+}
 function documentsView(){
   if(!currentUser)return `<div class="card"><h2>Documents de cours</h2><p class="hint">Connecte-toi pour déposer et retrouver tes plans de cours, calendriers et autres documents dans ton espace privé.</p><button class="btn pri" id="docsLogin">Se connecter</button></div>`;
-  return `<div class="card"><div class="bar"><h2>Documents de cours</h2></div><p class="hint">Dépose un plan de cours, un calendrier ou un autre document. Tes fichiers restent privés et accessibles avec ton compte.</p><label>Type de document<select id="docCategory"><option value="plan">Plan de cours</option><option value="calendrier">Calendrier</option><option value="autre">Autre document</option></select></label><input id="docFiles" type="file" accept=".pdf,.doc,.docx,.ics,.png,.jpg,.jpeg" multiple hidden><div class="dropbox" id="dropZone" role="button" tabindex="0" aria-label="Choisir ou déposer des documents"><strong>Dépose tes fichiers ici</strong><p>ou choisis-les sur ton appareil · PDF, Word, calendrier .ics ou image · 20 Mo maximum par fichier</p><button class="btn pri" type="button" id="docChoose">Choisir des fichiers</button></div><p id="docStatus" class="hint" role="status"></p><h3 class="ct">Mes documents</h3><div id="docList" class="empty">Chargement…</div><p class="hint">Le dépôt conserve les documents dans ton compte. Les dates et devoirs doivent encore être ajoutés manuellement dans Calendrier.</p></div>`;
+  return `<div class="card"><div class="bar"><h2>Documents de cours</h2></div><p class="hint">Dépose un plan de cours, un calendrier ou un autre document. Tes fichiers restent privés et accessibles avec ton compte.</p><label>Type de document<select id="docCategory"><option value="plan">Plan de cours</option><option value="calendrier">Calendrier</option><option value="autre">Autre document</option></select></label><input id="docFiles" type="file" accept=".pdf,.doc,.docx,.ics,.png,.jpg,.jpeg" multiple hidden><div class="dropbox" id="dropZone" role="button" tabindex="0" aria-label="Choisir ou déposer des documents"><strong>Dépose tes fichiers ici</strong><p>ou choisis-les sur ton appareil · PDF, Word, calendrier .ics ou image · 20 Mo maximum par fichier</p><button class="btn pri" type="button" id="docChoose">Choisir des fichiers</button></div><p id="docStatus" class="hint" role="status"></p><h3 class="ct">Mes documents</h3><div id="docList" class="empty">Chargement…</div><p class="hint">Les événements datés trouvés dans les fichiers .ics, PDF et Word .docx sont ajoutés automatiquement. Vérifie les dates dans Calendrier. Les images, scans et anciens fichiers .doc ne sont pas analysés.</p></div>`;
 }
 async function refreshDocuments(){
   if(!sb||!currentUser||view!=='docs')return;

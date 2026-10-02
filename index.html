@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Agenda – Automne 2026</title>
+<title>Boussole — ton agenda étudiant</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--c:#6b7280;--on:#fff;color-scheme:light;--bg:#eef1f6;--sf:#fff;--ink:#101828;--mute:#566179;--line:#d6dce8;--acc:#101828;--onacc:#fff;--warn:#b42318;--onc:#fff}
+:root{--c:#477a63;--on:#fff;color-scheme:light;--bg:#f4f6f1;--sf:#fffdf9;--ink:#26372d;--mute:#68776b;--line:#dfe6da;--acc:#477a63;--onacc:#fff;--warn:#b42318;--onc:#fff}
 [data-theme=sombre]{color-scheme:dark;--bg:#0c111b;--sf:#151c2a;--ink:#e7ebf3;--mute:#9aa6bb;--line:#263046;--acc:#e7ebf3;--onacc:#0c111b;--warn:#ff8a7a;--onc:#1a0a08}
 [data-theme=ocean]{color-scheme:dark;--bg:#071a2b;--sf:#0d2840;--ink:#e6f1fa;--mute:#8fb0c9;--line:#1c4262;--acc:#38bdf8;--onacc:#04202f;--warn:#ff8a7a;--onc:#1a0a08}
 [data-theme=foret]{color-scheme:light;--bg:#e9f1e9;--sf:#fbfffb;--ink:#14291b;--mute:#4b6653;--line:#cadccb;--acc:#1f6b3a;--onacc:#fff;--warn:#b42318;--onc:#fff}
@@ -25,7 +25,8 @@ select,input,textarea{background:var(--sf);color:var(--ink)}
 select,input[type=date],input[type=time]{min-height:34px}
 :focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 
-.hero{background:var(--acc);color:var(--onacc);border-radius:14px;padding:20px 22px;display:flex;gap:20px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.welcome{display:flex;align-items:center;gap:12px;margin:8px 2px 14px}.brandMark{width:42px;height:42px;border-radius:14px;background:#e0eee3;color:#315d47;display:grid;place-items:center;font-size:22px}.welcome b{display:block;font-size:18px;letter-spacing:-.03em}.welcome small{color:var(--mute)}
+.hero{background:linear-gradient(115deg,#477a63,#5d9175 58%,#87a889);color:#fff;border-radius:20px;padding:24px 26px;display:flex;gap:20px;align-items:center;justify-content:space-between;flex-wrap:wrap;box-shadow:0 12px 32px rgba(48,82,59,.12)}.hero p{opacity:.88}.hero .big{font-size:clamp(56px,12vw,96px);font-weight:800;line-height:.9;letter-spacing:-.04em}.hero h1{margin:0 0 6px;font-size:clamp(22px,3.4vw,32px);font-weight:800;letter-spacing:-.03em}.hero .r{text-align:right}.heroActions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}.hero .btn{border-color:rgba(255,255,255,.45);background:rgba(255,255,255,.14);color:white}.hero .btn.pri{background:#fff;color:#315d47;border-color:#fff}.heroMeta{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.heroMeta span{border-radius:999px;background:rgba(255,255,255,.15);padding:5px 10px;font-size:12px}
 .hero .big{font-size:clamp(56px,12vw,96px);font-weight:800;line-height:.9;letter-spacing:-.04em}
 .hero h1{margin:0 0 4px;font-size:clamp(20px,3.4vw,30px);font-weight:800;letter-spacing:-.02em}
 .hero p{margin:0;opacity:.75}
@@ -140,7 +141,8 @@ input[type=color]{width:44px;height:36px;padding:2px;border:1px solid var(--line
 nav label.th{display:flex;align-items:center;gap:6px;margin:0;font-size:13px;color:var(--mute);font-weight:500}
 nav .th select{width:auto;margin:0;padding:6px 8px;border:1px solid var(--line);border-radius:8px}
 .bar select{padding:6px 8px;border:1px solid var(--line);border-radius:8px}
-@media(max-width:640px){main{padding:10px}.hero .r{text-align:left}.day{min-height:70px}.chip{font-size:10.5px;padding:1px 3px}}
+@media(max-width:640px){main{padding:10px}.hero{padding:20px;border-radius:16px}.hero .r{text-align:left}.day{min-height:70px}.chip{font-size:10.5px;padding:1px 3px}}
+.chartCard{border:1px solid var(--line);border-radius:12px;background:color-mix(in srgb,var(--acc) 3%,var(--sf));padding:12px;margin:10px 0}.chartCard h4{margin:0 0 8px;font-size:14px}.chartScroll{overflow-x:auto}.scoreChart{display:block;width:100%;min-width:360px;height:auto}.scoreChart text{font-family:inherit;fill:var(--mute);font-size:11px}.scoreChart .grid{stroke:var(--line);stroke-width:1}.scoreChart .mine{fill:var(--acc)}.scoreChart .group{fill:color-mix(in srgb,var(--acc) 28%,var(--sf))}.chartLegend{display:flex;gap:16px;color:var(--mute);font-size:12px;margin:6px 0 0}.chartLegend span{display:flex;gap:6px;align-items:center}.chartLegend i{width:10px;height:10px;border-radius:3px;background:var(--acc)}.chartLegend i.groupKey{background:color-mix(in srgb,var(--acc) 28%,var(--sf));border:1px solid color-mix(in srgb,var(--acc) 45%,var(--line))}
 @media(prefers-reduced-motion:no-preference){.hero .big{animation:pop .5s ease-out}@keyframes pop{from{opacity:0;transform:translateY(8px)}}}
 .noteIntro{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(220px,.8fr);gap:18px;align-items:center;background:linear-gradient(120deg,color-mix(in srgb,var(--acc) 9%,var(--sf)),var(--sf));border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px}
 .noteIntro h2{font-size:24px;margin:0 0 5px;letter-spacing:-.03em}
@@ -165,6 +167,7 @@ nav .th select{width:auto;margin:0;padding:6px 8px;border:1px solid var(--line);
 <body>
 <main>
   <div id="warn" hidden role="alert">Ce navigateur bloque l'enregistrement : tes modifications disparaîtront à la fermeture. Ouvre l'app depuis ton adresse Vercel (pas dans un aperçu) ou utilise « Exporter » pour sauvegarder.</div>
+  <div class="welcome"><span class="brandMark" aria-hidden="true">✦</span><div><b>Boussole</b><small>Ton semestre, un peu plus simple.</small></div></div>
   <section class="hero" id="hero" aria-live="polite"></section>
   <nav role="tablist">
     <button class="tab" role="tab" data-v="cal">Calendrier</button>
@@ -373,11 +376,12 @@ const rel=n=>n===0?"aujourd'hui":n===1?'demain':n===-1?'hier':n>0?`dans ${n} jou
 const evTitle=e=>`${e.approx?'~ ':''}${e.title} · ${CO[e.course]}`;
 
 function hero(){
-  const nx=sorted().find(e=>e.type==='exam'&&!e.done&&diff(e.date)>=0);
-  const h=$('#hero');
-  if(!nx){h.innerHTML='<div><h1>Aucun examen à venir</h1><p>Ajoute tes prochaines évaluations avec le bouton ci-dessous.</p></div>';return}
-  const n=diff(nx.date);
-  h.innerHTML=`<div><p>Prochain examen</p><h1>${esc(nx.title)} – ${CO[nx.course]}</h1><p>${fmtD(nx.date,{weekday:'long',day:'numeric',month:'long'})}${nx.approx?' (à confirmer)':''}${nx.notes?' · '+esc(nx.notes):''}</p></div><div class="r"><div class="big">${n}</div><p>${n===0?"c'est aujourd'hui":n===1?'jour':'jours'}</p></div>`;
+  const nx=sorted().find(e=>!e.done&&diff(e.date)>=0),h=$('#hero');
+  const upcoming=sorted().filter(e=>!e.done&&diff(e.date)>=0).length;
+  const actions='<div class="heroActions"><button class="btn pri" type="button" data-hero-add>Ajouter une évaluation</button><button class="btn" type="button" data-hero-doc>Déposer un document</button></div>';
+  if(!nx){h.innerHTML='<div><p>Bienvenue dans ton espace étudiant</p><h1>Un semestre à ton rythme.</h1><p>Ajoute tes évaluations ou dépose un plan de cours : on t’aide à garder le fil.</p>'+actions+'</div><div class="heroMeta"><span>✦ Tout au même endroit</span><span>☀️ Un pas à la fois</span></div>';return}
+  const n=diff(nx.date),kind=nx.type==='exam'?'Prochain examen':'Prochaine échéance';
+  h.innerHTML='<div><p>'+kind+'</p><h1>'+esc(nx.title)+' – '+esc(CO[nx.course])+'</h1><p>'+fmtD(nx.date,{weekday:'long',day:'numeric',month:'long'})+(nx.approx?' · date à confirmer':'')+'</p>'+actions+'</div><div class="r"><div class="big">'+n+'</div><p>'+(n===0?"c'est aujourd'hui":n===1?'jour':'jours')+'</p><div class="heroMeta"><span>'+upcoming+' à venir</span></div></div>';
 }
 
 function calView(){
@@ -481,6 +485,20 @@ function notesView(){
   });
   return h;
 }
+function scoreGraph(title,items){
+  const rows=items.filter(x=>Number.isFinite(x.mine)||Number.isFinite(x.group));
+  if(!rows.length)return '';
+  const W=Math.max(360,rows.length*92+54),H=200,L=34,R=10,T=8,B=48,PH=H-T-B,plotW=W-L-R;
+  let svg='<svg class="scoreChart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(title)+'">';
+  [0,25,50,75,100].forEach(v=>{const y=T+PH*(1-v/100);svg+='<line class="grid" x1="'+L+'" y1="'+y+'" x2="'+(W-R)+'" y2="'+y+'"/><text x="'+(L-6)+'" y="'+(y+4)+'" text-anchor="end">'+v+'</text>'});
+  const slot=plotW/rows.length;
+  rows.forEach((x,i)=>{const cx=L+slot*i+slot/2;
+    [[x.mine,'mine',-11],[x.group,'group',11]].forEach(([v,klass,off])=>{if(!Number.isFinite(v))return;const val=Math.max(0,Math.min(100,v)),hh=PH*val/100;svg+='<rect class="'+klass+'" x="'+(cx+off-8)+'" y="'+(T+PH-hh)+'" width="16" height="'+hh+'" rx="4"><title>'+esc(x.label)+': '+val+' %</title></rect>'});
+    const lab=String(x.label||'').slice(0,13);svg+='<text x="'+cx+'" y="'+(H-25)+'" text-anchor="middle">'+esc(lab)+'</text>';
+  });
+  svg+='</svg><div class="chartLegend"><span><i></i>Ta note</span><span><i class="groupKey"></i>Moyenne du groupe</span></div>';
+  return '<div class="chartCard"><h4>'+esc(title)+'</h4><div class="chartScroll">'+svg+'</div></div>';
+}
 function results(){
   if(view!=='notes')return;
   const P=st.p,obj=num(P.obj)??30,tgt=num(P.tgt)??85;
@@ -493,7 +511,7 @@ function results(){
     const lo=calc(c,4).R,hi=calc(c,-4).R,rg=hi-lo>.1?` (${f1(lo)} à ${f1(hi)})`:'';
     const tot=sum(c.ev,e=>num(e.w)||0),left=tot-r.W,need=left>.01?(tgt*tot-r.note*r.W)/left:null;
     const nt=need==null?`Cours terminé : note finale de ${f1(r.note)} %.`:need>100?`Objectif de ${tgt} % hors d'atteinte (il faudrait ${f1(need,0)} % sur le reste).`:need<=0?`Objectif de ${tgt} % déjà assuré.`:`Il faut ${f1(need)} % en moyenne sur les ${f1(left,0)} % restants pour finir à ${tgt} %.`;
-    el.innerHTML=`<div class="kp"><div><b>${f1(r.note)} %</b><span>Note actuelle</span></div><div><b>${r.est?'≈ ':''}${f1(r.mean)} %</b><span>Moyenne du groupe (auto)</span></div><div><b>${f1(r.sd)}</b><span>Écart type estimé</span></div><div><b>${f1(r.z,2)}</b><span>Cote Z</span></div><div><b>${f1(pctl(r.z),0)} %</b><span>Percentile dans le groupe</span></div><div><b>${Math.round(r.known*100)} %</b><span>Précision</span></div><div class="r"><b>${f1(r.R)}</b><span>Cote R estimée${rg}</span></div></div><p class="hint">${nt}</p><div class="ch">${r.ev.map(e=>pair(c.id,e.n||'Évaluation',e.g,e.m)).join('')}</div><p class="hint">Barre pleine : ta note. Barre pâle : moyenne du groupe.</p>`;
+    el.innerHTML=`<div class="kp"><div><b>${f1(r.note)} %</b><span>Note actuelle</span></div><div><b>${r.est?'≈ ':''}${f1(r.mean)} %</b><span>Moyenne du groupe (auto)</span></div><div><b>${f1(r.sd)}</b><span>Écart type estimé</span></div><div><b>${f1(r.z,2)}</b><span>Cote Z</span></div><div><b>${f1(pctl(r.z),0)} %</b><span>Percentile dans le groupe</span></div><div><b>${Math.round(r.known*100)} %</b><span>Précision</span></div><div class="r"><b>${f1(r.R)}</b><span>Cote R estimée${rg}</span></div></div><p class="hint">${nt}</p><div class="ch">${r.ev.map(e=>pair(c.id,e.n||'Évaluation',e.g,e.m)).join('')}</div>${scoreGraph('Notes par évaluation',r.ev.map(e=>({label:e.n||'Évaluation',mine:e.g,group:e.m})))}<p class="hint">Chaque paire de colonnes compare ta note à la moyenne du groupe.</p>`;
   });
   const G=agg(),dash=document.querySelector('#dash');
   if(!G){dash.innerHTML=`<div class="rg"><div><span>Entre ta note dans au moins un cours (avec ses unités) pour voir ta cote R globale estimée.</span></div></div>`;return}
@@ -501,7 +519,7 @@ function results(){
   dash.innerHTML=`<div class="rg"><div><b>${f1(G.R)}</b><span>Cote R globale estimée${G.hi-G.lo>.1?` (${f1(G.lo)} à ${f1(G.hi)})`:''}</span></div><div><b>${f1(G.note)} %</b><span>Moyenne pondérée</span></div><div><b>${f1(pctl((G.R-25)/5),0)} %</b><span>Percentile estimé</span></div><div><b>${G.prec} %</b><span>Précision (${lb})<span class="precBar"><i style="width:${G.prec}%"></i></span></span></div><div><b>${d>=0?'+':''}${f1(d)}</b><span>${d>=0?'Au-dessus':'Sous'} de l’objectif (${f1(obj,0)})</span></div></div>
   ${srt.length>1?`<p class="hint">Meilleur cours : ${esc(srt[0].c.name)} (R ${f1(srt[0].r.R)}). À améliorer en priorité : ${esc(srt[srt.length-1].c.name)} (R ${f1(srt[srt.length-1].r.R)}). ${srt.length} cours inclus, pondérés par leurs unités.</p>`:''}
   <h3 class="ct">Cote R estimée par cours</h3><div class="ch">${srt.map(x=>bar(x.c.id,x.c.name,(x.r.R-10)/30*100,f1(x.r.R),(obj-10)/30*100)).join('')}</div><p class="hint">Trait vertical : ton objectif de cote R. Échelle de 10 à 40.</p>
-  <h3 class="ct">Ma note et moyenne du groupe</h3><div class="ch">${G.rows.map(x=>pair(x.c.id,x.c.name,x.r.note,x.r.mean)).join('')}</div>
+  <h3 class="ct">Notes moyennes par cours</h3>${scoreGraph('Comparaison des moyennes par cours',G.rows.map(x=>({label:x.c.name,mine:x.r.note,group:x.r.mean})))}
   <h3 class="ct">Avancement des évaluations</h3><div class="ch">${G.rows.map(x=>{const t=sum(x.c.ev,e=>num(e.w)||0);const v=t?x.r.W/t*100:0;return bar(x.c.id,x.c.name,v,f1(v,0)+' %')}).join('')}</div>`;
 }
 
@@ -622,8 +640,25 @@ function getMammoth(){
   mammothLoading=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/mammoth@1.13.0/mammoth.browser.min.js';s.onload=()=>window.mammoth?resolve(window.mammoth):reject(new Error('Mammoth indisponible'));s.onerror=()=>reject(new Error('Bibliothèque Word indisponible'));document.head.appendChild(s)});
   return mammothLoading;
 }
-async function extractDocumentText(file,ext){
+let ocrWorker=null,ocrWorkerPromise=null;
+async function getOcrWorker(status){
+  if(ocrWorker)return ocrWorker;
+  if(ocrWorkerPromise)return ocrWorkerPromise;
+  ocrWorkerPromise=(async()=>{
+    if(!window.Tesseract){
+      await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/tesseract.min.js';s.onload=resolve;s.onerror=()=>reject(new Error('OCR indisponible'));document.head.appendChild(s)});
+    }
+    if(!window.Tesseract)throw new Error('OCR indisponible');
+    ocrWorker=await window.Tesseract.createWorker('fra',1,{logger:m=>{if(m.status==='recognizing text'&&status)status.textContent='Lecture du document en français… '+Math.round((m.progress||0)*100)+' %'}});
+    return ocrWorker;
+  })();
+  try{return await ocrWorkerPromise}catch(e){ocrWorkerPromise=null;throw e}
+}
+async function releaseOcrWorker(){if(ocrWorker){await ocrWorker.terminate();ocrWorker=null;ocrWorkerPromise=null}}
+async function recognizeImage(source,status){const worker=await getOcrWorker(status),result=await worker.recognize(source);return result.data?.text||''}
+async function extractDocumentText(file,ext,status){
   if(ext==='ics')return {events:icsEvents(await file.text(),file.name),supported:true};
+  if(ext==='png'||ext==='jpg'||ext==='jpeg')return {events:textEvents(await recognizeImage(file,status),file.name),supported:true,ocr:true};
   if(ext==='docx'){
     const mammoth=await getMammoth(),result=await mammoth.extractRawText({arrayBuffer:await file.arrayBuffer()});
     return {events:textEvents(result.value,file.name),supported:true};
@@ -637,7 +672,15 @@ async function extractDocumentText(file,ext){
       for(const item of content.items){if(!item.str?.trim())continue;const y=Math.round(item.transform?.[5]||0);let row;
         for(let j=rows.length-1;j>=0;j--){if(Math.abs(rows[j].y-y)<=3){row=rows[j];break}}
         if(!row){row={y:y,text:''};rows.push(row)}row.text+=(row.text?' ':'')+item.str.trim()}
-      lines.push(rows.map(r=>r.text).join('\n'));
+      let pageText=rows.map(r=>r.text).join('\n');
+      if(pageText.replace(/\s/g,'').length<20&&n<=20){
+        status.textContent='Lecture de la page '+n+' du PDF…';
+        const viewport=page.getViewport({scale:1.5}),canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
+        canvas.width=viewport.width;canvas.height=viewport.height;
+        await page.render({canvasContext:ctx,viewport}).promise;
+        pageText=await recognizeImage(canvas,status);canvas.width=0;canvas.height=0;
+      }
+      lines.push(pageText);
     }
     return {events:textEvents(lines.join('\n'),file.name),supported:true};
   }
@@ -645,7 +688,7 @@ async function extractDocumentText(file,ext){
 }
 function documentsView(){
   if(!currentUser)return '<div class="card"><h2>Documents de cours</h2><p class="hint">Connecte-toi pour déposer et retrouver tes plans de cours et calendriers dans ton espace privé.</p><button class="btn pri" id="docsLogin">Se connecter</button></div>';
-  return '<div class="card"><div class="bar"><h2>Documents de cours</h2></div><p class="hint">Dépose un plan de cours ou un calendrier. Les examens et devoirs datés seront ajoutés automatiquement à ton calendrier.</p><label>Type de document<select id="docCategory"><option value="plan">Plan de cours</option><option value="calendrier">Calendrier</option><option value="autre">Autre document</option></select></label><input id="docFiles" type="file" accept=".pdf,.doc,.docx,.ics,.png,.jpg,.jpeg" multiple hidden><div class="dropbox" id="dropZone" role="button" tabindex="0" aria-label="Choisir ou déposer des documents"><strong>Dépose tes fichiers ici</strong><p>ou choisis-les sur ton appareil · PDF, Word, calendrier .ics ou image · 20 Mo maximum par fichier</p><button class="btn pri" type="button" id="docChoose">Choisir des fichiers</button></div><p id="docStatus" class="hint" role="status"></p><h3 class="ct">Mes documents</h3><div id="docList" class="empty">Chargement…</div><p class="hint">Les calendriers .ics sont lus directement. Les PDF avec texte et les Word .docx sont parcourus dans ton navigateur. Les images, scans sans texte et anciens fichiers .doc ne sont pas analysés. Vérifie les dates repérées dans Calendrier.</p></div>';
+  return '<div class="card"><div class="bar"><h2>Documents de cours</h2></div><p class="hint">Dépose un plan de cours ou un calendrier. Les examens et devoirs datés seront ajoutés automatiquement à ton calendrier.</p><label>Type de document<select id="docCategory"><option value="plan">Plan de cours</option><option value="calendrier">Calendrier</option><option value="autre">Autre document</option></select></label><input id="docFiles" type="file" accept=".pdf,.doc,.docx,.ics,.png,.jpg,.jpeg" multiple hidden><div class="dropbox" id="dropZone" role="button" tabindex="0" aria-label="Choisir ou déposer des documents"><strong>Dépose tes fichiers ici</strong><p>ou choisis-les sur ton appareil · PDF, Word, calendrier .ics ou image · 20 Mo maximum par fichier</p><button class="btn pri" type="button" id="docChoose">Choisir des fichiers</button></div><p id="docStatus" class="hint" role="status"></p><h3 class="ct">Mes documents</h3><div id="docList" class="empty">Chargement…</div><p class="hint">Les photos JPG/PNG et les pages numérisées des PDF sont lues en français par OCR dans ton navigateur; le texte des PDF, Word .docx et calendriers .ics est aussi analysé. Les anciens fichiers .doc sont conservés, mais ne sont pas lus automatiquement. L’OCR peut confondre des caractères ou des dates : vérifie les éléments ajoutés dans Calendrier.</p></div>';
 }
 async function refreshDocuments(){
   if(!sb||!currentUser||view!=='docs')return;
@@ -675,9 +718,10 @@ async function uploadDocuments(files){
     status.textContent='Envoi de '+file.name+'…';
     const {error}=await sb.storage.from(DOC_BUCKET).upload(path,file,{contentType:DOC_TYPES[ext],upsert:false});
     if(error){console.error(error);details.push('Échec de l’envoi de '+file.name+'. Vérifie la configuration du stockage.');continue}
-    try{const result=await extractDocumentText(file,ext);imported.push(...result.events);if(!result.supported)details.push(file.name+' est conservé, mais son format n’est pas analysé automatiquement.');else if(!result.events.length)details.push('Aucun examen ou devoir daté repéré dans '+file.name+'.')}
+    try{const result=await extractDocumentText(file,ext,status);imported.push(...result.events);if(!result.supported)details.push(file.name+' est conservé, mais son format n’est pas analysé automatiquement.');else if(!result.events.length)details.push('Aucun examen ou devoir daté repéré dans '+file.name+'. Vérifie le texte détecté avant de le ressaisir.')}
     catch(err){console.error(err);details.push(file.name+' est conservé, mais son texte n’a pas pu être analysé.')}
   }
+  await releaseOcrWorker();
   const keys=new Set(st.ev.map(e=>foldText(e.title)+'|'+e.date)),unique=[];
   imported.forEach(ev=>{const key=foldText(ev.title)+'|'+ev.date;if(!keys.has(key)){keys.add(key);unique.push(ev)}});
   if(unique.length){st.ev.push(...unique);save({silent:true});render();toast(unique.length+' examen(s) ou devoir(s) ajouté(s) au calendrier ✓')}
@@ -700,6 +744,8 @@ async function deleteDocument(path){
 }
 function render(){
   hero();
+  $('#hero').querySelector('[data-hero-add]')?.addEventListener('click',()=>openEv(null));
+  $('#hero').querySelector('[data-hero-doc]')?.addEventListener('click',()=>{view='docs';render()});
   document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.v===view));
   paint();$('#view').innerHTML=view==='cal'?calView():view==='list'?listView():view==='sched'?schedView():view==='study'?studyView():view==='docs'?documentsView():notesView();
   results();

@@ -96,7 +96,7 @@ using (
 );
 ```
 
-Le dépôt stocke les fichiers de façon privée. Après l'envoi, les fichiers `.ics`, PDF avec texte sélectionnable et Word `.docx` sont analysés dans le navigateur; les examens et devoirs avec une date reconnue sont ajoutés automatiquement au calendrier. Les images, PDF numérisés sans couche texte et anciens fichiers `.doc` ne sont pas analysés. Vérifie les dates repérées dans le calendrier.
+Le dépôt stocke les fichiers de façon privée. Après l’envoi, les calendriers `.ics`, PDF, Word `.docx`, photos JPG/PNG et pages numérisées de PDF sont analysés dans le navigateur; l’OCR français (Tesseract.js) sert à lire les images. Les examens et devoirs datés repérés sont ajoutés au calendrier. Les anciens fichiers `.doc` sont conservés, mais pas analysés automatiquement. Vérifie les dates, car l’OCR peut confondre des caractères ou échéances.
 
 ## Structure du projet
 

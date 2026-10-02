@@ -245,25 +245,7 @@ const PAL=['#2563eb','#9333ea','#059669','#d97706','#0891b2','#db2777','#65a30d'
 const TY={exam:'Examen',devoir:'Devoir',labo:'Laboratoire',test:'Test en ligne',autre:'Autre'};
 const DJ=['Lundi','Mardi','Mercredi','Jeudi','Vendredi'];
 const E=(title,course,type,date,notes='',approx=false)=>({title,course,type,date,notes,approx,time:'',done:false});
-const SEED_EV=()=>[
- E('Examen 1','alg','exam','2026-09-24','25 %'),
- E('Laboratoire Excel','alg','labo','2026-10-26','6 % – local A-2153'),
- E('Examen 2','alg','exam','2026-11-12','25 %'),
- E('Minitest historique','alg','test','2026-12-03','3 %'),
- E('Examen 3 – synthèse','alg','exam','2026-12-18','35 % – entre le 18 et le 22 décembre',true),
- E('Examen 1','philo','exam','2026-10-05','20 % – semaine 7 (cours B)',true),
- E('Examen 2','philo','exam','2026-11-16','30 % – semaine 13 (cours A)',true),
- E('Texte argumentatif final','philo','exam','2026-12-08','25 % – en classe'),
- E('Examen 1','eco','exam','2026-09-22','25 % – semaine 5',true),
- E('Test Moodle 1','eco','test','2026-09-08','5 % – semaine 3',true),
- E('Résumé vidéo','eco','devoir','2026-10-12','5 % – semaine 8',true),
- E('Test Moodle 2','eco','test','2026-10-12','5 % – semaine 8',true),
- E('Examen 2','eco','exam','2026-10-27','25 % – semaine 10',true),
- E('Test Moodle 3','eco','test','2026-11-17','5 % – semaine 13',true),
- E('Examen 3 – synthèse','eco','exam','2026-12-01','30 % – semaine 15',true),
- E('Date limite de désinscription','eco','devoir','2026-09-18'),
- E("Date limite d'abandon",'eco','devoir','2026-11-03')
-].map((e,i)=>({...e,id:'e'+i}));
+const SEED_EV=()=>[];
 const B=(day,start,end,title,course,room='')=>({day,start,end,title,course,room});
 const SEED_BL=()=>[
  B(1,'10:00','11:50','Philosophie et rationalité','philo','A-2132'),
@@ -296,14 +278,14 @@ const SEED_CO=()=>[
 ];
 const SEED_P=()=>({dm:'',ds:'',rho:'',ifgz:'',idgz:'',obj:'',tgt:'',smax:'3',sh:'14'});
 const fixBl=bl=>{const T=[['Écriture','ecr'],['gestion','gest'],['Méthodes','meth'],['Activités','ash'],['Multisports','eps'],['Vie étudiante','vie']];bl.forEach(b=>{if(b.course==='autre'){const m=T.find(x=>b.title.includes(x[0]));if(m)b.course=m[1]}});return bl};
-const fresh=()=>({ev:SEED_EV(),bl:fixBl(SEED_BL()),co:SEED_CO(),p:SEED_P(),sd:{}});
+const fresh=()=>({ev:[],bl:fixBl(SEED_BL()),co:SEED_CO(),p:SEED_P(),sd:{}});
 function norm(s){
   if(!s.co){
     const co=SEED_CO(),M={g1:'alg',g2:'philo',g3:'eco'},old=(s.gr&&s.gr.p)||{};
     ((s.gr&&s.gr.c)||[]).forEach(c=>{const t=co.find(x=>x.id===M[c.id]);if(t)Object.assign(t,{units:c.units,ifgz:c.ifgz,idgz:c.idgz,fm:c.fm,fs:c.fs,ev:c.ev});else co.push({...c,color:'#6b7280'})});
     s.co=co;fixBl(s.bl);s.p={rho:old.rho&&old.rho!=='0.7'?old.rho:''};delete s.gr;
   }
-  s.p=Object.assign(SEED_P(),s.p||{});s.sd=s.sd||{};return s;
+  s.ev=(s.ev||[]).filter(e=>!/^e\d+$/.test(e.id));s.p=Object.assign(SEED_P(),s.p||{});s.sd=s.sd||{};return s;
 }
 const SUPABASE_URL='https://nizoozaydlsibwlwzgys.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5pem9vemF5ZGxzaWJ3bHd6Z3lzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA5MDY5NTgsImV4cCI6MjEwNjQ4Mjk1OH0.eNcVhjYCJuT76ywLlv7t2cde7HTmY1W7i25eA337S48';

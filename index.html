@@ -660,7 +660,7 @@ function findDateAndTime(line){
 }
 function eventKind(text){
   const s=foldText(text);
-  if(/\b(examen|examens|exam|intra|final|evaluation|quiz|test)\b/.test(s))return 'exam';
+  if(/\b(mini[ -]?test|examen|examens|exam|intra|final|evaluation|quiz|test)\b/.test(s))return 'exam';
   if(/\b(devoir|remise|travail|laboratoire|labo|rapport|projet|dissertation|redaction|lecture|presentation|expose|echeance|date limite)\b/.test(s))return /\b(laboratoire|labo)\b/.test(s)?'labo':'devoir';
   return null;
 }
@@ -668,7 +668,11 @@ function importedEvent(line,date,fileName,includeGeneric=false,courseId=''){
   const kind=eventKind(line)||(includeGeneric?'autre':null);if(!kind)return null;
   const source=String(line||'').replace(/\s+/g,' ').trim();
   let title=source.replace(/(?:20\d{2}[-/.]\d{1,2}[-/.]\d{1,2}|\d{1,2}[-/.]\d{1,2}[-/.]20\d{2}|\d{1,2}(?:er)?\s+[\p{L}.]+\s*(?:20\d{2})?)/iu,' ')
-    .replace(/\b([01]?\d|2[0-3])\s*(?:h|:)\s*[0-5]\d\b/ig,' ').replace(/[•*–—:;|]+/g,' ').replace(/\s+/g,' ').trim();
+    .replace(/\b([01]?\d|2[0-3])\s*(?:h|:)\s*[0-5]\d\b/ig,' ')
+    .replace(/\b(?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)\b/ig,' ')
+    .replace(/^\s*\d{1,2}\s+(?=(?:examen|mini[ -]?test)\b)/i,' ')
+    .replace(/([%％]\s*\)?)[\s:|,-]*\d{1,2}\s*$/,'$1')
+    .replace(/[•*–—:;|]+/g,' ').replace(/\s+/g,' ').trim();
   if(title.length>80)title=title.slice(0,77).trim()+'…';
   if(!title)title=includeGeneric?'Événement importé':kind==='exam'?'Examen':'Devoir';
   if(includeGeneric&&foldText(title).length<3)return null;
@@ -708,10 +712,12 @@ function identifyDocumentCourse(text){
   const raw=String(text||''),folded=foldText(raw);
   let course=st.co.find(c=>c.id!=='autre'&&foldText(c.name).length>3&&folded.includes(foldText(c.name)));
   if(course)return course;
-  const code=raw.match(/\b(\d{3})\s*-\s*(\d{3})\s*-\s*([A-Z]{2})\b(?:\s+A\d{2})?\s+([^\r\n]+)/);
+  const code=raw.match(/\b(\d{3})\s*-\s*([A-Z0-9]{3})\s*-\s*([A-Z]{2})\b/);
   const codeKey=code?code[1]+'-'+code[2]+'-'+code[3]:'';
-  let name=code?code[4].replace(/\s{2,}.*/,'').replace(/\s+\d+.*$/,'').trim():'';
-  const knownCodes={'340-101-MQ':'philo','601-101-MQ':'ecr','109-101-MQ':'eps'};
+  const header=raw.match(/(?:^|\n)\s*([^|\n]{4,100}?)\s*,?\s*\|?\s*\d{3}\s*-\s*[A-Z0-9]{3}\s*-\s*[A-Z]{2}\b/i);
+  const trailingName=code?raw.slice(code.index+code[0].length).split(/[\r\n|]/,1)[0].replace(/^\s*,?\s*(?:Groupe\s*\d+).*$/i,'').replace(/^\s+A\d{2}\s*/,'').trim():'';
+  let name=(header?.[1]||trailingName).replace(/\s+/g,' ').replace(/^\s*[,;:-]+|[,;:-]+\s*$/g,'').trim();
+  const knownCodes={'201-SH4-RE':'alg','340-101-MQ':'philo','601-101-MQ':'ecr','109-101-MQ':'eps'};
   if(knownCodes[codeKey])course=st.co.find(c=>c.id===knownCodes[codeKey]);
   if(!course&&!name){
     const aliases=[['gestion','gest'],['philosophie','philo'],['algèbre','alg']];
@@ -720,7 +726,7 @@ function identifyDocumentCourse(text){
   }
   if(course)return course;
   if(name.length<4)return null;
-  const id='doc'+uid().slice(1).replace(/[^a-z0-9]/gi,'').toLowerCase();
+  const id=knownCodes[codeKey]||'doc'+uid().slice(1).replace(/[^a-z0-9]/gi,'').toLowerCase();
   course={id,name:name.slice(0,60),color:PAL[st.co.length%PAL.length],units:'2.33',ifgz:'',idgz:'',fm:'',fs:'',ev:[{id:id+'-0',name:'',w:'',grade:'',mean:'',sd:''}]};
   st.co.splice(Math.max(0,st.co.length-1),0,course);
   return course;
@@ -809,10 +815,30 @@ function parseWeeklyClasses(text,courseId){
   }
   return out;
 }
+function flexibleFinalExamEvents(text,fileName,courseId){
+  const lines=String(text||'').replace(/\u00a0/g,' ').split(/\r?\n/).map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean),out=[],monthNames=Object.keys(months).sort((a,b)=>b.length-a.length);
+  const monthPattern='(?:'+monthNames.join('|')+')\\b';
+  for(let i=0;i<lines.length;i++){
+    const exam=lines[i].match(/\b(examen\s*\d+)\b/i);if(!exam)continue;
+    const context=foldText(lines.slice(i,Math.min(lines.length,i+4)).join(' '));
+    if(!/journ[eé]es?\s+d['’]examens?|dates?\s+d['’]examens?/i.test(context))continue;
+    const options=context.match(new RegExp('((?:\\d{1,2}\\s*(?:,|ou|et)\\s*)*\\d{1,2})\\s+('+monthPattern+')(?:\\s+(20\\d{2}))?','i'));
+    if(!options)continue;
+    const month=months[foldText(options[2])];if(month==null)continue;
+    const days=options[1].match(/\d{1,2}/g)?.map(Number).filter(day=>day>=1&&day<=31)||[];
+    if(days.length<2)continue;
+    const year=+(options[3]||S0.getFullYear()),dates=days.map(day=>makeEventDate(year,month,day)).filter(Boolean);
+    if(!dates.length)continue;
+    const dateText=days.join(', ').replace(/, (\d+)$/,' ou $1')+' '+options[2];
+    out.push({id:uid(),title:exam[1].replace(/\s+/g,' ').trim()+' (date à confirmer)',course:courseId||'autre',type:'exam',date:dates[0].date,time:'',notes:'Date à confirmer : une séance sera retenue parmi le '+dateText+'. Repéré dans '+fileName,approx:true,done:false});
+  }
+  return out;
+}
 function documentEvents(text,fileName,courseId,includeGeneric=false,looseCalendar=false,classSchedule=[]){
-  const planned=coursePlanEvents(text,fileName,courseId,classSchedule),cleanTitle=s=>foldText(s).replace(/\s*\(semaine\s+\d+\)$/,'').replace(/\s*\(?\s*\d+(?:[.,]\d+)?\s*%\s*\)?/g,'').trim();
+  const planned=coursePlanEvents(text,fileName,courseId,classSchedule),cleanTitle=s=>foldText(s).replace(/\s*\(semaine\s+\d+\)$/,'').replace(/\s*\(?\s*\d+(?:[.,]\d+)?\s*\%\s*\)?/g,'').trim();
   const ordinary=textEvents(text,fileName,includeGeneric,looseCalendar,courseId).filter(e=>!planned.some(p=>p.date===e.date&&p.type===e.type&&cleanTitle(p.title)===cleanTitle(e.title)));
-  return ordinary.concat(planned);
+  const all=ordinary.concat(planned,flexibleFinalExamEvents(text,fileName,courseId)),seen=new Set();
+  return all.filter(e=>{const key=foldText(e.title)+'|'+e.date+'|'+e.type+'|'+e.course;if(seen.has(key))return false;seen.add(key);return true});
 }
 function icsEvents(text,fileName){
   const unfolded=String(text||'').replace(/\r?\n[ \t]/g,'');

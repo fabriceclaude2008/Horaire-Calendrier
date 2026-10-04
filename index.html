@@ -16,6 +16,7 @@
 [data-theme=violet]{color-scheme:dark;--bg:#15101f;--sf:#20182f;--ink:#efe9fb;--mute:#a99cc6;--line:#38294f;--acc:#b794f6;--onacc:#1c1030;--warn:#ff8a7a;--onc:#1a0a08}
 [data-theme=papier]{color-scheme:light;--bg:#f6f1e7;--sf:#fffdf8;--ink:#2a2118;--mute:#6e6154;--line:#e2d9c8;--acc:#b45309;--onacc:#fff;--warn:#b42318;--onc:#fff}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.45 "Schibsted Grotesk",system-ui,sans-serif;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
 main{max-width:1100px;margin:0 auto;padding:16px}
@@ -26,6 +27,7 @@ select,input[type=date],input[type=time]{min-height:34px}
 :focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 
 .welcome{display:flex;align-items:center;gap:12px;margin:8px 2px 14px}.brandMark{width:42px;height:42px;border-radius:14px;background:#e0eee3;color:#315d47;display:grid;place-items:center;font-size:22px}.welcome b{display:block;font-size:18px;letter-spacing:-.03em}.welcome small{color:var(--mute)}
+.authGate{max-width:620px;margin:36px auto;padding:28px}.authGate h1{margin:0 0 8px;font-size:clamp(24px,5vw,34px);letter-spacing:-.03em}.authGate p{color:var(--mute)}.authGate .acts{justify-content:flex-start;margin-top:18px}
 .hero{background:linear-gradient(115deg,#477a63,#5d9175 58%,#87a889);color:#fff;border-radius:20px;padding:24px 26px;display:flex;gap:20px;align-items:center;justify-content:space-between;flex-wrap:wrap;box-shadow:0 12px 32px rgba(48,82,59,.12)}.hero p{opacity:.88}.hero .big{font-size:clamp(56px,12vw,96px);font-weight:800;line-height:.9;letter-spacing:-.04em}.hero h1{margin:0 0 6px;font-size:clamp(22px,3.4vw,32px);font-weight:800;letter-spacing:-.03em}.hero .r{text-align:right}.heroActions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}.hero .btn{border-color:rgba(255,255,255,.45);background:rgba(255,255,255,.14);color:white}.hero .btn.pri{background:#fff;color:#315d47;border-color:#fff}.heroMeta{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.heroMeta span{border-radius:999px;background:rgba(255,255,255,.15);padding:5px 10px;font-size:12px}
 .hero .big{font-size:clamp(56px,12vw,96px);font-weight:800;line-height:.9;letter-spacing:-.04em}
 .hero h1{margin:0 0 4px;font-size:clamp(20px,3.4vw,30px);font-weight:800;letter-spacing:-.02em}
@@ -253,38 +255,20 @@ const DJ=['Lundi','Mardi','Mercredi','Jeudi','Vendredi'];
 const E=(title,course,type,date,notes='',approx=false)=>({title,course,type,date,notes,approx,time:'',done:false});
 const SEED_EV=()=>[];
 const B=(day,start,end,title,course,room='')=>({day,start,end,title,course,room});
-const SEED_BL=()=>[
- B(1,'10:00','11:50','Philosophie et rationalité','philo','A-2132'),
- B(1,'16:00','17:50','Algèbre linéaire','alg','C-2440'),
- B(2,'12:00','13:50','Activités sciences humaines','autre'),
- B(2,'14:00','16:50','Initiation à l’économie globale','eco','A-3064'),
- B(3,'09:00','11:50','Méthodes de travail','autre','B-2309'),
- B(3,'12:00','13:50','Philosophie et rationalité','philo','A-2130'),
- B(3,'16:00','18:50','Écriture et littérature','autre','C-2436'),
- B(4,'10:00','11:50','Multisports','autre','E-1633'),
- B(4,'12:00','13:50','Vie étudiante','autre'),
- B(4,'16:00','17:50','Algèbre linéaire','alg','G-2823'),
- B(5,'09:00','11:50','Introduction à la gestion','autre','G-1873'),
- B(5,'12:00','13:50','Écriture et littérature','autre','C-2434')
-].map((b,i)=>({...b,id:'b'+i}));
+const SEED_BL=()=>[];
 
 const EV=(name,w)=>({name,w,grade:'',mean:'',sd:''});
 const mkc=(id,name,color,evs=[])=>({id,name,color,units:'2.33',ifgz:'',idgz:'',fm:'',fs:'',ev:(evs.length?evs:[EV('','')]).map((e,i)=>({...e,id:id+'-'+i}))});
-const SEED_CO=()=>[
- mkc('alg','Algèbre linéaire','#2563eb',[EV('Examen 1',25),EV('Laboratoire Excel',6),EV('Examen 2',25),EV('Minitest historique',3),EV('Examen 3 – synthèse',35)]),
- mkc('philo','Philosophie et rationalité','#9333ea',[EV('Examen 1',20),EV('Examen 2',30),EV('Texte argumentatif final',25),EV('Travaux courts (5)',15),EV('Journaux de lecture (6)',10)]),
- mkc('eco','Initiation à l’économie globale','#059669',[EV('Examen 1',25),EV('Résumé vidéo',5),EV('Examen 2',25),EV('Examen 3 – synthèse',30),EV('Tests Moodle (3)',15)]),
- mkc('ecr','Écriture et littérature','#d97706'),
- mkc('gest','Introduction à la gestion','#0891b2'),
- mkc('meth','Méthodes de travail','#db2777'),
- mkc('ash','Activités sciences humaines','#65a30d'),
- mkc('eps','Multisports','#dc2626'),
- mkc('vie','Vie étudiante','#64748b'),
- {id:'autre',name:'Autre',color:'#6b7280',units:'',ifgz:'',idgz:'',fm:'',fs:'',ev:[]}
-];
+const STARTER_COURSES={alg:'Algèbre linéaire',philo:'Philosophie et rationalité',eco:'Initiation à l’économie globale',ecr:'Écriture et littérature',gest:'Introduction à la gestion',meth:'Méthodes de travail',ash:'Activités sciences humaines',eps:'Multisports',vie:'Vie étudiante'};
+const STARTER_ASSESSMENTS={
+  alg:['Examen 1','Laboratoire Excel','Examen 2','Minitest historique','Examen 3 – synthèse'],
+  philo:['Examen 1','Examen 2','Texte argumentatif final','Travaux courts (5)','Journaux de lecture (6)'],
+  eco:['Examen 1','Résumé vidéo','Examen 2','Examen 3 – synthèse','Tests Moodle (3)']
+};
+const SEED_CO=()=>[{id:'autre',name:'Autre',color:'#6b7280',units:'',ifgz:'',idgz:'',fm:'',fs:'',ev:[]}];
 const SEED_P=()=>({dm:'',ds:'',rho:'',ifgz:'',idgz:'',obj:'',tgt:'',smax:'3',sh:'14'});
 const fixBl=bl=>{const T=[['Écriture','ecr'],['gestion','gest'],['Méthodes','meth'],['Activités','ash'],['Multisports','eps'],['Vie étudiante','vie']];bl.forEach(b=>{if(b.course==='autre'){const m=T.find(x=>b.title.includes(x[0]));if(m)b.course=m[1]}});return bl};
-const fresh=()=>({ev:[],bl:fixBl(SEED_BL()),co:SEED_CO(),p:SEED_P(),sd:{}});
+const fresh=()=>({ev:[],bl:[],co:SEED_CO(),p:SEED_P(),sd:{}});
 function norm(s){
   if(!s.co){
     const co=SEED_CO(),M={g1:'alg',g2:'philo',g3:'eco'},old=(s.gr&&s.gr.p)||{};
@@ -314,6 +298,7 @@ async function cloudSave(){
   if(error){console.error(error);toast('Sauvegarde cloud impossible');}
 }
 function save({silent=false}={}){
+  if(!currentUser)return false;
   try{
     localStorage.setItem(KEY,JSON.stringify(st));
     document.querySelector('#warn').hidden=true;
@@ -335,36 +320,60 @@ function updateAccountUI(){
     state.innerHTML=`<small>${esc(currentUser.email)}</small>`;
     btn.textContent='Déconnexion';
   }else{
-    state.innerHTML=`<small>${supabaseConfigured?'Non connecté':'Mode local'}</small>`;
+    state.innerHTML=`<small>Non connecté</small>`;
     btn.textContent='Connexion';
   }
 }
+function privateAccountData(value){
+  const data=norm(value),starterIds=new Set(Object.keys(STARTER_COURSES));
+  data.bl=(data.bl||[]).filter(b=>!/^b\d+$/.test(String(b.id||'')));
+  data.co=(data.co||[]).filter(c=>{
+    if(!starterIds.has(c.id))return true;
+    const referenced=(data.ev||[]).some(e=>e.course===c.id)||data.bl.some(b=>b.course===c.id);
+    const custom=String(c.name||'')!==STARTER_COURSES[c.id]||String(c.units||'2.33')!=='2.33'||[c.fm,c.fs,c.ifgz,c.idgz].some(v=>String(v||'').trim())||(c.ev||[]).some(e=>String(e.grade||e.mean||e.sd||e.date||'').trim()||(e.name&&!((STARTER_ASSESSMENTS[c.id]||[]).includes(e.name))));
+    return referenced||custom;
+  });
+  if(!data.co.some(c=>c.id==='autre'))data.co.push({id:'autre',name:'Autre',color:'#6b7280',units:'',ifgz:'',idgz:'',fm:'',fs:'',ev:[]});
+  return data;
+}
 async function loadCloudForUser(user){
   if(!sb)return;
+  clearTimeout(cloudSaveTimer);st=fresh();
   const {data,error}=await sb.from('agenda_data').select('data').eq('user_id',user.id).maybeSingle();
-  if(error){console.error(error);toast('Erreur de chargement du compte');return}
+  if(error){console.error(error);st=fresh();render();toast('Erreur de chargement du compte');return}
   if(data?.data?.ev&&data?.data?.bl){
-    st=norm(data.data);
+    const original=JSON.stringify(data.data);
+    st=privateAccountData(data.data);
+    const migrated=JSON.stringify(st)!==original,datesLinked=syncCalendarExamsToNotes();
+    if(migrated||datesLinked)save({silent:true});
     localStorage.setItem(KEY,JSON.stringify(st));
     render();
     toast('Données du compte chargées ✓');
   }else{
+    st=fresh();
+    localStorage.setItem(KEY,JSON.stringify(st));
     await cloudSave();
-    toast('Compte prêt : tes données locales sont sauvegardées ✓');
+    render();
+    toast('Compte prêt. Dépose un document pour remplir ton espace.');
   }
 }
 async function initAuth(){
   updateAccountUI();
-  if(!sb)return;
+  if(!sb){render();return}
   const {data}=await sb.auth.getSession();
   currentUser=data.session?.user||null;
   updateAccountUI();
-  if(currentUser)await loadCloudForUser(currentUser);
+  if(currentUser)await loadCloudForUser(currentUser);else render();
   sb.auth.onAuthStateChange(async (_event,session)=>{
     currentUser=session?.user||null;
     updateAccountUI();
     if(currentUser)await loadCloudForUser(currentUser);
-    else render();
+    else{
+      clearTimeout(cloudSaveTimer);st=fresh();
+      localStorage.removeItem(KEY);
+      for(const dialog of document.querySelectorAll('dialog[open]'))dialog.close();
+      render();
+    }
   });
 }
 const $=s=>document.querySelector(s), p2=n=>String(n).padStart(2,'0');
@@ -898,6 +907,19 @@ async function refreshDocuments(){
     return '<div class="docRow"><div class="docIcon">'+esc(ext.slice(0,4))+'</div><div class="docMeta"><b title="'+esc(label)+'">'+esc(label)+'</b><small>'+DOC_CATEGORIES[category]+' · '+date+(file.metadata?.size?' · '+(file.metadata.size/1048576).toFixed(1)+' Mo':'')+'</small></div>'+(canAnalyze?'<button class="btn" type="button" data-doc-analyze="'+esc(category+'/'+file.name)+'">Ré-analyser</button>':'')+'<button class="btn" type="button" data-doc-download="'+esc(category+'/'+file.name)+'">Ouvrir</button><button class="btn del" type="button" data-doc-delete="'+esc(category+'/'+file.name)+'">Supprimer</button></div>';
   }).join('');
 }
+function syncCalendarExamsToNotes(){
+  let changed=false;
+  for(const event of st.ev.filter(e=>e.type==='exam'&&e.course&&e.course!=='autre'&&e.date)){
+    const course=st.co.find(c=>c.id===event.course);if(!course)continue;
+    let assessment=course.ev.find(e=>e.eventId===event.id)||course.ev.find(e=>matchingAssessmentEvents(course.id,e).includes(event));
+    if(!assessment){
+      assessment=course.ev.find(e=>!String(e.name||'').trim()&&!e.date&&!e.grade&&!e.mean&&!e.sd);
+      if(!assessment){assessment={id:uid(),name:event.title,w:'',grade:'',mean:'',sd:'',date:event.date,eventId:event.id};course.ev.push(assessment);changed=true}
+      else {assessment.name=event.title;assessment.date=event.date;assessment.eventId=event.id;changed=true}
+    }else if(assessment.date!==event.date||assessment.eventId!==event.id){assessment.date=event.date;assessment.eventId=event.id;changed=true}
+  }
+  return changed;
+}
 function mergeImportedData(imported,importedClasses,initialCourseCount){
   const baseTitle=s=>foldText(s).replace(/\s*\(semaine\s+\d+\)\s*$/,'').trim();
   const wasImported=e=>/^(?:repéré dans|ajouté depuis)\b/i.test(String(e?.notes||''));
@@ -920,8 +942,8 @@ function mergeImportedData(imported,importedClasses,initialCourseCount){
   }
   const classKeys=new Set(st.bl.map(b=>b.day+'|'+b.start+'|'+b.end+'|'+b.course)),uniqueClasses=[];
   for(const b of importedClasses){const key=b.day+'|'+b.start+'|'+b.end+'|'+b.course;if(!classKeys.has(key)){classKeys.add(key);uniqueClasses.push(b)}}
-  const coursesAdded=Math.max(0,st.co.length-initialCourseCount);
-  if(added||updated||uniqueClasses.length||coursesAdded){
+  const coursesAdded=Math.max(0,st.co.length-initialCourseCount),assessmentsLinked=syncCalendarExamsToNotes();
+  if(added||updated||uniqueClasses.length||coursesAdded||assessmentsLinked){
     st.bl.push(...uniqueClasses);
     save({silent:true});
     if(view!=='docs')render();
@@ -1024,11 +1046,22 @@ async function deleteDocument(path){
   toast('Document supprimé');refreshDocuments();
 }
 function render(){
+  const page=$('#view'),nav=document.querySelector('nav'),foot=document.querySelector('.foot');
+  if(!currentUser){
+    $('#hero').hidden=true;$('#hero').innerHTML='';nav.hidden=true;foot.hidden=true;$('#warn').hidden=true;
+    $('#dayDetails').innerHTML='';fEv.reset();fBl.reset();fAuth.reset();fEv.course.innerHTML='';fBl.course.innerHTML='';
+    page.innerHTML='<section class="card authGate"><span class="tag">Espace privé</span><h1>Connecte-toi pour commencer</h1><p>Ton calendrier et tes cours sont privés. Après la connexion, dépose tes plans de cours ou ton calendrier pour y importer tes examens, devoirs et plages de cours.</p><div class="acts"><button class="btn pri" type="button" id="gateLogin">Se connecter</button><button class="btn" type="button" id="gateSignup">Créer un compte</button></div></section>';
+    $('#gateLogin')?.addEventListener('click',()=>$('#accountBtn').click());
+    $('#gateSignup')?.addEventListener('click',()=>{$('#accountBtn').click();$('#authMode').click()});
+    return;
+  }
+  $('#hero').hidden=false;nav.hidden=false;foot.hidden=false;
+  fEv.course.innerHTML=opts(CO);fBl.course.innerHTML=opts(CO);
   hero();
   $('#hero').querySelector('[data-hero-add]')?.addEventListener('click',()=>openEv(null));
   $('#hero').querySelector('[data-hero-doc]')?.addEventListener('click',()=>{view='docs';render()});
   document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.v===view));
-  paint();$('#view').innerHTML=view==='cal'?calView():view==='list'?listView():view==='sched'?schedView():view==='study'?studyView():view==='docs'?documentsView():notesView();
+  paint();page.innerHTML=view==='cal'?calView():view==='list'?listView():view==='sched'?schedView():view==='study'?studyView():view==='docs'?documentsView():notesView();
   results();
   if(view==='docs'&&currentUser)refreshDocuments();
   if(view==='docs'){
@@ -1039,7 +1072,6 @@ function render(){
     $('#docsLogin')?.addEventListener('click',()=>$('#accountBtn').click());
   }
 }
-
 // Dialogs
 const dEv=$('#dEv'), fEv=$('#fEv'), dBl=$('#dBl'), fBl=$('#fBl');
 const opts=o=>Object.entries(o).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
@@ -1081,9 +1113,11 @@ document.querySelectorAll('[data-close],[data-day-close]').forEach(b=>b.onclick=
 // Authentification
 const dAuth=$('#dAuth'), fAuth=$('#fAuth');
 let authSignup=false;
-$('#accountBtn').onclick=()=>{
+$('#accountBtn').onclick=async()=>{
   if(currentUser){
-    if(sb)sb.auth.signOut();
+    clearTimeout(cloudSaveTimer);
+    await cloudSave();
+    if(sb)await sb.auth.signOut();
     return;
   }
   if(!sb){alert('Pour activer les comptes, ajoute ton URL et ta clé anon Supabase dans le code.');return}

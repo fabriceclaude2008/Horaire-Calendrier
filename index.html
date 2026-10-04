@@ -696,6 +696,10 @@ function textEvents(text,fileName,includeGeneric=false,looseCalendar=false,cours
     for(const clean of chunks){
       if(clean.length>500)continue;
       let dt=findDateAndTime(clean),eventLine=clean;
+      if(dt&&clean.includes('|')){
+        const cells=clean.split('|').map(x=>x.trim()),dateCell=cells.findIndex(cell=>!!findDateAndTime(cell));
+        if(dateCell>0){const titleCell=cells.slice(0,dateCell).reverse().find(cell=>eventKind(cell)&&!/^\d{1,2}$/.test(cell));if(titleCell)eventLine=titleCell}
+      }
       if(!dt&&monthContext){
         const day=clean.match(/^\s*(?:[•*·]\s*)?(\d{1,2})(?:er)?(?:[.)–—:-]\s*|\s+)(.+)$/);
         if(day&&+day[1]>=1&&+day[1]<=31){dt=makeEventDate(monthContext.year,monthContext.month,+day[1]);eventLine=day[2].trim()}
@@ -896,8 +900,8 @@ async function extractDocumentText(file,ext,status,category='plan'){
       const page=await doc.getPage(n),content=await page.getTextContent(),rows=[];
       for(const item of content.items){if(!item.str?.trim())continue;const y=Math.round(item.transform?.[5]||0),x=Number(item.transform?.[4]||0);let row;
         for(let j=rows.length-1;j>=0;j--){if(Math.abs(rows[j].y-y)<=3){row=rows[j];break}}
-        if(!row){row={y:y,items:[]};rows.push(row)}row.items.push({x,text:item.str.trim()})}
-      let pageText=rows.sort((a,b)=>b.y-a.y).map(r=>{const items=r.items.sort((a,b)=>a.x-b.x);let line='',lastX=null;for(const item of items){if(line)line+=(lastX!=null&&item.x-lastX>70?' | ':' ');line+=item.text;lastX=item.x+Math.max(1,item.text.length*4)}return line}).join('\n');
+        if(!row){row={y:y,items:[]};rows.push(row)}row.items.push({x,width:Number(item.width)||0,text:item.str.trim()})}
+      let pageText=rows.sort((a,b)=>b.y-a.y).map(r=>{const items=r.items.sort((a,b)=>a.x-b.x);let line='',lastX=null;for(const item of items){const gap=lastX==null?null:item.x-lastX;if(line)line+=gap>70?' | ':gap>1.5?' ':'';line+=item.text;lastX=item.x+(item.width>0?item.width:Math.max(1,item.text.length*4))}return line}).join('\n');
       if(pageText.replace(/\s/g,'').length<160&&n<=40){
         status.textContent='Lecture de la page '+n+' du PDF…';
         const viewport=page.getViewport({scale:1.5}),canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');

@@ -50,7 +50,7 @@ nav .sp{flex:1}
 .day:hover{background:color-mix(in srgb,var(--ink) 4%,var(--sf))}
 .day.out{opacity:.6}
 .day.rel{background:repeating-linear-gradient(135deg,transparent 0 6px,color-mix(in srgb,var(--mute) 12%,transparent) 6px 12px)}
-.day .n{font-weight:700;font-size:12px;padding:1px 4px;align-self:flex-start;border-radius:6px}.classchip{border-left-style:dashed;background:color-mix(in srgb,var(--acc) 8%,var(--sf));font-weight:500}.classMore{font-size:10px;color:var(--mute);padding:0 5px}.dh small{display:block;color:var(--mute);font-size:10px;font-weight:500}.dayItem{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:left;padding:10px 12px;margin:4px 0;border:1px solid var(--line);border-radius:9px;background:var(--sf);color:var(--ink)}.dayItem span{font-size:12px;color:var(--mute);text-align:right}.dayItem b{font-size:14px}
+.day .n{font-weight:700;font-size:12px;padding:1px 4px;align-self:flex-start;border-radius:6px}.classchip{border-left-style:dashed;background:color-mix(in srgb,var(--acc) 8%,var(--sf));font-weight:500}.classMore{font-size:10px;color:var(--mute);padding:0 5px}.dh small{display:block;color:var(--mute);font-size:10px;font-weight:500}.dayItem{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:left;padding:10px 12px;margin:4px 0;border:1px solid var(--line);border-radius:9px;background:var(--sf);color:var(--ink)}.dayItem span{font-size:12px;color:var(--mute);text-align:right}.dayItem b{font-size:14px}.dayItem small{display:block;width:100%;color:var(--mute);font-size:12px;text-align:left;margin-top:4px}.dayClass{margin-bottom:4px}.dayClass .dayItem{margin:2px 0}.dayExamList{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:4px 12px;margin:4px 0 14px}.dayExam{margin:0;padding:6px 4px;border-bottom:1px solid var(--line)}
 .day.today .n{background:var(--acc);color:var(--onacc)}
 .chip{display:block;flex:none;width:100%;text-align:left;border:0;border-left:3px solid var(--c);background:color-mix(in srgb,var(--c) 15%,var(--sf));border-radius:4px;padding:3px 5px;font-size:11.5px;line-height:1.3;overflow-wrap:anywhere;white-space:normal}
 .chip.exam{background:var(--c);color:var(--on);font-weight:700}
@@ -416,11 +416,18 @@ function calView(){
 function openDay(date){
   dayDialogDate=date;
   const d=parse(date),dow=(d.getDay()+6)%7+1,inSession=d>=S0&&d<addD(S0,112),blocks=inSession?st.bl.filter(b=>b.day===dow).sort((a,b)=>a.start.localeCompare(b.start)):[],events=sorted().filter(e=>e.date===date);
+  const courseBlocks=[],courseKeys=new Set();
+  for(const b of blocks){const key=b.course==='autre'?b.course+'|'+b.title:b.course;if(!courseKeys.has(key)){courseKeys.add(key);courseBlocks.push(b)}}
+  const dayCourses=courseBlocks.length?courseBlocks:st.co.filter(c=>c.id!=='autre').map(c=>({course:c.id,title:c.name}));
   $('#dayTitle').textContent=fmtD(date,{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   let html='';
-  if(blocks.length){html+='<h4 class="ct">Cours</h4>'+blocks.map(b=>'<button class="dayItem" type="button" data-day-block="'+esc(b.id)+'"><b>'+esc(b.title)+'</b><span>'+b.start+'–'+b.end+(b.room?' · '+esc(b.room):'')+'</span></button>').join('')}
-  if(events.length){html+='<h4 class="ct">Examens et devoirs</h4>'+events.map(e=>'<button class="dayItem" type="button" data-day-event="'+esc(e.id)+'"><b>'+esc(e.title)+'</b><span>'+TY[e.type]+' · '+esc(CO[e.course])+(e.time?' · '+e.time:'')+(e.approx?' · date à confirmer':'')+'</span></button>').join('')}
-  if(!blocks.length&&!events.length)html='<p class="empty">Aucun cours ni élément prévu. Tu peux en ajouter à cette journée.</p>';
+  if(blocks.length){html+='<h4 class="ct">Cours</h4>'+blocks.map(b=>'<div class="dayClass"><button class="dayItem" type="button" data-day-block="'+esc(b.id)+'"><b>'+esc(b.title)+'</b><span>'+b.start+'–'+b.end+(b.room?' · '+esc(b.room):'')+'</span></button></div>').join('')}
+  if(dayCourses.length){html+='<h4 class="ct">Examen dans un cours</h4><p class="hint">Coche un cours pour ajouter son examen à cette date au calendrier.</p><div class="dayExamList">'+dayCourses.map(b=>{
+    const course=b.course,hasExam=events.some(e=>e.type==='exam'&&e.course===course),label=course!=='autre'?CO[course]:b.title;
+    return '<label class="ck dayExam"><input type="checkbox" data-day-exam-course="'+esc(course)+'"'+(hasExam?' checked':'')+'> Examen dans '+esc(label)+'</label>';
+  }).join('')+'</div>'}
+  if(events.length){html+='<h4 class="ct">Examens et devoirs</h4>'+events.map(e=>'<button class="dayItem" type="button" data-day-event="'+esc(e.id)+'"><b>'+esc(e.title)+'</b><span>'+esc(TY[e.type]||'Événement')+' · '+esc(CO[e.course])+(e.time?' · '+e.time:'')+(e.approx?' · date à confirmer':'')+(e.done?' · terminé':'')+'</span>'+(e.notes?'<small>'+esc(e.notes)+'</small>':'')+'</button>').join('')}
+  if(!blocks.length&&!events.length&&!dayCourses.length)html='<p class="empty">Aucun cours ni élément prévu. Tu peux en ajouter à cette journée.</p>';
   $('#dayDetails').innerHTML=html;$('#dDay').showModal();
 }
 function listView(){
@@ -613,15 +620,17 @@ function eventKind(text){
   if(/\b(devoir|remise|travail|laboratoire|labo|rapport|projet|dissertation|redaction|lecture|presentation|expose|echeance|date limite)\b/.test(s))return /\b(laboratoire|labo)\b/.test(s)?'labo':'devoir';
   return null;
 }
-function importedEvent(line,date,fileName,includeGeneric=false){
+function importedEvent(line,date,fileName,includeGeneric=false,courseId=''){
   const kind=eventKind(line)||(includeGeneric?'autre':null);if(!kind)return null;
-  let title=String(line).replace(/(?:20\d{2}[-/.]\d{1,2}[-/.]\d{1,2}|\d{1,2}[-/.]\d{1,2}[-/.]20\d{2}|\d{1,2}(?:er)?\s+[\p{L}.]+\s*(?:20\d{2})?)/iu,' ')
+  const source=String(line||'').replace(/\s+/g,' ').trim();
+  let title=source.replace(/(?:20\d{2}[-/.]\d{1,2}[-/.]\d{1,2}|\d{1,2}[-/.]\d{1,2}[-/.]20\d{2}|\d{1,2}(?:er)?\s+[\p{L}.]+\s*(?:20\d{2})?)/iu,' ')
     .replace(/\b([01]?\d|2[0-3])\s*(?:h|:)\s*[0-5]\d\b/ig,' ').replace(/[•*–—:;|]+/g,' ').replace(/\s+/g,' ').trim();
   if(title.length>80)title=title.slice(0,77).trim()+'…';
   if(!title)title=includeGeneric?'Événement importé':kind==='exam'?'Examen':'Devoir';
   if(includeGeneric&&foldText(title).length<3)return null;
-  const lineText=foldText(line),course=(st.co||[]).find(c=>c.id!=='autre'&&foldText(c.name).length>2&&lineText.includes(foldText(c.name)));
-  return {id:uid(),title:title,course:course?.id||'autre',type:kind,date:date.date,time:date.time||'',notes:'Ajouté depuis '+fileName,approx:false,done:false};
+  const lineText=foldText(source),matched=(st.co||[]).find(c=>c.id!=='autre'&&foldText(c.name).length>2&&lineText.includes(foldText(c.name)));
+  const excerpt=source.slice(0,360);
+  return {id:uid(),title:title,course:matched?.id||courseId||'autre',type:kind,date:date.date,time:date.time||'',notes:'Ajouté depuis '+fileName+(excerpt?' · '+excerpt:''),approx:false,done:false};
 }
 function calendarGridContext(text){
   const folded=foldText(text),keys=Object.keys(months).sort((a,b)=>b.length-a.length),m=folded.match(new RegExp('\\b('+keys.join('|')+')\\b\\s*(20\\d{2})?'));
@@ -630,7 +639,7 @@ function calendarGridContext(text){
   if(new Set(weekdays).size<3)return null;
   return {month:months[m[1]],year:+(m[2]||S0.getFullYear())};
 }
-function textEvents(text,fileName,includeGeneric=false,looseCalendar=false){
+function textEvents(text,fileName,includeGeneric=false,looseCalendar=false,courseId=''){
   const out=[],seen=new Set(),monthContext=looseCalendar?calendarGridContext(text):null,lines=String(text||'').replace(/\u00a0/g,' ').split(/\r?\n/).map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean);
   for(let i=0;i<lines.length;i++){
     const chunks=[lines[i]];
@@ -644,7 +653,7 @@ function textEvents(text,fileName,includeGeneric=false,looseCalendar=false){
         if(day&&+day[1]>=1&&+day[1]<=31){dt=makeEventDate(monthContext.year,monthContext.month,+day[1]);eventLine=day[2].trim()}
       }
       if(!dt)continue;
-      const ev=importedEvent(eventLine,dt,fileName,includeGeneric||!!monthContext);if(!ev)continue;
+      const ev=importedEvent(eventLine,dt,fileName,includeGeneric||!!monthContext,courseId);if(!ev)continue;
       const key=foldText(ev.title)+'|'+ev.date;
       if(!seen.has(key)){seen.add(key);out.push(ev)}
     }
@@ -655,9 +664,12 @@ function identifyDocumentCourse(text){
   const raw=String(text||''),folded=foldText(raw);
   let course=st.co.find(c=>c.id!=='autre'&&foldText(c.name).length>3&&folded.includes(foldText(c.name)));
   if(course)return course;
-  const code=raw.match(/\b\d{3}-\d{3}-[A-Z]{2}\s+([^\r\n]+)/);
-  let name=code?code[1].replace(/\s{2,}.*/,'').trim():'';
-  if(!name){
+  const code=raw.match(/\b(\d{3})\s*-\s*(\d{3})\s*-\s*([A-Z]{2})\b(?:\s+A\d{2})?\s+([^\r\n]+)/);
+  const codeKey=code?code[1]+'-'+code[2]+'-'+code[3]:'';
+  let name=code?code[4].replace(/\s{2,}.*/,'').replace(/\s+\d+.*$/,'').trim():'';
+  const knownCodes={'340-101-MQ':'philo','601-101-MQ':'ecr','109-101-MQ':'eps'};
+  if(knownCodes[codeKey])course=st.co.find(c=>c.id===knownCodes[codeKey]);
+  if(!course&&!name){
     const aliases=[['gestion','gest'],['philosophie','philo'],['algèbre','alg']];
     const alias=aliases.find(x=>folded.includes(foldText(x[0])));
     if(alias)course=st.co.find(c=>c.id===alias[1]);
@@ -669,51 +681,66 @@ function identifyDocumentCourse(text){
   st.co.splice(Math.max(0,st.co.length-1),0,course);
   return course;
 }
-function coursePlanEvents(text,fileName,courseId){
+function classDateForWeek(courseId,week,letter,importedClasses=[]){
+  const blocks=[...st.bl,...importedClasses].filter(b=>b.course===courseId).sort((a,b)=>a.day-b.day||String(a.start).localeCompare(String(b.start)));
+  const index=letter==='b'?1:0,block=blocks[index];
+  if(!block||!Number.isFinite(+block.day))return null;
+  return makeEventDate(S0.getFullYear(),S0.getMonth(),S0.getDate()+(week-1)*7+(+block.day-1));
+}
+function coursePlanEvents(text,fileName,courseId,importedClasses=[]){
   const raw=String(text||'').replace(/\u00a0/g,' ').replace(/\r/g,'');
-  const start=raw.search(/Calendrier\s+des\s+activit(?:é|e)s/i);
-  if(start<0)return [];
-  const rest=raw.slice(start),endMatch=rest.search(/[ÉE]valuation formative/i),section=rest.slice(0,endMatch<0?undefined:endMatch);
-  const marks=[...section.matchAll(/(?:^|\n)\s*(1[0-6]|[1-9])\s+(?:[.•●▪◦·*–—:-]\s*)?(?=(?:Cours\s+[AB]\b|Cours levés\b|Semaine de lecture\b))/gim)];
+  const headings=[/Calendrier\s+des\s+activit(?:é|e)s/i,/Calendrier\s+des\s+évaluations/i,/Planification\s+des\s+activit(?:é|e)s/i,/Échéancier/i];
+  let start=-1;
+  for(const re of headings){const p=raw.search(re);if(p>=0&&(start<0||p<start))start=p}
+  const section=start>=0?raw.slice(start):raw;
+  const endMatch=section.search(/[ÉE]valuation formative|Politique de présence|Matériel obligatoire/i);
+  const calendar=section.slice(0,endMatch<0?undefined:endMatch);
+  const marks=[...calendar.matchAll(/(?:^|\n)\s*(?:semaine\s*)?(1[0-6]|[1-9])\s*(?:[.•●▪◦·*–—:.)-]\s*)?(?=(?:Cours\s*[AB]\b|Cours levés\b|Semaine de lecture\b|Examen\b|Travail\b|Remise\b|Quiz\b|Évaluation\b))/gim)];
   if(!marks.length)return [];
   const out=[],seen=new Set();
   const capitalize=s=>s?s.charAt(0).toLocaleUpperCase('fr-CA')+s.slice(1):s;
   for(let i=0;i<marks.length;i++){
     const week=+marks[i][1],begin=marks[i].index+marks[i][0].lastIndexOf(marks[i][1])+marks[i][1].length;
-    const stop=i+1<marks.length?marks[i+1].index:section.length,block=section.slice(begin,stop),items=new Map();
-    const addItem=(title,type,at)=>{
+    const stop=i+1<marks.length?marks[i+1].index:calendar.length,block=calendar.slice(begin,stop),items=new Map();
+    const addItem=(title,type,at,excerpt='')=>{
       title=String(title||'').replace(/\s+/g,' ').trim();
       if(!title)return;
+      const position=Math.max(0,at||0),similar=[...items.values()].find(item=>item.type===type&&Math.abs(item.at-position)<=3);
+      if(similar){if(title.length>similar.title.length){items.delete(similar.key);similar.title=title;similar.key=type+'|'+foldText(title);similar.excerpt=excerpt||similar.excerpt;similar.at=position;items.set(similar.key,similar)}return}
       const key=type+'|'+foldText(title);
-      if(!items.has(key))items.set(key,{key,title,type,at:Math.max(0,at||0)});
+      if(!items.has(key))items.set(key,{key,title,type,at:position,excerpt});
     };
     for(const m of block.matchAll(/\bExamen\s*(\d+)\b/gi))addItem('Examen '+m[1],'exam',m.index);
     for(const m of block.matchAll(/\bTravail\s+court\s*(\d+)\b/gi))addItem('Travail court '+m[1],'devoir',m.index);
     for(const m of block.matchAll(/\b(?:remise\s+du\s+)?journal\s+de\s+lecture\s*(\d+)\b/gi))addItem('Remise du journal de lecture '+m[1],'devoir',m.index);
-    const redaction=block.match(/\b(?:rédaction(?:\s+du\s+texte argumentatif)?|remise\s+(?:du\s+)?texte argumentatif)\b/i);
-    const weightedText=block.match(/\btexte argumentatif\b(?=[^.\n]{0,60}\b\d+(?:[.,]\d+)?\s*%)/i);
-    const essay=redaction||weightedText;
-    if(essay&&/\btexte argumentatif\b/i.test(block))addItem('Rédaction du texte argumentatif','devoir',essay.index);
-    else if(essay)addItem(capitalize(essay[0]),'devoir',essay.index);
-    const generic=[
+    const patterns=[
       {re:/\b(?:examen(?:\s+(?:final|de\s+mi-session))?|intra|quiz|test|évaluation)\s*(?:(?:n[°oº]?)\s*)?\d*\b/gi,type:'exam'},
-      {re:/\b(?:devoir|labo(?:ratoire)?|rapport|projet|dissertation)\s*(?:(?:n[°oº]?)\s*)?\d*\b/gi,type:'devoir'},
-      {re:/\btravail\s+(?:court|pratique|écrit)\s*(?:(?:n[°oº]?)\s*)?\d*\b/gi,type:'devoir'},
-      {re:/\bjournal\s+de\s+lecture\s*\d*\b/gi,type:'devoir'}
+      {re:/\b(?:devoir|labo(?:ratoire)?|rapport|projet|dissertation|rédaction|présentation|exposé|remise|journal de lecture)\s*(?:(?:n[°oº]?)\s*)?\d*\b/gi,type:'devoir'},
+      {re:/\btravail\s+(?:court|pratique|écrit)\s*(?:(?:n[°oº]?)\s*)?\d*\b/gi,type:'devoir'}
     ];
-    for(const pattern of generic)for(const m of block.matchAll(pattern.re)){
-      let title=capitalize(m[0].replace(/\s+/g,' ').trim());
-      if(/^journal\b/i.test(title)&&!/^(?:remise\s+du\s+)/i.test(title))title='Remise du '+title.toLowerCase();
-      addItem(title,pattern.type,m.index);
+    for(const pattern of patterns)for(const m of block.matchAll(pattern.re)){
+      const at=m.index,lineStart=Math.max(block.lastIndexOf('\n',at),block.lastIndexOf('•',at),block.lastIndexOf(';',at))+1;
+      const lineEnd=[block.indexOf('\n',at),block.indexOf('•',at),block.indexOf(';',at)].filter(x=>x>=0).reduce((a,b)=>Math.min(a,b),block.length);
+      const excerpt=block.slice(lineStart,lineEnd).replace(/\s+/g,' ').trim();
+      let title=excerpt||capitalize(m[0].replace(/\s+/g,' ').trim());
+      if(title.length>100)title=title.slice(0,97).trim()+'…';
+      addItem(title,pattern.type,at,excerpt);
     }
+    const reading=block.match(/\b(?:semaine de lecture|semaine de relâche|semaine d'examens?)\b/iu);
+    if(reading&&/\bexamen/i.test(reading[0]))addItem(reading[0],'exam',reading.index);
     for(const item of items.values()){
-      const context=block.slice(Math.max(0,item.at-100),Math.min(block.length,item.at+220));
-      const explicit=findDateAndTime(context),fallback=makeEventDate(S0.getFullYear(),S0.getMonth(),S0.getDate()+(week-1)*7),date=explicit||fallback;
+      const context=block.slice(Math.max(0,item.at-120),Math.min(block.length,item.at+260)),dateInContext=findDateAndTime(context);
+      const letterMatch=context.match(/\bCours\s*([AB])\b/i)||block.match(/\bCours\s*([AB])\b/i),letter=letterMatch?.[1]?.toLowerCase()||'';
+      const date=dateInContext||classDateForWeek(courseId,week,letter,importedClasses)||makeEventDate(S0.getFullYear(),S0.getMonth(),S0.getDate()+(week-1)*7);
       if(!date)continue;
-      const key=foldText(item.title)+'|'+date.date+'|'+item.type;
+      let title=item.title;
+      if(!dateInContext&&!classDateForWeek(courseId,week,letter,importedClasses))title+=' (semaine '+week+')';
+      const key=foldText(title)+'|'+date.date+'|'+item.type+'|'+(courseId||'autre');
       if(seen.has(key))continue;
       seen.add(key);
-      out.push({id:uid(),title:item.title+(explicit?'':' (semaine '+week+')'),course:courseId||'autre',type:item.type,date:date.date,time:date.time||'',notes:'Repéré dans '+fileName+(explicit?'':' · semaine '+week+' à confirmer'),approx:!explicit,done:false});
+      const details=(item.excerpt||context).replace(/\s+/g,' ').trim().slice(0,360);
+      const mapped=!!(!dateInContext&&classDateForWeek(courseId,week,letter,importedClasses));
+      out.push({id:uid(),title:title.slice(0,80),course:courseId||'autre',type:item.type,date:date.date,time:date.time||'',notes:'Repéré dans '+fileName+' · semaine '+week+(letter?' · Cours '+letter.toUpperCase():'')+(details?' · '+details:''),approx:!dateInContext&&!mapped,done:false});
     }
   }
   return out;
@@ -727,8 +754,8 @@ function parseWeeklyClasses(text,courseId){
       const timeMatch=line.match(/\b([01]?\d|2[0-3])\s*(?:h|:)\s*([0-5]\d)?\s*(?:-|–|—|à|a)\s*([01]?\d|2[0-3])\s*(?:h|:)\s*([0-5]\d)?\b/i);if(!timeMatch)continue;
       const start=String(+timeMatch[1]).padStart(2,'0')+':'+(timeMatch[2]||'00'),end=String(+timeMatch[3]).padStart(2,'0')+':'+(timeMatch[4]||'00');
       if(tm(start)>=tm(end))continue;
-      let c=courseId?st.co.find(x=>x.id===courseId):null;
-      if(!c)c=st.co.find(x=>x.id!=='autre'&&folded.includes(foldText(x.name)));
+      let c=st.co.find(x=>x.id!=='autre'&&foldText(x.name).length>2&&folded.includes(foldText(x.name)));
+      if(!c&&courseId)c=st.co.find(x=>x.id===courseId);
       if(!c&&/\bgestion\b/.test(folded))c=st.co.find(x=>x.id==='gest');
       const cleaned=line.replace(new RegExp('\\b'+day[0]+'\\b','i'),' ').replace(timeMatch[0],' ').replace(/^\s*[:·,-]+|[:·,-]+\s*$/g,'').replace(/\s+/g,' ').trim();
       const title=(c&&foldText(cleaned).length<4?c.name:cleaned)|| (c?c.name:'Cours importé');
@@ -738,9 +765,9 @@ function parseWeeklyClasses(text,courseId){
   }
   return out;
 }
-function documentEvents(text,fileName,courseId,includeGeneric=false,looseCalendar=false){
-  const planned=coursePlanEvents(text,fileName,courseId),cleanTitle=s=>foldText(s).replace(/\s*\(semaine\s+\d+\)$/,'').replace(/\s*\(?\s*\d+(?:[.,]\d+)?\s*%\s*\)?/g,'').trim();
-  const ordinary=textEvents(text,fileName,includeGeneric,looseCalendar).filter(e=>!planned.some(p=>p.date===e.date&&p.type===e.type&&cleanTitle(p.title)===cleanTitle(e.title)));
+function documentEvents(text,fileName,courseId,includeGeneric=false,looseCalendar=false,classSchedule=[]){
+  const planned=coursePlanEvents(text,fileName,courseId,classSchedule),cleanTitle=s=>foldText(s).replace(/\s*\(semaine\s+\d+\)$/,'').replace(/\s*\(?\s*\d+(?:[.,]\d+)?\s*%\s*\)?/g,'').trim();
+  const ordinary=textEvents(text,fileName,includeGeneric,looseCalendar,courseId).filter(e=>!planned.some(p=>p.date===e.date&&p.type===e.type&&cleanTitle(p.title)===cleanTitle(e.title)));
   return ordinary.concat(planned);
 }
 function icsEvents(text,fileName){
@@ -783,12 +810,12 @@ async function recognizeImage(source,status){const worker=await getOcrWorker(sta
 async function extractDocumentText(file,ext,status,category='plan'){
   if(ext==='ics')return {events:icsEvents(await file.text(),file.name),classes:[],supported:true};
   if(ext==='png'||ext==='jpg'||ext==='jpeg'||ext==='webp'){
-    const text=await recognizeImage(file,status),course=identifyDocumentCourse(text);
-    return {events:documentEvents(text,file.name,course?.id,true,category==='calendrier'||!!calendarGridContext(text)),classes:parseWeeklyClasses(text,course?.id),supported:true,ocr:true};
+    const text=await recognizeImage(file,status),course=identifyDocumentCourse(text),classes=parseWeeklyClasses(text,course?.id);
+    return {events:documentEvents(text,file.name,course?.id,true,category==='calendrier'||!!calendarGridContext(text),classes),classes,supported:true,ocr:true};
   }
   if(ext==='docx'){
-    const mammoth=await getMammoth(),result=await mammoth.extractRawText({arrayBuffer:await file.arrayBuffer()}),text=result.value,course=identifyDocumentCourse(text);
-    return {events:documentEvents(text,file.name,course?.id,category==='calendrier',category==='calendrier'),classes:parseWeeklyClasses(text,course?.id),supported:true};
+    const mammoth=await getMammoth(),result=await mammoth.extractRawText({arrayBuffer:await file.arrayBuffer()}),text=result.value,course=identifyDocumentCourse(text),classes=parseWeeklyClasses(text,course?.id);
+    return {events:documentEvents(text,file.name,course?.id,category==='calendrier',category==='calendrier',classes),classes,supported:true};
   }
   if(ext==='pdf'){
     if(!pdfLoading)pdfLoading=import('https://cdn.jsdelivr.net/npm/pdfjs-dist@6.3.289/build/pdf.mjs');
@@ -797,11 +824,11 @@ async function extractDocumentText(file,ext,status,category='plan'){
     for(let n=1;n<=doc.numPages;n++){
       status.textContent='Lecture de la page '+n+' sur '+doc.numPages+'…';
       const page=await doc.getPage(n),content=await page.getTextContent(),rows=[];
-      for(const item of content.items){if(!item.str?.trim())continue;const y=Math.round(item.transform?.[5]||0);let row;
+      for(const item of content.items){if(!item.str?.trim())continue;const y=Math.round(item.transform?.[5]||0),x=Number(item.transform?.[4]||0);let row;
         for(let j=rows.length-1;j>=0;j--){if(Math.abs(rows[j].y-y)<=3){row=rows[j];break}}
-        if(!row){row={y:y,text:''};rows.push(row)}row.text+=(row.text?' ':'')+item.str.trim()}
-      let pageText=rows.sort((a,b)=>b.y-a.y).map(r=>r.text).join('\n');
-      if(pageText.replace(/\s/g,'').length<100&&n<=40){
+        if(!row){row={y:y,items:[]};rows.push(row)}row.items.push({x,text:item.str.trim()})}
+      let pageText=rows.sort((a,b)=>b.y-a.y).map(r=>{const items=r.items.sort((a,b)=>a.x-b.x);let line='',lastX=null;for(const item of items){if(line)line+=(lastX!=null&&item.x-lastX>70?' | ':' ');line+=item.text;lastX=item.x+Math.max(1,item.text.length*4)}return line}).join('\n');
+      if(pageText.replace(/\s/g,'').length<160&&n<=40){
         status.textContent='Lecture de la page '+n+' du PDF…';
         const viewport=page.getViewport({scale:1.5}),canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
         canvas.width=viewport.width;canvas.height=viewport.height;
@@ -810,14 +837,14 @@ async function extractDocumentText(file,ext,status,category='plan'){
       }
       lines.push(pageText);
     }
-    const text=lines.join('\n'),course=identifyDocumentCourse(text);
-    return {events:documentEvents(text,file.name,course?.id,category==='calendrier',category==='calendrier'),classes:parseWeeklyClasses(text,course?.id),supported:true};
+    const text=lines.join('\n'),course=identifyDocumentCourse(text),classes=parseWeeklyClasses(text,course?.id);
+    return {events:documentEvents(text,file.name,course?.id,category==='calendrier',category==='calendrier',classes),classes,supported:true};
   }
   return {events:[],classes:[],supported:false};
 }
 function documentsView(){
   if(!currentUser)return '<div class="card"><h2>Documents de cours</h2><p class="hint">Connecte-toi pour déposer et retrouver tes plans de cours et calendriers dans ton espace privé.</p><button class="btn pri" id="docsLogin">Se connecter</button></div>';
-  return '<div class="card"><div class="bar"><h2>Documents de cours</h2></div><p class="hint">Dépose un plan de cours ou un calendrier. Les examens, devoirs et événements datés seront ajoutés automatiquement à ton calendrier; les évaluations indiquées par semaine seront visibles avec une date à confirmer.</p><label>Type de document<select id="docCategory"><option value="plan">Plan de cours</option><option value="calendrier">Calendrier</option><option value="autre">Autre document</option></select></label><input id="docFiles" type="file" accept=".pdf,.doc,.docx,.ics,.png,.jpg,.jpeg,.webp" multiple hidden><div class="dropbox" id="dropZone" role="button" tabindex="0" aria-label="Choisir ou déposer des documents"><strong>Dépose tes fichiers ici</strong><p>ou choisis-les sur ton appareil · PDF, Word, calendrier .ics ou image · 20 Mo maximum par fichier</p><button class="btn pri" type="button" id="docChoose">Choisir des fichiers</button></div><p id="docStatus" class="hint" role="status"></p><h3 class="ct">Mes documents</h3><div id="docList" class="empty">Chargement…</div><p class="hint">Les photos JPG/PNG/WebP et les pages numérisées des PDF sont lues en français dans ton navigateur. Les évaluations datées, les évaluations indiquées par semaine dans un plan de cours, et les plages hebdomadaires avec jour et heures lisibles peuvent être ajoutées automatiquement. Les fichiers .doc sont conservés, mais ne sont pas analysés. Les documents déjà déposés peuvent être relus avec « Ré-analyser ». Vérifie les dates signalées « à confirmer » et les cours importés.</p></div>';
+  return '<div class="card"><div class="bar"><h2>Documents de cours</h2><button class="btn" type="button" data-doc-all-analyze>Ré-analyser tous les documents</button></div><p class="hint">Dépose un plan de cours ou un calendrier. Les examens, devoirs et événements datés seront ajoutés automatiquement à ton calendrier; les évaluations indiquées par semaine seront visibles avec une date à confirmer.</p><label>Type de document<select id="docCategory"><option value="plan">Plan de cours</option><option value="calendrier">Calendrier</option><option value="autre">Autre document</option></select></label><input id="docFiles" type="file" accept=".pdf,.doc,.docx,.ics,.png,.jpg,.jpeg,.webp" multiple hidden><div class="dropbox" id="dropZone" role="button" tabindex="0" aria-label="Choisir ou déposer des documents"><strong>Dépose tes fichiers ici</strong><p>ou choisis-les sur ton appareil · PDF, Word, calendrier .ics ou image · 20 Mo maximum par fichier</p><button class="btn pri" type="button" id="docChoose">Choisir des fichiers</button></div><p id="docStatus" class="hint" role="status"></p><h3 class="ct">Mes documents</h3><div id="docList" class="empty">Chargement…</div><p class="hint">Les photos JPG/PNG/WebP et les pages numérisées des PDF sont lues en français dans ton navigateur. Les évaluations datées, les évaluations indiquées par semaine dans un plan de cours, et les plages hebdomadaires avec jour et heures lisibles peuvent être ajoutées automatiquement. Les fichiers .doc sont conservés, mais ne sont pas analysés. Les documents déjà déposés peuvent être relus avec « Ré-analyser ». Vérifie les dates signalées « à confirmer » et les cours importés.</p></div>';
 }
 async function refreshDocuments(){
   if(!sb||!currentUser||view!=='docs')return;
@@ -841,12 +868,18 @@ function mergeImportedData(imported,importedClasses,initialCourseCount){
   const wasImported=e=>/^(?:repéré dans|ajouté depuis)\b/i.test(String(e?.notes||''));
   let added=0,updated=0;
   for(const ev of imported){
-    const exact=st.ev.find(e=>foldText(e.title)===foldText(ev.title)&&e.date===ev.date);
+    const exact=st.ev.find(e=>foldText(e.title)===foldText(ev.title)&&e.date===ev.date&&e.type===ev.type&&(e.course===ev.course||e.course==='autre'||ev.course==='autre'));
     if(exact){
-      if(exact.approx&&!ev.approx&&wasImported(exact)){const id=exact.id,done=exact.done;Object.assign(exact,ev,{id,done});updated++}
+      if(wasImported(exact)){
+        const id=exact.id,done=exact.done;
+        const upgradedCourse=ev.course!=='autre'&&exact.course!==ev.course;
+        if(upgradedCourse||exact.approx&&!ev.approx||String(exact.notes||'')!==String(ev.notes||'')||exact.time!==ev.time){
+          Object.assign(exact,ev,{id,done,course:ev.course==='autre'?exact.course:ev.course});updated++;
+        }
+      }
       continue;
     }
-    const old=st.ev.find(e=>wasImported(e)&&e.approx&&e.course===ev.course&&baseTitle(e.title)===baseTitle(ev.title));
+    const old=st.ev.find(e=>wasImported(e)&&e.approx&&(e.course===ev.course||e.course==='autre')&&e.type===ev.type&&baseTitle(e.title)===baseTitle(ev.title));
     if(old){const id=old.id,done=old.done;Object.assign(old,ev,{id,done});updated++}
     else st.ev.push(ev),added++;
   }
@@ -898,11 +931,11 @@ async function uploadDocuments(files){
   else if(details.length)toast('Import terminé; consulte les détails.');
   await refreshDocuments();
 }
-async function reanalyzeDocument(path){
-  if(!currentUser)return;
+async function reanalyzeDocument(path,refresh=true){
+  if(!currentUser)return null;
   const status=$('#docStatus'),parts=path.split('/'),category=parts.shift(),objectName=parts.join('/'),name=objectName.replace(/^\d+-[^-]+-/,'');
   const ext=(name.split('.').pop()||'').toLowerCase();
-  if(!DOC_TYPES[ext]||ext==='doc'){if(status)status.textContent='Ce document ne peut pas être analysé automatiquement.';return}
+  if(!DOC_TYPES[ext]||ext==='doc'){if(status)status.textContent='Ce document ne peut pas être analysé automatiquement.';return null}
   try{
     if(status)status.textContent='Téléchargement de '+name+'…';
     const {data,error}=await sb.storage.from(DOC_BUCKET).download(currentUser.id+'/'+path);
@@ -911,15 +944,35 @@ async function reanalyzeDocument(path){
     if(status)status.textContent='Ré-analyse de '+name+'…';
     const result=await extractDocumentText(file,ext,status,category);
     await releaseOcrWorker();
-    if(!result.supported){if(status)status.textContent='Ce format ne peut pas être analysé automatiquement.';return}
+    if(!result.supported){if(status)status.textContent='Ce document ne peut pas être analysé automatiquement.';return null}
     const merged=mergeImportedData(result.events,result.classes||[],initialCourseCount);
     if(status)status.textContent='Ré-analyse terminée : '+merged.recognized+' évaluation(s) repérée(s), '+(merged.added+merged.updated)+' ajoutée(s) ou corrigée(s).';
     if(merged.added||merged.updated)toast((merged.added+merged.updated)+' élément(s) ajouté(s) ou corrigé(s) ✓');
     else toast(merged.recognized?'Les évaluations détectées étaient déjà dans ton agenda.':'Aucune évaluation reconnue dans ce document.');
+    return merged;
   }catch(err){
     console.error(err);await releaseOcrWorker();
     if(status)status.textContent='La ré-analyse a échoué ('+(err?.message||'erreur inconnue')+'). Essaie un autre format ou une image plus nette.';
+    return null;
+  }finally{if(refresh)await refreshDocuments()}
+}
+async function reanalyzeAllDocuments(){
+  if(!currentUser||!sb)return;
+  const status=$('#docStatus'),folders=Object.keys(DOC_CATEGORIES);
+  if(status)status.textContent='Recherche des documents…';
+  const results=await Promise.all(folders.map(category=>sb.storage.from(DOC_BUCKET).list(currentUser.id+'/'+category,{limit:100,sortBy:{column:'created_at',order:'desc'}})));
+  const failed=results.find(x=>x.error);
+  if(failed){if(status)status.textContent='Impossible de charger la liste des documents.';return}
+  const files=results.flatMap((res,i)=>res.data.filter(f=>f.name&&!f.name.startsWith('.')).map(f=>({category:folders[i],name:f.name})));
+  let processed=0,recognized=0,added=0,updated=0;
+  for(let i=0;i<files.length;i++){
+    const file=files[i];
+    if(status)status.textContent='Ré-analyse du document '+(i+1)+' sur '+files.length+'…';
+    const result=await reanalyzeDocument(file.category+'/'+file.name,false);
+    if(result){processed++;recognized+=result.recognized;added+=result.added;updated+=result.updated}
   }
+  if(status)status.textContent='Ré-analyse terminée : '+processed+' document(s) relu(s), '+recognized+' évaluation(s) repérée(s), '+(added+updated)+' ajoutée(s) ou corrigée(s).';
+  if(added||updated)toast((added+updated)+' évaluation(s) récupérée(s) ✓');
   await refreshDocuments();
 }
 async function openDocument(path){
@@ -1038,6 +1091,8 @@ document.addEventListener('click',e=>{
   if(downloadButton){openDocument(downloadButton.dataset.docDownload);return}
   const deleteButton=t.closest('[data-doc-delete]');
   if(deleteButton){deleteDocument(deleteButton.dataset.docDelete);return}
+  const analyzeAllButton=t.closest('[data-doc-all-analyze]');
+  if(analyzeAllButton){reanalyzeAllDocuments();return}
   const tab=t.closest('.tab'); if(tab){view=tab.dataset.v;render();return}
   if(t.closest('#add')){openEv(null);return}
   if(t.closest('#addBl')){openBl(null);return}
@@ -1067,6 +1122,12 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('change',e=>{
   const t=e.target;
+  if(t.dataset.dayExamCourse){
+    const course=t.dataset.dayExamCourse,date=dayDialogDate,matching=st.ev.filter(x=>x.date===date&&x.type==='exam'&&x.course===course);
+    if(t.checked){if(!matching.length)st.ev.push({...E('Examen — '+CO[course],course,'exam',date,'Ajouté depuis la journée'),id:uid()})}
+    else if(matching.length){if(!confirm('Retirer '+matching.length+' examen(s) de ce cours pour cette journée ?')){t.checked=true;return}const ids=new Set(matching.map(x=>x.id));st.ev=st.ev.filter(x=>!ids.has(x.id))}
+    save();render();openDay(date);return;
+  }
   if(t.dataset.done){const ev=st.ev.find(x=>x.id===t.dataset.done);ev.done=t.checked;save();render()}
   else if(t.dataset.date){const ev=st.ev.find(x=>x.id===t.dataset.date);if(ev&&t.value){ev.date=t.value;save();render()}}
   else if(t.id==='fPer'){fPer=t.value;render()}

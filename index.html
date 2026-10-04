@@ -666,11 +666,14 @@ function eventKind(text){
 }
 function importedEvent(line,date,fileName,includeGeneric=false,courseId=''){
   const kind=eventKind(line)||(includeGeneric?'autre':null);if(!kind)return null;
-  const source=String(line||'').replace(/\s+/g,' ').trim();
-  let title=source.replace(/(?:20\d{2}[-/.]\d{1,2}[-/.]\d{1,2}|\d{1,2}[-/.]\d{1,2}[-/.]20\d{2}|\d{1,2}(?:er)?\s+[\p{L}.]+\s*(?:20\d{2})?)/iu,' ')
+  let source=String(line||'').replace(/\s+/g,' ').trim();
+  const eventStart=source.search(/\b(?:mini[ -]?test|examen|exam|laboratoire|labo|devoir|remise|travail|rapport|projet|dissertation|rédaction|présentation|exposé|quiz|test|évaluation)\b/i);
+  if(eventStart>0&&/^\s*\d{1,2}\s+/.test(source.slice(0,eventStart)))source=source.slice(eventStart);
+  let title=source.replace(/(?:20\d{2}[-/.]\d{1,2}[-/.]\d{1,2}|\d{1,2}[-/.]\d{1,2}[-/.]20\d{2}|\d{1,2}(?:er)?\s+(?:janv?(?:ier)?|f[eé]vr?(?:ier)?|mars|avr?(?:il)?|mai|juin|juil?(?:let)?|ao[uû]t|sept?(?:embre)?|oct(?:obre)?|nov(?:embre)?|d[eé]c(?:embre)?)\.?\s*(?:20\d{2})?)/iu,' ')
     .replace(/\b([01]?\d|2[0-3])\s*(?:h|:)\s*[0-5]\d\b/ig,' ')
     .replace(/\b(?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)\b/ig,' ')
-    .replace(/^\s*\d{1,2}\s+(?=(?:examen|mini[ -]?test)\b)/i,' ')
+    .replace(/\bLocal\s*:.*/i,' ')
+    .replace(/^\s*\d{1,2}\s+(?=(?:examen|mini[ -]?test|laboratoire|labo)\b)/i,' ')
     .replace(/([%％]\s*\)?)[\s:|,-]*\d{1,2}\s*$/,'$1')
     .replace(/[•*–—:;|]+/g,' ').replace(/\s+/g,' ').trim();
   if(title.length>80)title=title.slice(0,77).trim()+'…';
@@ -687,28 +690,30 @@ function calendarGridContext(text){
   if(new Set(weekdays).size<3)return null;
   return {month:months[m[1]],year:+(m[2]||S0.getFullYear())};
 }
+function hasAmbiguousExamDates(text){
+  const value=foldText(text),monthsPattern=Object.keys(months).sort((a,b)=>b.length-a.length).join('|');
+  return /\bjournees?\s+d['’]?\s*examens?\b/.test(value)&&new RegExp('\\b\\d{1,2}\\s*(?:,|ou|et)\\s*\\d{1,2}.*\\b(?:'+monthsPattern+')\\b','i').test(value);
+}
 function textEvents(text,fileName,includeGeneric=false,looseCalendar=false,courseId=''){
   const out=[],seen=new Set(),monthContext=looseCalendar?calendarGridContext(text):null,lines=String(text||'').replace(/\u00a0/g,' ').split(/\r?\n/).map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean);
   for(let i=0;i<lines.length;i++){
-    const chunks=[lines[i]];
-    if(i+1<lines.length)chunks.push(lines[i]+' '+lines[i+1]);
-    if(i>0)chunks.push(lines[i-1]+' '+lines[i]);
-    for(const clean of chunks){
-      if(clean.length>500)continue;
-      let dt=findDateAndTime(clean),eventLine=clean;
-      if(dt&&clean.includes('|')){
-        const cells=clean.split('|').map(x=>x.trim()),dateCell=cells.findIndex(cell=>!!findDateAndTime(cell));
-        if(dateCell>0){const titleCell=cells.slice(0,dateCell).reverse().find(cell=>eventKind(cell)&&!/^\d{1,2}$/.test(cell));if(titleCell)eventLine=titleCell}
-      }
-      if(!dt&&monthContext){
-        const day=clean.match(/^\s*(?:[•*·]\s*)?(\d{1,2})(?:er)?(?:[.)–—:-]\s*|\s+)(.+)$/);
-        if(day&&+day[1]>=1&&+day[1]<=31){dt=makeEventDate(monthContext.year,monthContext.month,+day[1]);eventLine=day[2].trim()}
-      }
-      if(!dt)continue;
-      const ev=importedEvent(eventLine,dt,fileName,includeGeneric||!!monthContext,courseId);if(!ev)continue;
-      const key=foldText(ev.title)+'|'+ev.date;
-      if(!seen.has(key)){seen.add(key);out.push(ev)}
+    const nearby=lines.slice(Math.max(0,i-2),Math.min(lines.length,i+4)).join(' '),ambiguous=hasAmbiguousExamDates(nearby);
+    let clean=lines[i];
+    if(!findDateAndTime(clean)&&eventKind(clean)&&i+1<lines.length&&!ambiguous&&findDateAndTime(lines[i+1]))clean+=' '+lines[i+1];
+    if(clean.length>500)continue;
+    let dt=ambiguous&&eventKind(clean)?null:findDateAndTime(clean),eventLine=clean;
+    if(dt&&clean.includes('|')){
+      const cells=clean.split('|').map(x=>x.trim()),dateCell=cells.findIndex(cell=>!!findDateAndTime(cell));
+      if(dateCell>0){const titleCell=cells.slice(0,dateCell).reverse().find(cell=>eventKind(cell)&&!/^\d{1,2}$/.test(cell));if(titleCell)eventLine=titleCell}
     }
+    if(!dt&&monthContext&&!ambiguous){
+      const day=clean.match(/^\s*(?:[•*·]\s*)?(\d{1,2})(?:er)?(?:[.)–—:-]\s*|\s+)(.+)$/);
+      if(day&&+day[1]>=1&&+day[1]<=31){dt=makeEventDate(monthContext.year,monthContext.month,+day[1]);eventLine=day[2].trim()}
+    }
+    if(!dt)continue;
+    const ev=importedEvent(eventLine,dt,fileName,includeGeneric||!!monthContext,courseId);if(!ev)continue;
+    const key=foldText(ev.title)+'|'+ev.date+'|'+ev.type+'|'+ev.course;
+    if(!seen.has(key)){seen.add(key);out.push(ev)}
   }
   return out;
 }
@@ -824,25 +829,40 @@ function flexibleFinalExamEvents(text,fileName,courseId){
   const monthPattern='(?:'+monthNames.join('|')+')\\b';
   for(let i=0;i<lines.length;i++){
     const exam=lines[i].match(/\b(examen\s*\d+)\b/i);if(!exam)continue;
-    const context=foldText(lines.slice(i,Math.min(lines.length,i+4)).join(' '));
+    const context=foldText(lines.slice(Math.max(0,i-2),Math.min(lines.length,i+4)).join(' '));
     if(!/journ[eé]es?\s+d['’]examens?|dates?\s+d['’]examens?/i.test(context))continue;
-    const options=context.match(new RegExp('((?:\\d{1,2}\\s*(?:,|ou|et)\\s*)*\\d{1,2})\\s+('+monthPattern+')(?:\\s+(20\\d{2}))?','i'));
+    const examAt=context.search(/\bexamen\s*\d+\b/),dateContext=context.slice(Math.max(0,examAt));
+    const options=dateContext.match(new RegExp('((?:\\d{1,2}\\s*(?:,|ou|et)\\s*)*\\d{1,2})\\s+('+monthPattern+')(?:\\s+(20\\d{2}))?','i'));
     if(!options)continue;
     const month=months[foldText(options[2])];if(month==null)continue;
     const days=options[1].match(/\d{1,2}/g)?.map(Number).filter(day=>day>=1&&day<=31)||[];
     if(days.length<2)continue;
     const year=+(options[3]||S0.getFullYear()),dates=days.map(day=>makeEventDate(year,month,day)).filter(Boolean);
     if(!dates.length)continue;
-    const dateText=days.join(', ').replace(/, (\d+)$/,' ou $1')+' '+options[2];
-    out.push({id:uid(),title:exam[1].replace(/\s+/g,' ').trim()+' (date à confirmer)',course:courseId||'autre',type:'exam',date:dates[0].date,time:'',notes:'Date à confirmer : une séance sera retenue parmi le '+dateText+'. Repéré dans '+fileName,approx:true,done:false});
+    const dateText=days.join(', ').replace(/, (\d+)$/,' ou $1')+' '+['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'][month];
+    out.push({id:uid(),title:exam[1].replace(/\s+/g,' ').trim()+' (date à confirmer)',course:courseId||'autre',type:'exam',date:dates[0].date,time:'',notes:'Repéré dans '+fileName+' · Date à confirmer : une séance sera retenue parmi le '+dateText,approx:true,done:false});
   }
   return out;
 }
 function documentEvents(text,fileName,courseId,includeGeneric=false,looseCalendar=false,classSchedule=[]){
-  const planned=coursePlanEvents(text,fileName,courseId,classSchedule),cleanTitle=s=>foldText(s).replace(/\s*\(semaine\s+\d+\)$/,'').replace(/\s*\(?\s*\d+(?:[.,]\d+)?\s*\%\s*\)?/g,'').trim();
+  const planned=coursePlanEvents(text,fileName,courseId,classSchedule),cleanTitle=s=>foldText(s).replace(/\s*\(semaine\s+\d+\)$/,'').replace(/\s*\(?\s*\d+(?:[.,]\d+)?\s*%\s*\)?/g,'').trim();
   const ordinary=textEvents(text,fileName,includeGeneric,looseCalendar,courseId).filter(e=>!planned.some(p=>p.date===e.date&&p.type===e.type&&cleanTitle(p.title)===cleanTitle(e.title)));
-  const all=ordinary.concat(planned,flexibleFinalExamEvents(text,fileName,courseId)),seen=new Set();
-  return all.filter(e=>{const key=foldText(e.title)+'|'+e.date+'|'+e.type+'|'+e.course;if(seen.has(key))return false;seen.add(key);return true});
+  const all=ordinary.concat(planned,flexibleFinalExamEvents(text,fileName,courseId)),seen=new Set(),examPositions=new Map(),out=[];
+  const certainty=e=>!e.approx?3:/date à confirmer|parmi le/i.test(String(e.notes||''))?2:1;
+  for(const event of all){
+    const exactKey=foldText(event.title)+'|'+event.date+'|'+event.type+'|'+event.course;
+    if(seen.has(exactKey))continue;
+    seen.add(exactKey);
+    const exam=event.type==='exam'&&assessmentIdentity(event.title).match(/^exam:(\d+)$/);
+    if(exam){
+      const key=event.course+'|'+exam[1],existingIndex=examPositions.get(key);
+      if(existingIndex==null){examPositions.set(key,out.length);out.push(event)}
+      else if(certainty(event)>certainty(out[existingIndex]))out[existingIndex]=event;
+      continue;
+    }
+    out.push(event);
+  }
+  return out;
 }
 function icsEvents(text,fileName){
   const unfolded=String(text||'').replace(/\r?\n[ \t]/g,'');
@@ -900,8 +920,8 @@ async function extractDocumentText(file,ext,status,category='plan'){
       const page=await doc.getPage(n),content=await page.getTextContent(),rows=[];
       for(const item of content.items){if(!item.str?.trim())continue;const y=Math.round(item.transform?.[5]||0),x=Number(item.transform?.[4]||0);let row;
         for(let j=rows.length-1;j>=0;j--){if(Math.abs(rows[j].y-y)<=3){row=rows[j];break}}
-        if(!row){row={y:y,items:[]};rows.push(row)}row.items.push({x,width:Number(item.width)||0,text:item.str.trim()})}
-      let pageText=rows.sort((a,b)=>b.y-a.y).map(r=>{const items=r.items.sort((a,b)=>a.x-b.x);let line='',lastX=null;for(const item of items){const gap=lastX==null?null:item.x-lastX;if(line)line+=gap>70?' | ':gap>1.5?' ':'';line+=item.text;lastX=item.x+(item.width>0?item.width:Math.max(1,item.text.length*4))}return line}).join('\n');
+        if(!row){row={y:y,items:[]};rows.push(row)}row.items.push({x,text:item.str.trim()})}
+      let pageText=rows.sort((a,b)=>b.y-a.y).map(r=>{const items=r.items.sort((a,b)=>a.x-b.x);let line='',lastX=null;for(const item of items){if(line)line+=(lastX!=null&&item.x-lastX>70?' | ':' ');line+=item.text;lastX=item.x+Math.max(1,item.text.length*4)}return line}).join('\n');
       if(pageText.replace(/\s/g,'').length<160&&n<=40){
         status.textContent='Lecture de la page '+n+' du PDF…';
         const viewport=page.getViewport({scale:1.5}),canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
@@ -937,11 +957,52 @@ async function refreshDocuments(){
     return '<div class="docRow"><div class="docIcon">'+esc(ext.slice(0,4))+'</div><div class="docMeta"><b title="'+esc(label)+'">'+esc(label)+'</b><small>'+DOC_CATEGORIES[category]+' · '+date+(file.metadata?.size?' · '+(file.metadata.size/1048576).toFixed(1)+' Mo':'')+'</small></div>'+(canAnalyze?'<button class="btn" type="button" data-doc-analyze="'+esc(category+'/'+file.name)+'">Ré-analyser</button>':'')+'<button class="btn" type="button" data-doc-download="'+esc(category+'/'+file.name)+'">Ouvrir</button><button class="btn del" type="button" data-doc-delete="'+esc(category+'/'+file.name)+'">Supprimer</button></div>';
   }).join('');
 }
+function assessmentIdentity(title){
+  const s=foldText(title),exam=s.match(/\b(?:examen|exam)\s*(\d+)\b/);
+  if(exam)return 'exam:'+exam[1];
+  if(/\bminitest\b/.test(s))return /\bhistorique\b/.test(s)?'minitest:historique':'minitest';
+  if(/\blaboratoire\b/.test(s)&&/\bexcel\b/.test(s))return 'laboratoire:excel';
+  return s.replace(/^\s*\d+\s+/,'').replace(/\b\d+(?:[.,]\d+)?\s*%/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+}
+function isImportedDocumentEvent(event){return /(?:repéré dans|ajouté depuis)\b/i.test(String(event?.notes||''))}
+function sourceDocumentName(event){
+  const match=String(event?.notes||'').match(/(?:repéré dans|ajouté depuis)\s+(.+?)(?:\s*[·|]|$)/i);
+  if(!match)return '';
+  return foldText(match[1].trim().replace(/\.[^.]+$/,'').replace(/\s*\(\s*\d+\s*\)$/,'').replace(/[-_]\d+[-_]$/,'').replace(/[-_]+$/,'')).replace(/[^a-z0-9]+/g,'');
+}
+function documentEventKey(event){
+  const source=sourceDocumentName(event),identity=assessmentIdentity(event?.title||'');
+  return source&&identity?source+'|'+String(event?.type||'')+'|'+identity:'';
+}
+function compatibleImportedCourse(a,b){return !a||!b||a===b||a==='autre'||b==='autre'}
+function isNoisyExamImport(event){
+  const text=foldText(String(event?.title||'')+' '+String(event?.notes||''));
+  return /\bajustement\b/.test(text)&&/\bjournees?\s+d(?:['’]?\s*)?/.test(text);
+}
 function syncCalendarExamsToNotes(){
   let changed=false;
+  const before=st.ev.length;
+  st.ev=st.ev.filter(event=>!(isImportedDocumentEvent(event)&&isNoisyExamImport(event)));
+  if(st.ev.length!==before)changed=true;
+  const validEventIds=new Set(st.ev.map(event=>event.id));
+  for(const course of st.co){
+    const initial=course.ev.length;
+    course.ev=course.ev.filter(assessment=>{
+      const key=assessmentIdentity(assessment.name),blank=![assessment.w,assessment.grade,assessment.mean,assessment.sd].some(value=>String(value||'').trim());
+      if(!blank)return true;
+      if(isNoisyExamImport({title:assessment.name})){changed=true;return false}
+      if(!key)return true;
+      const duplicate=course.ev.some(other=>other!==assessment&&assessmentIdentity(other.name)===key&&(/^exam:\d+$/.test(key)||foldText(other.name)===foldText(assessment.name)));
+      if(duplicate){changed=true;return false}
+      if(!assessment.eventId||validEventIds.has(assessment.eventId))return true;
+      return true;
+    });
+    if(course.ev.length!==initial)changed=true;
+  }
   for(const event of st.ev.filter(e=>e.type==='exam'&&e.course&&e.course!=='autre'&&e.date)){
     const course=st.co.find(c=>c.id===event.course);if(!course)continue;
-    let assessment=course.ev.find(e=>e.eventId===event.id)||course.ev.find(e=>matchingAssessmentEvents(course.id,e).includes(event));
+    const identity=assessmentIdentity(event.title);
+    let assessment=course.ev.find(e=>e.eventId===event.id)||(identity&&course.ev.find(e=>assessmentIdentity(e.name)===identity))||course.ev.find(e=>matchingAssessmentEvents(course.id,e).includes(event));
     if(!assessment){
       assessment=course.ev.find(e=>!String(e.name||'').trim()&&!e.date&&!e.grade&&!e.mean&&!e.sd);
       if(!assessment){assessment={id:uid(),name:event.title,w:'',grade:'',mean:'',sd:'',date:event.date,eventId:event.id};course.ev.push(assessment);changed=true}
@@ -951,25 +1012,38 @@ function syncCalendarExamsToNotes(){
   return changed;
 }
 function mergeImportedData(imported,importedClasses,initialCourseCount){
-  const baseTitle=s=>foldText(s).replace(/\s*\(semaine\s+\d+\)\s*$/,'').trim();
-  const wasImported=e=>/^(?:repéré dans|ajouté depuis)\b/i.test(String(e?.notes||''));
+  const baseTitle=s=>foldText(s).replace(/\s*\(semaine\s+\d+\)\s*$/,'').trim(),wasImported=isImportedDocumentEvent;
   let added=0,updated=0;
+  st.ev=st.ev.filter(event=>!(wasImported(event)&&isNoisyExamImport(event)));
+  const consumed=new Set();
   for(const ev of imported){
+    const key=documentEventKey(ev);
     const exact=st.ev.find(e=>foldText(e.title)===foldText(ev.title)&&e.date===ev.date&&e.type===ev.type&&(e.course===ev.course||e.course==='autre'||ev.course==='autre'));
     if(exact){
       if(wasImported(exact)){
-        const id=exact.id,done=exact.done;
-        const upgradedCourse=ev.course!=='autre'&&exact.course!==ev.course;
-        if(upgradedCourse||exact.approx&&!ev.approx||String(exact.notes||'')!==String(ev.notes||'')||exact.time!==ev.time){
-          Object.assign(exact,ev,{id,done,course:ev.course==='autre'?exact.course:ev.course});updated++;
-        }
+        const id=exact.id,done=exact.done,course=ev.course==='autre'?exact.course:ev.course;
+        const changed=exact.course!==course||exact.time!==ev.time||String(exact.notes||'')!==String(ev.notes||'')||!!exact.approx!==!!ev.approx;
+        if(changed){Object.assign(exact,ev,{id,done,course});updated++}
+        consumed.add(id);
       }
       continue;
     }
-    const old=st.ev.find(e=>wasImported(e)&&e.approx&&(e.course===ev.course||e.course==='autre')&&e.type===ev.type&&baseTitle(e.title)===baseTitle(ev.title));
-    if(old){const id=old.id,done=old.done;Object.assign(old,ev,{id,done});updated++}
-    else st.ev.push(ev),added++;
+    let old=null;
+    if(key)old=st.ev.find(e=>wasImported(e)&&documentEventKey(e)===key&&compatibleImportedCourse(e.course,ev.course)&&!consumed.has(e.id))||null;
+    if(!old)old=st.ev.find(e=>wasImported(e)&&e.approx&&(e.course===ev.course||e.course==='autre')&&e.type===ev.type&&baseTitle(e.title)===baseTitle(ev.title));
+    if(old){const id=old.id,done=old.done,course=ev.course==='autre'?old.course:ev.course;Object.assign(old,ev,{id,done,course});consumed.add(id);updated++}
+    else {st.ev.push(ev);consumed.add(ev.id);added++}
   }
+  let removedDuplicates=0;
+  st.ev=st.ev.filter(event=>{
+    if(!wasImported(event)||consumed.has(event.id))return true;
+    const key=documentEventKey(event);
+    if(!key)return true;
+    const replacement=imported.some(next=>documentEventKey(next)===key&&compatibleImportedCourse(event.course,next.course));
+    if(!replacement)return true;
+    removedDuplicates++;return false;
+  });
+  updated+=removedDuplicates;
   const classKeys=new Set(st.bl.map(b=>b.day+'|'+b.start+'|'+b.end+'|'+b.course)),uniqueClasses=[];
   for(const b of importedClasses){const key=b.day+'|'+b.start+'|'+b.end+'|'+b.course;if(!classKeys.has(key)){classKeys.add(key);uniqueClasses.push(b)}}
   const coursesAdded=Math.max(0,st.co.length-initialCourseCount),assessmentsLinked=syncCalendarExamsToNotes();

@@ -496,15 +496,50 @@ function agg(){
   const T=sum(rows,x=>x.u),g=f=>sum(rows,x=>x.u*f(x))/T,has=k=>num(P[k])!=null||rows.every(x=>num(x.c[k])!=null);
   return{rows,R:g(x=>x.r.R),lo:g(x=>x.lo),hi:g(x=>x.hi),note:g(x=>x.r.note),prec:Math.round(100*(.6*g(x=>x.r.known)+.2*has('ifgz')+.2*has('idgz')))};
 }
+function matchingAssessmentEvents(courseId,assessment){
+  const kind=eventKind(assessment.name)||'exam';
+  const foldName=s=>foldText(s).replace(/\s*\(semaine\s+\d+\)/g,'').replace(/[^\p{L}\p{N}]+/gu,' ').trim();
+  const wanted=foldName(assessment.name);
+  const matches=st.ev.filter(event=>{
+    if(event.course!==courseId||event.type!==kind)return false;
+    const title=foldName(event.title);
+    return title===wanted||(Math.min(title.length,wanted.length)>=8&&(title.includes(wanted)||wanted.includes(title)));
+  });
+  const linked=assessment.eventId&&st.ev.find(event=>event.id===assessment.eventId&&event.course===courseId&&event.type===kind);
+  if(linked&&!matches.includes(linked))matches.unshift(linked);
+  return matches;
+}
+function syncEvaluationDate(courseId,evaluationId,date){
+  const course=st.co.find(c=>c.id===courseId),assessment=course?.ev.find(e=>e.id===evaluationId);
+  if(!course||!assessment)return;
+  const matches=matchingAssessmentEvents(courseId,assessment),kind=eventKind(assessment.name)||'exam';
+  if(date){
+    assessment.date=date;
+    if(matches.length){
+      for(const event of matches)event.date=date;
+      assessment.eventId=matches[0].id;
+    }else{
+      const event={...E(assessment.name||'Examen',courseId,kind,date,'Ajouté depuis Notes et cote R'),id:uid()};
+      st.ev.push(event);assessment.eventId=event.id;
+    }
+    save();render();toast('Date mise à jour dans le calendrier ✓');return;
+  }
+  assessment.date='';
+  const ids=new Set(matches.map(event=>event.id));
+  if(assessment.eventId)ids.add(assessment.eventId);
+  if(ids.size)st.ev=st.ev.filter(event=>!ids.has(event.id));
+  delete assessment.eventId;
+  save();render();toast('Date retirée du calendrier');
+}
 function notesView(){
   const P=st.p,inp=(a,v,x='')=>`<input ${a} value="${esc(v)}" inputmode="decimal" ${x}>`;
   let h=`<section class="noteIntro"><div><h2>Ta progression, en un coup d’œil</h2><p>Compare tes résultats aux moyennes du groupe, repère l’effet des évaluations restantes et suis une estimation de ta cote R. Les résultats restent des estimations tant que les données officielles du groupe ne sont pas disponibles.</p></div><div class="noteGuide"><div><b>Note actuelle</b><span>Selon les évaluations saisies et leur pondération.</span></div><div><b>Cote Z</b><span>Écart à la moyenne, mesuré en écarts types.</span></div><div><b>Précision</b><span>Indique la quantité d’informations renseignées.</span></div></div></section><div class="card"><div class="bar"><h2>Notes et cote R</h2><button class="btn pri" id="addCo">Ajouter un cours</button></div><div id="dash"></div><p class="hint">Une cote R officielle est calculée par le ministère après la session. Cette estimation utilise tes notes, les moyennes et les écarts types entrés ici. Le percentile est indicatif et n’est pas un rang officiel.</p></div>
   <div class="card"><h2 style="margin:0 0 4px;font-size:17px">Paramètres de l'estimation</h2><p class="hint">Entre au moins ta note : sans moyenne ni écart type du groupe, l'app utilise les valeurs par défaut ci-dessous. Plus tu ajoutes d'information réelle (moyenne, écart type, IFGZ, IDGZ), plus l'estimation est précise. Formule : R = (Z × IDGZ + IFGZ + 5) × 5.</p><div class="par">${[['dm','Moyenne du groupe par défaut %',75],['ds','Écart type par défaut',12],['rho','Corrélation entre évaluations (0 à 1)',0.7],['ifgz','IFGZ (facultatif)',0],['idgz','IDGZ (facultatif)',1],['obj','Objectif de cote R',30],['tgt','Objectif de note finale %',85]].map(([k,l,d])=>`<label>${l}${inp('data-p="'+k+'"',P[k],'placeholder="'+d+'"')}</label>`).join('')}</div></div>`;
   st.co.filter(c=>c.id!=='autre').forEach(c=>{
     h+=`<div class="card co" data-co="${c.id}" data-c="${c.id}"><div class="bar"><input type="color" data-f="color" value="${esc(c.color)}" aria-label="Couleur du cours"><input class="nm" data-f="name" value="${esc(c.name)}" aria-label="Nom du cours"><label class="u">Unités (ex. 3-1-3)<input data-f="units" value="${esc(c.units)}"></label><button class="btn del" data-delco>Supprimer</button></div>
-    <div class="sw"><table class="ev"><thead><tr><th>Évaluation</th><th>Pond. %</th><th>Ma note %</th><th>Moy. groupe %</th><th>Écart type</th><th>Z</th><th></th></tr></thead><tbody>`;
-    c.ev.forEach(e=>{h+=`<tr data-ev="${e.id}"><td><input data-e="name" value="${esc(e.name)}" aria-label="Nom"></td><td>${inp('data-e="w"',e.w)}</td><td>${inp('data-e="grade"',e.grade)}</td><td>${inp('data-e="mean"',e.mean,'placeholder="'+f1(num(P.dm)??75,0)+'"')}</td><td>${inp('data-e="sd"',e.sd,'placeholder="'+f1(num(P.ds)??12,0)+'"')}</td><td class="z"></td><td><button class="btn" data-delev aria-label="Supprimer l'évaluation">×</button></td></tr>`});
-    h+=`</tbody></table></div><button class="btn" data-addev>Ajouter une évaluation</button>
+    <div class="sw"><table class="ev"><thead><tr><th>Évaluation</th><th>Date</th><th>Pond. %</th><th>Ma note %</th><th>Moy. groupe %</th><th>Écart type</th><th>Z</th><th></th></tr></thead><tbody>`;
+    c.ev.forEach(e=>{const calendarEvent=matchingAssessmentEvents(c.id,e)[0],date=calendarEvent?.date||e.date||'';h+=`<tr data-ev="${e.id}"><td><input data-e="name" value="${esc(e.name)}" aria-label="Nom"></td><td><input type="date" data-exam-date="${esc(e.id)}" value="${esc(date)}" aria-label="Date de l’évaluation"></td><td>${inp('data-e="w"',e.w)}</td><td>${inp('data-e="grade"',e.grade)}</td><td>${inp('data-e="mean"',e.mean,'placeholder="'+f1(num(P.dm)??75,0)+'"')}</td><td>${inp('data-e="sd"',e.sd,'placeholder="'+f1(num(P.ds)??12,0)+'"')}</td><td class="z"></td><td><button class="btn" data-delev aria-label="Supprimer l'évaluation">×</button></td></tr>`});
+    h+=`</tbody></table></div><p class="hint">La date choisie synchronise l’évaluation avec le calendrier. Efface-la pour retirer l’événement du calendrier.</p><button class="btn" data-addev>Ajouter une évaluation</button>
     <details><summary>Valeurs officielles du cours (facultatif)</summary><div class="par"><label>Moyenne finale du groupe %${inp('data-f="fm"',c.fm)}</label><label>Écart type final du groupe${inp('data-f="fs"',c.fs)}</label><label>IFGZ du cours${inp('data-f="ifgz"',c.ifgz)}</label><label>IDGZ du cours${inp('data-f="idgz"',c.idgz)}</label></div></details><div id="res-${c.id}"></div></div>`;
   });
   return h;
@@ -1122,6 +1157,7 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('change',e=>{
   const t=e.target;
+  if(t.dataset.examDate){const card=t.closest('[data-co]');if(card)syncEvaluationDate(card.dataset.co,t.dataset.examDate,t.value);return}
   if(t.dataset.dayExamCourse){
     const course=t.dataset.dayExamCourse,date=dayDialogDate,matching=st.ev.filter(x=>x.date===date&&x.type==='exam'&&x.course===course);
     if(t.checked){if(!matching.length)st.ev.push({...E('Examen — '+CO[course],course,'exam',date,'Ajouté depuis la journée'),id:uid()})}

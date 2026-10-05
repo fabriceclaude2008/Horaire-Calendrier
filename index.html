@@ -80,7 +80,7 @@ nav .sp{flex:1}
 .blk b{display:block}
 .blk span{color:var(--mute)}
 .blk.study{border-left-style:dashed;background:color-mix(in srgb,var(--acc) 12%,var(--sf))}
-.blk.study.done{opacity:.45;text-decoration:line-through}
+.blk.study.done{opacity:.45;text-decoration:line-through}.blk.timedEvent{border-left-color:#f59e0b;background:color-mix(in srgb,#f59e0b 22%,var(--sf));z-index:2}.blk.timedEvent.exam{border-left-color:#ef4444;background:color-mix(in srgb,#ef4444 22%,var(--sf))}
 .account{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
 .account small{color:var(--mute)}
 dialog{border:1px solid var(--line);border-radius:14px;background:var(--sf);color:var(--ink);padding:20px;width:min(440px,calc(100vw - 24px))}
@@ -178,6 +178,16 @@ nav .th select{width:auto;margin:0;padding:6px 8px;border:1px solid var(--line);
 .docMeta{flex:1;min-width:0}.docMeta b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .docMeta small{color:var(--mute)}
 @media(max-width:640px){.noteIntro{grid-template-columns:1fr}.noteGuide{grid-template-columns:1fr}.dayItem{align-items:flex-start;flex-direction:column}.dayItem span{text-align:left}}
+
+/* Professional, calm visual system */
+:root{--bg:#f5f7f6;--sf:#fff;--ink:#172b24;--mute:#64766e;--line:#dce6e0;--acc:#167a59;--onacc:#fff;--warn:#c24136}
+[data-theme=sombre]{--bg:#101a18;--sf:#182522;--ink:#e9f2ee;--mute:#a5b7af;--line:#2a3b35;--acc:#54c499;--onacc:#08251a}
+[data-theme=ocean]{--bg:#0e1b24;--sf:#152833;--ink:#eaf3f7;--mute:#a1b7c1;--line:#2b414d;--acc:#55b9d3;--onacc:#08232c}
+[data-theme=foret]{--bg:#edf4ef;--sf:#fff;--ink:#183525;--mute:#5e7666;--line:#d5e4d8;--acc:#247247;--onacc:#fff}
+[data-theme=violet]{--bg:#191724;--sf:#242233;--ink:#f0eef8;--mute:#b3adc9;--line:#39374c;--acc:#c3a7ff;--onacc:#211631}
+[data-theme=papier]{--bg:#f7f5ee;--sf:#fffefa;--ink:#30281c;--mute:#786c5d;--line:#e7dfd0;--acc:#a65d20;--onacc:#fff}
+body{font-family:Inter,"Schibsted Grotesk",system-ui,sans-serif;letter-spacing:.005em}main{max-width:1240px;padding:24px}.card,.hero,.noteIntro{border-radius:20px;box-shadow:0 10px 30px rgba(20,45,34,.055)}.card{padding:22px;margin:18px 0;border-color:color-mix(in srgb,var(--line) 75%,transparent)}.welcome{margin:12px 4px 22px}.brandMark{box-shadow:0 5px 14px rgba(22,122,89,.18)}nav{position:sticky;top:8px;z-index:10;padding:10px;border:1px solid var(--line);border-radius:16px;background:color-mix(in srgb,var(--sf) 92%,transparent);box-shadow:0 8px 24px rgba(15,35,26,.08);backdrop-filter:blur(14px)}.tab,.btn{border-radius:10px;transition:background .16s,transform .16s,box-shadow .16s}.btn:hover,.tab:hover{transform:translateY(-1px)}.btn.pri{box-shadow:0 4px 12px color-mix(in srgb,var(--acc) 22%,transparent)}input,select,textarea{border-radius:10px!important;border-color:var(--line)!important}.hero{padding:28px;color:var(--ink);background:linear-gradient(120deg,color-mix(in srgb,var(--acc) 9%,var(--sf)),var(--sf) 65%);border:1px solid var(--line)}.hero p{color:var(--mute);opacity:.9}.hero .btn{color:var(--ink);background:var(--sf);border-color:var(--line)}.hero .btn.pri{background:var(--acc);color:var(--onacc);border-color:var(--acc)}.hero h1{letter-spacing:-.045em}.noteIntro{padding:24px;background:linear-gradient(120deg,color-mix(in srgb,var(--acc) 12%,var(--sf)),var(--sf));border:1px solid var(--line)}.co{border-left-width:5px}.sched{min-width:760px}.sched .dh{position:relative;min-height:66px;background:var(--sf);border-top:1px solid var(--line)}.dayQuickAdd{display:block;margin:5px auto 0;width:25px;height:25px;border:1px solid var(--line);border-radius:50%;background:var(--bg);color:var(--acc);font-size:18px;line-height:1}.col{background:repeating-linear-gradient(var(--line) 0 1px,transparent 1px 52px),repeating-linear-gradient(90deg,var(--line) 0 1px,transparent 1px 50%)}.blk{box-shadow:0 2px 6px rgba(20,40,30,.08)}.timedEvent{z-index:3}.dayItem{border-radius:12px!important}.dayItem:hover{background:color-mix(in srgb,var(--acc) 8%,var(--sf))}
+@media(max-width:700px){main{padding:12px}.card{padding:16px;margin:12px 0}nav{top:4px;border-radius:12px}.noteIntro{padding:18px}.sched{min-width:740px}}
 </style>
 </head>
 <body>
@@ -191,7 +201,6 @@ nav .th select{width:auto;margin:0;padding:6px 8px;border:1px solid var(--line);
     <button class="tab" role="tab" data-v="sched">Horaire</button>
     <button class="tab" role="tab" data-v="notes">Notes et cote R</button>
     <button class="tab" role="tab" data-v="study">Étude</button>
-    <button class="tab" role="tab" data-v="docs">Documents</button>
     <span class="sp"></span>
     <label class="th">Thème<select id="themeSel"></select></label>
     <button class="btn pri" id="add">Ajouter un examen ou devoir</button>
@@ -234,7 +243,8 @@ nav .th select{width:auto;margin:0;padding:6px 8px;border:1px solid var(--line);
       <label>Cours<select name="course"></select></label>
       <label>Type<select name="type"></select></label>
       <label>Date<input type="date" name="date" required></label>
-      <label>Heure (facultatif)<input type="time" name="time"></label>
+      <label>Heure de début (facultative)<input type="time" name="time"></label>
+      <label>Heure de fin (facultative)<input type="time" name="endTime"></label>
     </div>
     <label class="ck"><input type="checkbox" name="approx"> Date à confirmer</label>
     <label>Notes<textarea name="notes" rows="2" maxlength="300" placeholder="Pondération, matière, local…"></textarea></label>
@@ -242,7 +252,7 @@ nav .th select{width:auto;margin:0;padding:6px 8px;border:1px solid var(--line);
   </form>
 </dialog>
 
-<dialog id="dDay"><div class="bar"><h3 id="dayTitle" style="flex:1;margin:0">Détails de la journée</h3><button type="button" class="btn" data-day-close>Fermer</button></div><div id="dayDetails"></div><div class="acts"><button type="button" class="btn pri" id="dayAdd">Ajouter une évaluation ce jour-là</button></div></dialog>
+<dialog id="dDay"><div class="bar"><h3 id="dayTitle" style="flex:1;margin:0">Détails de la journée</h3><button type="button" class="btn" data-day-close>Fermer</button></div><div id="dayDetails"></div><div class="acts"><button type="button" class="btn pri" id="dayAdd">Ajouter une activité ce jour-là</button></div></dialog>
 
 <dialog id="dBl">
   <form method="dialog" id="fBl">
@@ -263,9 +273,9 @@ nav .th select{width:auto;margin:0;padding:6px 8px;border:1px solid var(--line);
 const KEY='agenda-garneau-a2026-v1', S0=new Date(2026,7,24);
 const CO=new Proxy({},{get:(_,k)=>((st.co||[]).find(c=>c.id===k)||{}).name||'Autre',ownKeys:()=>st.co.map(c=>c.id),getOwnPropertyDescriptor:()=>({enumerable:true,configurable:true,value:''})});
 const PAL=['#2563eb','#9333ea','#059669','#d97706','#0891b2','#db2777','#65a30d','#dc2626','#64748b','#7c3aed'];
-const TY={exam:'Examen',devoir:'Devoir',labo:'Laboratoire',test:'Test en ligne',autre:'Autre'};
+const TY={exam:'Examen',devoir:'Devoir',labo:'Laboratoire',test:'Test en ligne',cours:'Cours',rdv:'Rendez-vous',etude:'Étude',autre:'Autre'};
 const DJ=['Lundi','Mardi','Mercredi','Jeudi','Vendredi'];
-const E=(title,course,type,date,notes='',approx=false)=>({title,course,type,date,notes,approx,time:'',done:false});
+const E=(title,course,type,date,notes='',approx=false)=>({title,course,type,date,notes,approx,time:'',endTime:'',done:false});
 const SEED_EV=()=>[];
 const B=(day,start,end,title,course,room='')=>({day,start,end,title,course,room});
 const SEED_BL=()=>[];
@@ -288,7 +298,7 @@ function norm(s){
     ((s.gr&&s.gr.c)||[]).forEach(c=>{const t=co.find(x=>x.id===M[c.id]);if(t)Object.assign(t,{units:c.units,ifgz:c.ifgz,idgz:c.idgz,fm:c.fm,fs:c.fs,ev:c.ev});else co.push({...c,color:'#6b7280'})});
     s.co=co;fixBl(s.bl);s.p={rho:old.rho&&old.rho!=='0.7'?old.rho:''};delete s.gr;
   }
-  s.ev=(s.ev||[]).filter(e=>!/^e\d+$/.test(e.id));s.p=Object.assign(SEED_P(),s.p||{});s.sd=s.sd||{};return s;
+  s.ev=(s.ev||[]).filter(e=>!/^e\d+$/.test(e.id)).map(e=>({...e,endTime:e.endTime||''}));s.p=Object.assign(SEED_P(),s.p||{});s.sd=s.sd||{};return s;
 }
 const SUPABASE_URL='https://nizoozaydlsibwlwzgys.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5pem9vemF5ZGxzaWJ3bHd6Z3lzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA5MDY5NTgsImV4cCI6MjEwNjQ4Mjk1OH0.eNcVhjYCJuT76ywLlv7t2cde7HTmY1W7i25eA337S48';
@@ -357,8 +367,8 @@ async function loadCloudForUser(user){
   if(data?.data?.ev&&data?.data?.bl){
     const original=JSON.stringify(data.data);
     st=privateAccountData(data.data);
-    const migrated=JSON.stringify(st)!==original,datesLinked=syncCalendarExamsToNotes();
-    if(migrated||datesLinked)save({silent:true});
+    const migrated=JSON.stringify(st)!==original;
+    if(migrated)save({silent:true});
     localStorage.setItem(KEY,JSON.stringify(st));
     render();
     toast('Données du compte chargées ✓');
@@ -367,7 +377,7 @@ async function loadCloudForUser(user){
     localStorage.setItem(KEY,JSON.stringify(st));
     await cloudSave();
     render();
-    toast('Compte prêt. Dépose un document pour remplir ton espace.');
+    toast('Compte prêt. Ajoute tes cours et tes activités quand tu veux.');
   }
 }
 async function initAuth(){
@@ -406,8 +416,8 @@ const evTitle=e=>`${e.approx?'~ ':''}${e.title} · ${CO[e.course]}`;
 function hero(){
   const nx=sorted().find(e=>!e.done&&diff(e.date)>=0),h=$('#hero');
   const upcoming=sorted().filter(e=>!e.done&&diff(e.date)>=0).length;
-  const actions='<div class="heroActions"><button class="btn pri" type="button" data-hero-add>Ajouter une évaluation</button><button class="btn" type="button" data-hero-doc>Déposer un document</button></div>';
-  if(!nx){h.innerHTML='<div><p>Bienvenue dans ton espace étudiant</p><h1>Un semestre à ton rythme.</h1><p>Ajoute tes évaluations ou dépose un plan de cours : on t’aide à garder le fil.</p>'+actions+'</div><div class="heroMeta"><span>✦ Tout au même endroit</span><span>☀️ Un pas à la fois</span></div>';return}
+  const actions='<div class="heroActions"><button class="btn pri" type="button" data-hero-add>Ajouter une évaluation</button><button class="btn" type="button" data-hero-schedule>Planifier ma semaine</button></div>';
+  if(!nx){h.innerHTML='<div><p>Bienvenue dans ton espace étudiant</p><h1>Un semestre à ton rythme.</h1><p>Ajoute tes évaluations, tes cours et tes périodes d’étude pour garder le fil de ta session.</p>'+actions+'</div><div class="heroMeta"><span>✦ Tout au même endroit</span><span>☀️ Un pas à la fois</span></div>';return}
   const n=diff(nx.date),kind=nx.type==='exam'?'Prochain examen':'Prochaine échéance';
   h.innerHTML='<div><p>'+kind+'</p><h1>'+esc(nx.title)+' – '+esc(CO[nx.course])+'</h1><p>'+fmtD(nx.date,{weekday:'long',day:'numeric',month:'long'})+(nx.approx?' · date à confirmer':'')+'</p>'+actions+'</div><div class="r"><div class="big">'+n+'</div><p>'+(n===0?"c'est aujourd'hui":n===1?'jour':'jours')+'</p><div class="heroMeta"><span>'+upcoming+' à venir</span></div></div>';
 }
@@ -417,7 +427,7 @@ function calView(){
   const start=new Date(y,m,1-((first.getDay()+6)%7));
   const sessionEvents=sorted().filter(e=>e.date>=iso(S0)&&e.date<iso(addD(S0,112))),examCount=sessionEvents.filter(e=>e.type==='exam').length,taskCount=sessionEvents.length-examCount;
   const countLabel=(n,singular,plural)=>n+' '+(n===1?singular:plural);
-  const sessionSummary=sessionEvents.length?countLabel(sessionEvents.length,'événement','événements')+' dans la session · '+countLabel(examCount,'examen','examens')+' · '+countLabel(taskCount,'devoir ou activité','devoirs ou activités'):'Aucun événement dans la session. Dépose ou réanalyse un plan de cours pour remplir le calendrier.';
+  const sessionSummary=sessionEvents.length?countLabel(sessionEvents.length,'événement','événements')+' dans la session · '+countLabel(examCount,'examen','examens')+' · '+countLabel(taskCount,'devoir ou activité','devoirs ou activités'):'Aucun événement dans la session. Ajoute tes examens dans Notes et cote R, ou planifie une activité dans Horaire.';
   let h='<div class="card"><div class="bar"><h2>'+first.toLocaleDateString('fr-CA',{month:'long',year:'numeric'})+'</h2><button class="btn" data-nav="-1" aria-label="Mois précédent">‹</button><button class="btn" data-nav="0">Aujourd’hui</button><button class="btn" data-nav="1" aria-label="Mois suivant">›</button></div><p class="hint">'+sessionSummary+'</p><div class="calWrap"><div class="cal"><div class="h"></div>';
   ['lun','mar','mer','jeu','ven','sam','dim'].forEach(d=>h+='<div class="h">'+d+'</div>');
   for(let r=0;r<6;r++){
@@ -429,7 +439,7 @@ function calView(){
       const evs=sorted().filter(e=>e.date===s),inSession=d>=S0&&d<addD(S0,112),blocks=inSession?st.bl.filter(b=>b.day===dow).sort((a,b)=>a.start.localeCompare(b.start)):[];
       const shown=blocks.slice(0,2).map(b=>'<button class="chip classchip" data-bid="'+esc(b.id)+'" title="'+esc(b.title+' · '+b.start+'–'+b.end)+'">Cours · '+esc(b.title)+'</button>').join('');
       const more=blocks.length>2?'<span class="classMore">+'+(blocks.length-2)+' cours</span>':'';
-      h+='<div class="day'+(d.getMonth()!==m?' out':'')+(s===todayS()?' today':'')+(isRel&&c<5?' rel':'')+'" data-date="'+s+'"><span class="n">'+d.getDate()+'</span>'+shown+more+evs.map(e=>'<button class="chip'+(e.type==='exam'?' exam':'')+(e.done?' done':'')+'" data-c="'+esc(e.course)+'" data-id="'+esc(e.id)+'" title="'+esc(evTitle(e))+'">'+(e.approx?'~ ':'')+esc(e.title)+'</button>').join('')+'</div>';
+      h+='<div class="day'+(d.getMonth()!==m?' out':'')+(s===todayS()?' today':'')+(isRel&&c<5?' rel':'')+'" data-date="'+s+'"><span class="n">'+d.getDate()+'</span>'+shown+more+evs.map(e=>'<button class="chip'+(e.type==='exam'?' exam':'')+(e.done?' done':'')+'" data-c="'+esc(e.course)+'" data-id="'+esc(e.id)+'" title="'+esc(evTitle(e))+'">'+(e.approx?'~ ':'')+esc(e.title)+(e.time?' · '+e.time+(e.endTime?'–'+e.endTime:''):'')+'</button>').join('')+'</div>';
     }
   }
   h+='</div></div></div><p class="foot">Sélectionne une journée pour voir ses cours et ses évaluations. Les cours de l’horaire hebdomadaire apparaissent aussi ici.</p>';
@@ -438,18 +448,11 @@ function calView(){
 function openDay(date){
   dayDialogDate=date;
   const d=parse(date),dow=(d.getDay()+6)%7+1,inSession=d>=S0&&d<addD(S0,112),blocks=inSession?st.bl.filter(b=>b.day===dow).sort((a,b)=>a.start.localeCompare(b.start)):[],events=sorted().filter(e=>e.date===date);
-  const courseBlocks=[],courseKeys=new Set();
-  for(const b of blocks){const key=b.course==='autre'?b.course+'|'+b.title:b.course;if(!courseKeys.has(key)){courseKeys.add(key);courseBlocks.push(b)}}
-  const dayCourses=courseBlocks.length?courseBlocks:st.co.filter(c=>c.id!=='autre').map(c=>({course:c.id,title:c.name}));
   $('#dayTitle').textContent=fmtD(date,{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   let html='';
-  if(blocks.length){html+='<h4 class="ct">Cours</h4>'+blocks.map(b=>'<div class="dayClass"><button class="dayItem" type="button" data-day-block="'+esc(b.id)+'"><b>'+esc(b.title)+'</b><span>'+b.start+'–'+b.end+(b.room?' · '+esc(b.room):'')+'</span></button></div>').join('')}
-  if(dayCourses.length){html+='<h4 class="ct">Examen dans un cours</h4><p class="hint">Coche un cours pour ajouter son examen à cette date au calendrier.</p><div class="dayExamList">'+dayCourses.map(b=>{
-    const course=b.course,hasExam=events.some(e=>e.type==='exam'&&e.course===course),label=course!=='autre'?CO[course]:b.title;
-    return '<label class="ck dayExam"><input type="checkbox" data-day-exam-course="'+esc(course)+'"'+(hasExam?' checked':'')+'> Examen dans '+esc(label)+'</label>';
-  }).join('')+'</div>'}
-  if(events.length){html+='<h4 class="ct">Examens et devoirs</h4>'+events.map(e=>'<button class="dayItem" type="button" data-day-event="'+esc(e.id)+'"><b>'+esc(e.title)+'</b><span>'+esc(TY[e.type]||'Événement')+' · '+esc(CO[e.course])+(e.time?' · '+e.time:'')+(e.approx?' · date à confirmer':'')+(e.done?' · terminé':'')+'</span>'+(e.notes?'<small>'+esc(e.notes)+'</small>':'')+'</button>').join('')}
-  if(!blocks.length&&!events.length&&!dayCourses.length)html='<p class="empty">Aucun cours ni élément prévu. Tu peux en ajouter à cette journée.</p>';
+  if(blocks.length){html+='<h4 class="ct">Cours réguliers</h4>'+blocks.map(b=>'<div class="dayClass"><button class="dayItem" type="button" data-day-block="'+esc(b.id)+'"><b>'+esc(b.title)+'</b><span>'+b.start+'–'+b.end+(b.room?' · '+esc(b.room):'')+'</span></button></div>').join('')}
+  if(events.length){html+='<h4 class="ct">Activités prévues</h4>'+events.map(e=>'<button class="dayItem" type="button" data-day-event="'+esc(e.id)+'"><b>'+esc(e.title)+'</b><span>'+esc(TY[e.type]||'Événement')+' · '+esc(CO[e.course])+(e.time?' · '+e.time+(e.endTime?'–'+e.endTime:''):'')+(e.approx?' · date à confirmer':'')+(e.done?' · terminé':'')+'</span>'+(e.notes?'<small>'+esc(e.notes)+'</small>':'')+'</button>').join('')}
+  if(!blocks.length&&!events.length)html='<p class="empty">Aucun cours ni activité prévu. Ajoute un rendez-vous ou une séance à cette journée.</p>';
   $('#dayDetails').innerHTML=html;$('#dDay').showModal();
 }
 function listView(){
@@ -461,7 +464,7 @@ function listView(){
   let last='';
   evs.forEach(e=>{
     if(e.date!==last){last=e.date;const n=diff(e.date);h+=`<div class="grp${n<0&&!e.done?' late':''}">${fmtD(e.date,{weekday:'long',day:'numeric',month:'long'})}<small>${rel(n)}</small></div>`}
-    h+=`<div class="it${e.done?' done':''}" data-c="${e.course}"><input type="checkbox" data-done="${e.id}"${e.done?' checked':''} aria-label="Terminé"><div class="t"><b data-id="${e.id}">${e.approx?'~ ':''}${esc(e.title)}</b><span><span class="tag${e.type==='exam'?' exam':''}">${TY[e.type]}</span>${CO[e.course]}${e.time?' · '+e.time:''}${e.approx?' · date à confirmer':''}${e.notes?' · '+esc(e.notes):''}</span></div><input type="date" class="dt" data-date="${e.id}" value="${e.date}" aria-label="Modifier la date"><button class="btn" data-id="${e.id}">Modifier</button></div>`;
+    h+=`<div class="it${e.done?' done':''}" data-c="${e.course}"><input type="checkbox" data-done="${e.id}"${e.done?' checked':''} aria-label="Terminé"><div class="t"><b data-id="${e.id}">${e.approx?'~ ':''}${esc(e.title)}</b><span><span class="tag${e.type==='exam'?' exam':''}">${TY[e.type]}</span>${CO[e.course]}${e.time?' · '+e.time+(e.endTime?'–'+e.endTime:''):''}${e.approx?' · date à confirmer':''}${e.notes?' · '+esc(e.notes):''}</span></div><input type="date" class="dt" data-date="${e.id}" value="${e.date}" aria-label="Modifier la date"><button class="btn" data-id="${e.id}">Modifier</button></div>`;
   });
   return h+'</div>';
 }
@@ -470,15 +473,22 @@ function schedView(){
   const H0=8,PX=52,now=new Date(),monday=schedMonday;
   const study=plan().list.filter(l=>{const d=parse(l.date);return d>=monday&&d<addD(monday,5)});
   const end=addD(monday,4),label=fmtD(iso(monday),{day:'numeric',month:'long'})+' – '+fmtD(iso(end),{day:'numeric',month:'long',year:'numeric'});
-  let h='<div class="card"><div class="bar"><button class="btn" data-week="-1" aria-label="Semaine précédente">‹</button><button class="btn" data-week="0">Cette semaine</button><button class="btn" data-week="1" aria-label="Semaine suivante">›</button><h2>Horaire · '+label+'</h2><button class="btn pri" id="addBl">Ajouter un cours</button></div><p class="hint">Utilise les flèches pour parcourir les semaines. Les cours réguliers et les périodes d’étude apparaissent dans chaque journée.</p>'+(!st.bl.length?'<div class="empty scheduleEmpty"><strong>Aucun cours régulier n’est enregistré.</strong><p>Ré-analyse tes documents déposés pour retrouver les cours indiqués, ou ajoute un cours avec le bouton ci-dessus.</p><button class="btn" type="button" data-schedule-reanalyze>Ré-analyser mes documents</button></div>':'')+'<div class="sw"><div class="sched"><div class="dh"></div>';
-  if(!st.bl.length&&!study.length)return h+'</div>';
-  for(let i=0;i<5;i++){const date=addD(monday,i);h+='<div class="dh'+(iso(date)===todayS()?' today':'')+'"><b>'+DJ[i]+'</b><small>'+fmtD(iso(date),{day:'numeric',month:'short'})+'</small></div>'}
+  let h='<div class="card"><div class="bar"><button class="btn" data-week="-1" aria-label="Semaine précédente">‹</button><button class="btn" data-week="0">Cette semaine</button><button class="btn" data-week="1" aria-label="Semaine suivante">›</button><h2>Horaire · '+label+'</h2><button class="btn" id="addBl">Ajouter un cours régulier</button><button class="btn pri" data-add-week>Ajouter à cette semaine</button></div><p class="hint">Chaque semaine s’ouvre séparément. Ajoute un cours ponctuel, un rendez-vous ou une séance d’étude à une journée et à une plage horaire.</p><div class="sw"><div class="sched"><div class="dh"></div>';
+  for(let i=0;i<5;i++){const date=addD(monday,i);h+='<div class="dh'+(iso(date)===todayS()?' today':'')+'"><b>'+DJ[i]+'</b><small>'+fmtD(iso(date),{day:'numeric',month:'short'})+'</small><button type="button" class="dayQuickAdd" data-add-day="'+i+'" aria-label="Ajouter à '+DJ[i]+'">+</button></div>'}
   h+='<div class="hrs">'+Array.from({length:15},(_,i)=>'<i style="top:'+(i*PX)+'px">'+(H0+i)+'h</i>').join('')+'</div>';
   for(let d=1;d<=5;d++){
     const date=addD(monday,d-1);h+='<div class="col">';
     (monday>=S0&&monday<addD(S0,112)?st.bl.filter(b=>b.day===d):[]).sort((a,b)=>a.start.localeCompare(b.start)).forEach(b=>{
       const top=(tm(b.start)-H0)*PX,ht=(tm(b.end)-tm(b.start))*PX-2;
       h+='<button class="blk" data-c="'+esc(b.course)+'" data-bid="'+esc(b.id)+'" style="top:'+top+'px;height:'+ht+'px"><b>'+esc(b.title)+'</b><span>'+b.start+'–'+b.end+(b.room?' · '+esc(b.room):'')+'</span></button>';
+    });
+    st.ev.filter(e=>e.date===iso(date)&&e.time).forEach(e=>{
+      const start=tm(e.time),finish=e.endTime?tm(e.endTime):start+60,visibleStart=Math.max(H0*60,start),visibleEnd=Math.min(22*60,finish);
+      if(start<22*60&&visibleEnd>visibleStart){
+        const top=(visibleStart-H0*60)*PX/60,ht=Math.max(28,(visibleEnd-visibleStart)*PX/60-2);
+        const defaultEnd=String(Math.floor(Math.min(22*60,start+60)/60)).padStart(2,'0')+':00';
+        h+='<button class="blk timedEvent'+(e.type==='exam'?' exam':'')+'" data-id="'+esc(e.id)+'" data-c="'+esc(e.course)+'" style="top:'+top+'px;height:'+ht+'px"><b>'+esc(e.title)+'</b><span>'+e.time+'–'+(e.endTime||defaultEnd)+' · '+esc(CO[e.course])+'</span></button>';
+      }
     });
     study.filter(l=>((parse(l.date).getDay()+6)%7+1)===d).forEach(l=>{
       const top=(l.s-H0)*PX,ht=(l.f-l.s)*PX-2,k=l.date+'|'+l.s+'|'+l.x.e.id,done=!!st.sd[k];
@@ -519,8 +529,14 @@ function agg(){
   const T=sum(rows,x=>x.u),g=f=>sum(rows,x=>x.u*f(x))/T,has=k=>num(P[k])!=null||rows.every(x=>num(x.c[k])!=null);
   return{rows,R:g(x=>x.r.R),lo:g(x=>x.lo),hi:g(x=>x.hi),note:g(x=>x.r.note),prec:Math.round(100*(.6*g(x=>x.r.known)+.2*has('ifgz')+.2*has('idgz')))};
 }
+function eventKind(name){const text=foldText(name);if(/\b(?:examen|exam)\b/.test(text))return 'exam';if(/\b(?:labo|laboratoire|excel)\b/.test(text))return 'labo';if(/\b(?:test|moodle|minitest)\b/.test(text))return 'test';if(/\b(?:devoir|travaux|texte|journal)\b/.test(text))return 'devoir';return 'exam'}
 function matchingAssessmentEvents(courseId,assessment){
-  const kind=eventKind(assessment.name)||'exam';
+  const kind=eventKind(assessment.name)||(/\bexcel\b/i.test(String(assessment.name||''))?'labo':'exam');
+  const identity=assessmentIdentity(assessment.name,kind),strict=/^(?:exam:\d+|minitest(?::|$)|laboratoire:)/.test(identity);
+  const linked=assessment.eventId&&st.ev.find(event=>event.id===assessment.eventId&&event.course===courseId);
+  const identityMatches=st.ev.filter(event=>event.course===courseId&&identity&&assessmentIdentity(String(event.title||'')+' '+String(event.notes||''),event.type)===identity);
+  if(linked)return [linked];
+  if(strict)return identityMatches.slice(0,1);
   const foldName=s=>foldText(s).replace(/\s*\(semaine\s+\d+\)/g,'').replace(/[^\p{L}\p{N}]+/gu,' ').trim();
   const wanted=foldName(assessment.name);
   const matches=st.ev.filter(event=>{
@@ -528,19 +544,17 @@ function matchingAssessmentEvents(courseId,assessment){
     const title=foldName(event.title);
     return title===wanted||(Math.min(title.length,wanted.length)>=8&&(title.includes(wanted)||wanted.includes(title)));
   });
-  const linked=assessment.eventId&&st.ev.find(event=>event.id===assessment.eventId&&event.course===courseId&&event.type===kind);
-  if(linked&&!matches.includes(linked))matches.unshift(linked);
-  return matches;
+  return linked?[linked]:matches.slice(0,1);
 }
 function syncEvaluationDate(courseId,evaluationId,date){
   const course=st.co.find(c=>c.id===courseId),assessment=course?.ev.find(e=>e.id===evaluationId);
   if(!course||!assessment)return;
-  const matches=matchingAssessmentEvents(courseId,assessment),kind=eventKind(assessment.name)||'exam';
+  const matches=matchingAssessmentEvents(courseId,assessment),kind=eventKind(assessment.name)||(/\bexcel\b/i.test(String(assessment.name||''))?'labo':'exam');
   if(date){
     assessment.date=date;
     if(matches.length){
       for(const event of matches)event.date=date;
-      assessment.eventId=matches[0].id;
+      assessment.eventId=(matches.find(event=>event.id===assessment.eventId)||matches[0]).id;
     }else{
       const event={...E(assessment.name||'Examen',courseId,kind,date,'Ajouté depuis Notes et cote R'),id:uid()};
       st.ev.push(event);assessment.eventId=event.id;
@@ -561,8 +575,8 @@ function notesView(){
   st.co.filter(c=>c.id!=='autre').forEach(c=>{
     h+=`<div class="card co" data-co="${c.id}" data-c="${c.id}"><div class="bar"><input type="color" data-f="color" value="${esc(c.color)}" aria-label="Couleur du cours"><input class="nm" data-f="name" value="${esc(c.name)}" aria-label="Nom du cours"><label class="u">Unités (ex. 3-1-3)<input data-f="units" value="${esc(c.units)}"></label><button class="btn del" data-delco>Supprimer</button></div>
     <div class="sw"><table class="ev"><thead><tr><th>Évaluation</th><th>Date</th><th>Pond. %</th><th>Ma note %</th><th>Moy. groupe %</th><th>Écart type</th><th>Z</th><th></th></tr></thead><tbody>`;
-    c.ev.forEach(e=>{const calendarEvent=matchingAssessmentEvents(c.id,e)[0],date=calendarEvent?.date||e.date||'';h+=`<tr data-ev="${e.id}"><td><input data-e="name" value="${esc(e.name)}" aria-label="Nom"></td><td><input type="date" data-exam-date="${esc(e.id)}" value="${esc(date)}" aria-label="Date de l’évaluation"></td><td>${inp('data-e="w"',e.w)}</td><td>${inp('data-e="grade"',e.grade)}</td><td>${inp('data-e="mean"',e.mean,'placeholder="'+f1(num(P.dm)??75,0)+'"')}</td><td>${inp('data-e="sd"',e.sd,'placeholder="'+f1(num(P.ds)??12,0)+'"')}</td><td class="z"></td><td><button class="btn" data-delev aria-label="Supprimer l'évaluation">×</button></td></tr>`});
-    h+=`</tbody></table></div><p class="hint">La date choisie synchronise l’évaluation avec le calendrier. Efface-la pour retirer l’événement du calendrier.</p><button class="btn" data-addev>Ajouter une évaluation</button>
+    c.ev.forEach(e=>{const calendarEvent=matchingAssessmentEvents(c.id,e)[0],date=e.date||calendarEvent?.date||'';h+=`<tr data-ev="${e.id}"><td><input data-e="name" value="${esc(e.name)}" aria-label="Nom"></td><td><input type="date" data-exam-date="${esc(e.id)}" value="${esc(date)}" aria-label="Date de l’évaluation"></td><td>${inp('data-e="w"',e.w)}</td><td>${inp('data-e="grade"',e.grade)}</td><td>${inp('data-e="mean"',e.mean,'placeholder="'+f1(num(P.dm)??75,0)+'"')}</td><td>${inp('data-e="sd"',e.sd,'placeholder="'+f1(num(P.ds)??12,0)+'"')}</td><td class="z"></td><td><button class="btn" data-delev aria-label="Supprimer l'évaluation">×</button></td></tr>`});
+    h+=`</tbody></table></div><p class="hint">Ajoute ici tes examens et autres évaluations. Une date inscrite ici crée ou déplace automatiquement le même événement dans le calendrier.</p><button class="btn pri" data-add-exam>Ajouter un examen</button> <button class="btn" data-addev>Ajouter une autre évaluation</button>
     <details><summary>Valeurs officielles du cours (facultatif)</summary><div class="par"><label>Moyenne finale du groupe %${inp('data-f="fm"',c.fm)}</label><label>Écart type final du groupe${inp('data-f="fs"',c.fs)}</label><label>IFGZ du cours${inp('data-f="ifgz"',c.ifgz)}</label><label>IDGZ du cours${inp('data-f="idgz"',c.idgz)}</label></div></details><div id="res-${c.id}"></div></div>`;
   });
   return h;
@@ -648,527 +662,24 @@ function studyView(){
   return h+'</div>';
 }
 
-const DOC_BUCKET='documents-etudiants';
-const DOC_TYPES={pdf:'application/pdf',doc:'application/msword',docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',ics:'text/calendar',png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',webp:'image/webp'};
-const DOC_CATEGORIES={plan:'Plan de cours',calendrier:'Calendrier',autre:'Autre document'};
-const months={janvier:0,janv:0,jan:0,fevrier:1,fevr:1,fev:1,mars:2,avril:3,avr:3,mai:4,juin:5,juillet:6,juil:6,aout:7,septembre:8,sept:8,sep:8,octobre:9,oct:9,novembre:10,nov:10,decembre:11,dec:11};
 const foldText=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
-function makeEventDate(year,month,day,time){
-  const d=new Date(year,month,day);
-  if(d.getFullYear()!==year||d.getMonth()!==month||d.getDate()!==day)return null;
-  return {date:String(year)+'-'+String(month+1).padStart(2,'0')+'-'+String(day).padStart(2,'0'),time:time||''};
-}
-function findDateAndTime(line){
-  const s=foldText(line),yearNow=new Date().getFullYear();let m,date=null;
-  if((m=s.match(/\b(20\d{2})[-/.](\d{1,2})[-/.](\d{1,2})\b/)))date=makeEventDate(+m[1],+m[2]-1,+m[3]);
-  if(!date&&(m=s.match(/\b(\d{1,2})[-/.](\d{1,2})[-/.](20\d{2})\b/)))date=makeEventDate(+m[3],+m[2]-1,+m[1]);
-  if(!date&&(m=s.match(/\b(\d{1,2})(?:er)?\s+(janv(?:ier)?|fevr?(?:ier)?|mars|avr(?:il)?|mai|juin|juil(?:let)?|aout|sept?(?:embre)?|oct(?:obre)?|nov(?:embre)?|dec(?:embre)?)\.?\s*(20\d{2})?\b/))){
-    const key=m[2].replace(/\.$/,'');let mon=months[key];
-    if(mon==null)mon=months[key.slice(0,4)]??months[key.slice(0,3)];
-    if(mon!=null)date=makeEventDate(+(m[3]||yearNow),mon,+m[1]);
-  }
-  if(!date)return null;
-  const tm=s.match(/\b([01]?\d|2[0-3])\s*(?:h|:)\s*([0-5]\d)\b/);
-  if(tm)date.time=String(+tm[1]).padStart(2,'0')+':'+tm[2];
-  return date;
-}
-function eventKind(text){
-  const s=foldText(text);
-  if(/\b(mini[ -]?test|examen|examens|exam|intra|final|evaluation|quiz|test)\b/.test(s))return 'exam';
-  if(/\b(devoir|remise|travail|laboratoire|labo|rapport|projet|dissertation|redaction|lecture|presentation|expose|echeance|date limite)\b/.test(s))return /\b(laboratoire|labo)\b/.test(s)?'labo':'devoir';
-  return null;
-}
-function importedEvent(line,date,fileName,includeGeneric=false,courseId=''){
-  const kind=eventKind(line)||(includeGeneric?'autre':null);if(!kind)return null;
-  let source=String(line||'').replace(/\s+/g,' ').trim();
-  const eventStart=source.search(/\b(?:mini[ -]?test|examen|exam|laboratoire|labo|devoir|remise|travail|rapport|projet|dissertation|rédaction|présentation|exposé|quiz|test|évaluation)\b/i);
-  if(eventStart>0&&/^\s*\d{1,2}\s+/.test(source.slice(0,eventStart)))source=source.slice(eventStart);
-  let title=source.replace(/(?:20\d{2}[-/.]\d{1,2}[-/.]\d{1,2}|\d{1,2}[-/.]\d{1,2}[-/.]20\d{2}|\d{1,2}(?:er)?\s+(?:janv?(?:ier)?|f[eé]vr?(?:ier)?|mars|avr?(?:il)?|mai|juin|juil?(?:let)?|ao[uû]t|sept?(?:embre)?|oct(?:obre)?|nov(?:embre)?|d[eé]c(?:embre)?)\.?\s*(?:20\d{2})?)/iu,' ')
-    .replace(/\b([01]?\d|2[0-3])\s*(?:h|:)\s*[0-5]\d\b/ig,' ')
-    .replace(/\b(?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)\b/ig,' ')
-    .replace(/\bLocal\s*:.*/i,' ')
-    .replace(/^\s*\d{1,2}\s+(?=(?:examen|mini[ -]?test|laboratoire|labo)\b)/i,' ')
-    .replace(/([%％]\s*\)?)[\s:|,-]*\d{1,2}\s*$/,'$1')
-    .replace(/[•*–—:;|]+/g,' ').replace(/\s+/g,' ').trim();
-  if(title.length>80)title=title.slice(0,77).trim()+'…';
-  if(!title)title=includeGeneric?'Événement importé':kind==='exam'?'Examen':'Devoir';
-  if(includeGeneric&&foldText(title).length<3)return null;
-  const lineText=foldText(source),matched=(st.co||[]).find(c=>c.id!=='autre'&&foldText(c.name).length>2&&lineText.includes(foldText(c.name)));
-  const excerpt=source.slice(0,360);
-  return {id:uid(),title:title,course:matched?.id||courseId||'autre',type:kind,date:date.date,time:date.time||'',notes:'Ajouté depuis '+fileName+(excerpt?' · '+excerpt:''),approx:false,done:false};
-}
-function calendarGridContext(text){
-  const folded=foldText(text),keys=Object.keys(months).sort((a,b)=>b.length-a.length),m=folded.match(new RegExp('\\b('+keys.join('|')+')\\b\\s*(20\\d{2})?'));
-  if(!m)return null;
-  const weekdays=folded.match(/\b(?:lun(?:di)?|mar(?:di)?|mer(?:credi)?|jeu(?:di)?|ven(?:dredi)?|sam(?:edi)?|dim(?:anche)?)\b/g)||[];
-  if(new Set(weekdays).size<3)return null;
-  return {month:months[m[1]],year:+(m[2]||S0.getFullYear())};
-}
-function hasAmbiguousExamDates(text){
-  const value=foldText(text),monthsPattern=Object.keys(months).sort((a,b)=>b.length-a.length).join('|');
-  return /\bjournees?\s+d['’]?\s*examens?\b/.test(value)&&new RegExp('\\b\\d{1,2}\\s*(?:,|ou|et)\\s*\\d{1,2}.*\\b(?:'+monthsPattern+')\\b','i').test(value);
-}
-function textEvents(text,fileName,includeGeneric=false,looseCalendar=false,courseId=''){
-  const out=[],seen=new Set(),monthContext=looseCalendar?calendarGridContext(text):null,lines=String(text||'').replace(/\u00a0/g,' ').split(/\r?\n/).map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean);
-  for(let i=0;i<lines.length;i++){
-    const nearby=lines.slice(Math.max(0,i-2),Math.min(lines.length,i+4)).join(' '),ambiguous=hasAmbiguousExamDates(nearby);
-    let clean=lines[i];
-    if(!findDateAndTime(clean)&&eventKind(clean)&&i+1<lines.length&&!ambiguous&&findDateAndTime(lines[i+1]))clean+=' '+lines[i+1];
-    if(clean.length>500)continue;
-    let dt=ambiguous&&eventKind(clean)?null:findDateAndTime(clean),eventLine=clean;
-    if(dt&&clean.includes('|')){
-      const cells=clean.split('|').map(x=>x.trim()),dateCell=cells.findIndex(cell=>!!findDateAndTime(cell));
-      if(dateCell>0){const titleCell=cells.slice(0,dateCell).reverse().find(cell=>eventKind(cell)&&!/^\d{1,2}$/.test(cell));if(titleCell)eventLine=titleCell}
-    }
-    if(!dt&&monthContext&&!ambiguous){
-      const day=clean.match(/^\s*(?:[•*·]\s*)?(\d{1,2})(?:er)?(?:[.)–—:-]\s*|\s+)(.+)$/);
-      if(day&&+day[1]>=1&&+day[1]<=31){dt=makeEventDate(monthContext.year,monthContext.month,+day[1]);eventLine=day[2].trim()}
-    }
-    if(!dt)continue;
-    const ev=importedEvent(eventLine,dt,fileName,includeGeneric||!!monthContext,courseId);if(!ev)continue;
-    const key=foldText(ev.title)+'|'+ev.date+'|'+ev.type+'|'+ev.course;
-    if(!seen.has(key)){seen.add(key);out.push(ev)}
-  }
-  return out;
-}
-function identifyDocumentCourse(text){
-  const raw=String(text||''),folded=foldText(raw);
-  let course=st.co.find(c=>c.id!=='autre'&&foldText(c.name).length>3&&folded.includes(foldText(c.name)));
-  if(course)return course;
-  const code=raw.match(/\b(\d{3})\s*-\s*([A-Z0-9]{3})\s*-\s*([A-Z]{2})\b/);
-  const codeKey=code?code[1]+'-'+code[2]+'-'+code[3]:'';
-  const header=raw.match(/(?:^|\n)\s*([^|\n]{4,100}?)\s*,?\s*\|?\s*\d{3}\s*-\s*[A-Z0-9]{3}\s*-\s*[A-Z]{2}\b/i);
-  const trailingName=code?raw.slice(code.index+code[0].length).split(/[\r\n|]/,1)[0].replace(/^\s*,?\s*(?:Groupe\s*\d+).*$/i,'').replace(/^\s+A\d{2}\s*/,'').trim():'';
-  let name=(header?.[1]||trailingName).replace(/\s+/g,' ').replace(/^\s*[,;:-]+|[,;:-]+\s*$/g,'').trim();
-  const knownCodes={'201-SH4-RE':'alg','340-101-MQ':'philo','601-101-MQ':'ecr','109-101-MQ':'eps'};
-  if(knownCodes[codeKey])course=st.co.find(c=>c.id===knownCodes[codeKey]);
-  if(!course&&!name){
-    const aliases=[['gestion','gest'],['philosophie','philo'],['algèbre','alg']];
-    const alias=aliases.find(x=>folded.includes(foldText(x[0])));
-    if(alias)course=st.co.find(c=>c.id===alias[1]);
-  }
-  if(course)return course;
-  if(name.length<4)return null;
-  const id=knownCodes[codeKey]||'doc'+uid().slice(1).replace(/[^a-z0-9]/gi,'').toLowerCase();
-  course={id,name:name.slice(0,60),color:PAL[st.co.length%PAL.length],units:'2.33',ifgz:'',idgz:'',fm:'',fs:'',ev:[{id:id+'-0',name:'',w:'',grade:'',mean:'',sd:''}]};
-  st.co.splice(Math.max(0,st.co.length-1),0,course);
-  return course;
-}
-function classDateForWeek(courseId,week,letter,importedClasses=[]){
-  const blocks=[...st.bl,...importedClasses].filter(b=>b.course===courseId).sort((a,b)=>a.day-b.day||String(a.start).localeCompare(String(b.start)));
-  const index=letter==='b'?1:0,block=blocks[index];
-  if(!block||!Number.isFinite(+block.day))return null;
-  return makeEventDate(S0.getFullYear(),S0.getMonth(),S0.getDate()+(week-1)*7+(+block.day-1));
-}
-function coursePlanEvents(text,fileName,courseId,importedClasses=[]){
-  const raw=String(text||'').replace(/\u00a0/g,' ').replace(/\r/g,'');
-  const headings=[/Calendrier\s+des\s+activit(?:é|e)s/i,/Calendrier\s+des\s+évaluations/i,/Planification\s+des\s+activit(?:é|e)s/i,/Échéancier/i];
-  let start=-1;
-  for(const re of headings){const p=raw.search(re);if(p>=0&&(start<0||p<start))start=p}
-  const section=start>=0?raw.slice(start):raw;
-  const endMatch=section.search(/[ÉE]valuation formative|Politique de présence|Matériel obligatoire/i);
-  const calendar=section.slice(0,endMatch<0?undefined:endMatch);
-  const marks=[...calendar.matchAll(/(?:^|\n)\s*(?:semaine\s*)?(1[0-6]|[1-9])\s*(?:[.•●▪◦·*–—:.)-]\s*)?(?=(?:Cours\s*[AB]\b|Cours levés\b|Semaine de lecture\b|Examen\b|Travail\b|Remise\b|Quiz\b|Évaluation\b))/gim)];
-  if(!marks.length)return [];
-  const out=[],seen=new Set();
-  const capitalize=s=>s?s.charAt(0).toLocaleUpperCase('fr-CA')+s.slice(1):s;
-  for(let i=0;i<marks.length;i++){
-    const week=+marks[i][1],begin=marks[i].index+marks[i][0].lastIndexOf(marks[i][1])+marks[i][1].length;
-    const stop=i+1<marks.length?marks[i+1].index:calendar.length,block=calendar.slice(begin,stop),items=new Map();
-    const addItem=(title,type,at,excerpt='')=>{
-      title=String(title||'').replace(/\s+/g,' ').trim();
-      if(!title)return;
-      const position=Math.max(0,at||0),similar=[...items.values()].find(item=>item.type===type&&Math.abs(item.at-position)<=3);
-      if(similar){if(title.length>similar.title.length){items.delete(similar.key);similar.title=title;similar.key=type+'|'+foldText(title);similar.excerpt=excerpt||similar.excerpt;similar.at=position;items.set(similar.key,similar)}return}
-      const key=type+'|'+foldText(title);
-      if(!items.has(key))items.set(key,{key,title,type,at:position,excerpt});
-    };
-    for(const m of block.matchAll(/\bExamen\s*(\d+)\b/gi))addItem('Examen '+m[1],'exam',m.index);
-    for(const m of block.matchAll(/\bTravail\s+court\s*(\d+)\b/gi))addItem('Travail court '+m[1],'devoir',m.index);
-    for(const m of block.matchAll(/\b(?:remise\s+du\s+)?journal\s+de\s+lecture\s*(\d+)\b/gi))addItem('Remise du journal de lecture '+m[1],'devoir',m.index);
-    const patterns=[
-      {re:/\b(?:examen(?:\s+(?:final|de\s+mi-session))?|intra|quiz|test|évaluation)\s*(?:(?:n[°oº]?)\s*)?\d*\b/gi,type:'exam'},
-      {re:/\b(?:devoir|labo(?:ratoire)?|rapport|projet|dissertation|rédaction|présentation|exposé|remise|journal de lecture)\s*(?:(?:n[°oº]?)\s*)?\d*\b/gi,type:'devoir'},
-      {re:/\btravail\s+(?:court|pratique|écrit)\s*(?:(?:n[°oº]?)\s*)?\d*\b/gi,type:'devoir'}
-    ];
-    for(const pattern of patterns)for(const m of block.matchAll(pattern.re)){
-      const at=m.index,lineStart=Math.max(block.lastIndexOf('\n',at),block.lastIndexOf('•',at),block.lastIndexOf(';',at))+1;
-      const lineEnd=[block.indexOf('\n',at),block.indexOf('•',at),block.indexOf(';',at)].filter(x=>x>=0).reduce((a,b)=>Math.min(a,b),block.length);
-      const excerpt=block.slice(lineStart,lineEnd).replace(/\s+/g,' ').trim();
-      let title=excerpt||capitalize(m[0].replace(/\s+/g,' ').trim());
-      if(title.length>100)title=title.slice(0,97).trim()+'…';
-      addItem(title,pattern.type,at,excerpt);
-    }
-    const reading=block.match(/\b(?:semaine de lecture|semaine de relâche|semaine d'examens?)\b/iu);
-    if(reading&&/\bexamen/i.test(reading[0]))addItem(reading[0],'exam',reading.index);
-    for(const item of items.values()){
-      const context=block.slice(Math.max(0,item.at-120),Math.min(block.length,item.at+260)),dateInContext=findDateAndTime(context);
-      const letterMatch=context.match(/\bCours\s*([AB])\b/i)||block.match(/\bCours\s*([AB])\b/i),letter=letterMatch?.[1]?.toLowerCase()||'';
-      const date=dateInContext||classDateForWeek(courseId,week,letter,importedClasses)||makeEventDate(S0.getFullYear(),S0.getMonth(),S0.getDate()+(week-1)*7);
-      if(!date)continue;
-      let title=item.title;
-      if(!dateInContext&&!classDateForWeek(courseId,week,letter,importedClasses))title+=' (semaine '+week+')';
-      const key=foldText(title)+'|'+date.date+'|'+item.type+'|'+(courseId||'autre');
-      if(seen.has(key))continue;
-      seen.add(key);
-      const details=(item.excerpt||context).replace(/\s+/g,' ').trim().slice(0,360);
-      const mapped=!!(!dateInContext&&classDateForWeek(courseId,week,letter,importedClasses));
-      out.push({id:uid(),title:title.slice(0,80),course:courseId||'autre',type:item.type,date:date.date,time:date.time||'',notes:'Repéré dans '+fileName+' · semaine '+week+(letter?' · Cours '+letter.toUpperCase():'')+(details?' · '+details:''),approx:!dateInContext&&!mapped,done:false});
-    }
-  }
-  return out;
-}
-function parseWeeklyClasses(text,courseId){
-  const days=[['dimanche',7],['samedi',6],['vendredi',5],['jeudi',4],['mercredi',3],['mardi',2],['lundi',1],['dim',7],['sam',6],['ven',5],['jeu',4],['mer',3],['mar',2],['lun',1]],lines=String(text||'').replace(/\u00a0/g,' ').split(/\r?\n/).map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean),out=[],seen=new Set();
-  for(let i=0;i<lines.length;i++){
-    const chunks=[lines[i]];if(i+1<lines.length)chunks.push(lines[i]+' '+lines[i+1]);
-    for(const line of chunks){
-      const folded=foldText(line),day=days.find(x=>new RegExp('\\b'+x[0]+'\\b').test(folded));if(!day)continue;
-      const timeMatch=line.match(/\b([01]?\d|2[0-3])\s*(?:h|:)\s*([0-5]\d)?\s*(?:-|–|—|à|a)\s*([01]?\d|2[0-3])\s*(?:h|:)\s*([0-5]\d)?\b/i);if(!timeMatch)continue;
-      const start=String(+timeMatch[1]).padStart(2,'0')+':'+(timeMatch[2]||'00'),end=String(+timeMatch[3]).padStart(2,'0')+':'+(timeMatch[4]||'00');
-      if(tm(start)>=tm(end))continue;
-      let c=st.co.find(x=>x.id!=='autre'&&foldText(x.name).length>2&&folded.includes(foldText(x.name)));
-      if(!c&&courseId)c=st.co.find(x=>x.id===courseId);
-      if(!c&&/\bgestion\b/.test(folded))c=st.co.find(x=>x.id==='gest');
-      const cleaned=line.replace(new RegExp('\\b'+day[0]+'\\b','i'),' ').replace(timeMatch[0],' ').replace(/^\s*[:·,-]+|[:·,-]+\s*$/g,'').replace(/\s+/g,' ').trim();
-      const title=(c&&foldText(cleaned).length<4?c.name:cleaned)|| (c?c.name:'Cours importé');
-      const course=c?c.id:'autre',key=day[1]+'|'+start+'|'+end+'|'+course;
-      if(!seen.has(key)){seen.add(key);out.push({id:uid(),day:day[1],start,end,title:title.slice(0,70),course,room:''})}
-    }
-  }
-  return out;
-}
-function flexibleFinalExamEvents(text,fileName,courseId){
-  const lines=String(text||'').replace(/\u00a0/g,' ').split(/\r?\n/).map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean),out=[],monthNames=Object.keys(months).sort((a,b)=>b.length-a.length);
-  const monthPattern='(?:'+monthNames.join('|')+')\\b';
-  for(let i=0;i<lines.length;i++){
-    const exam=lines[i].match(/\b(examen\s*\d+)\b/i);if(!exam)continue;
-    const context=foldText(lines.slice(Math.max(0,i-2),Math.min(lines.length,i+4)).join(' '));
-    if(!/journ[eé]es?\s+d['’]examens?|dates?\s+d['’]examens?/i.test(context))continue;
-    const examAt=context.search(/\bexamen\s*\d+\b/),dateContext=context.slice(Math.max(0,examAt));
-    const options=dateContext.match(new RegExp('((?:\\d{1,2}\\s*(?:,|ou|et)\\s*)*\\d{1,2})\\s+('+monthPattern+')(?:\\s+(20\\d{2}))?','i'));
-    if(!options)continue;
-    const month=months[foldText(options[2])];if(month==null)continue;
-    const days=options[1].match(/\d{1,2}/g)?.map(Number).filter(day=>day>=1&&day<=31)||[];
-    if(days.length<2)continue;
-    const year=+(options[3]||S0.getFullYear()),dates=days.map(day=>makeEventDate(year,month,day)).filter(Boolean);
-    if(!dates.length)continue;
-    const dateText=days.join(', ').replace(/, (\d+)$/,' ou $1')+' '+['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'][month];
-    out.push({id:uid(),title:exam[1].replace(/\s+/g,' ').trim()+' (date à confirmer)',course:courseId||'autre',type:'exam',date:dates[0].date,time:'',notes:'Repéré dans '+fileName+' · Date à confirmer : une séance sera retenue parmi le '+dateText,approx:true,done:false});
-  }
-  return out;
-}
-function documentEvents(text,fileName,courseId,includeGeneric=false,looseCalendar=false,classSchedule=[]){
-  const planned=coursePlanEvents(text,fileName,courseId,classSchedule),cleanTitle=s=>foldText(s).replace(/\s*\(semaine\s+\d+\)$/,'').replace(/\s*\(?\s*\d+(?:[.,]\d+)?\s*%\s*\)?/g,'').trim();
-  const ordinary=textEvents(text,fileName,includeGeneric,looseCalendar,courseId).filter(e=>!planned.some(p=>p.date===e.date&&p.type===e.type&&cleanTitle(p.title)===cleanTitle(e.title)));
-  const all=ordinary.concat(planned,flexibleFinalExamEvents(text,fileName,courseId)),seen=new Set(),examPositions=new Map(),out=[];
-  const certainty=e=>!e.approx?3:/date à confirmer|parmi le/i.test(String(e.notes||''))?2:1;
-  for(const event of all){
-    const exactKey=foldText(event.title)+'|'+event.date+'|'+event.type+'|'+event.course;
-    if(seen.has(exactKey))continue;
-    seen.add(exactKey);
-    const exam=event.type==='exam'&&assessmentIdentity(event.title).match(/^exam:(\d+)$/);
-    if(exam){
-      const key=event.course+'|'+exam[1],existingIndex=examPositions.get(key);
-      if(existingIndex==null){examPositions.set(key,out.length);out.push(event)}
-      else if(certainty(event)>certainty(out[existingIndex]))out[existingIndex]=event;
-      continue;
-    }
-    out.push(event);
-  }
-  return out;
-}
-function icsEvents(text,fileName){
-  const unfolded=String(text||'').replace(/\r?\n[ \t]/g,'');
-  return unfolded.split(/BEGIN:VEVENT/i).slice(1).map(block=>{
-    const prop=name=>{const m=block.match(new RegExp('^'+name+'(?:;[^:]*)?:(.*)$','im'));return m?m[1].trim().replace(/\\n/gi,' ').replace(/\\,/g,',').replace(/\\;/g,';'):''};
-    const summary=prop('SUMMARY'),desc=prop('DESCRIPTION'),start=block.match(/^DTSTART(?:;[^:]*)?:(\d{8})(?:T(\d{6})Z?)?/im);
-    if(!start)return null;
-    const d=makeEventDate(+start[1].slice(0,4),+start[1].slice(4,6)-1,+start[1].slice(6,8),start[2]?start[2].slice(0,2)+':'+start[2].slice(2,4):'');
-    if(!d)return null;
-    const event=importedEvent(summary+' '+desc,d,fileName,true);
-    const ev=event||{id:uid(),title:(summary||'Événement importé').slice(0,80),course:'autre',type:'autre',date:d.date,time:d.time||'',notes:'Ajouté depuis '+fileName,approx:false,done:false};
-    if(summary)ev.title=summary.slice(0,80);
-    return ev;
-  }).filter(Boolean);
-}
-let mammothLoading=null,pdfLoading=null;
-function getMammoth(){
-  if(window.mammoth)return Promise.resolve(window.mammoth);
-  if(mammothLoading)return mammothLoading;
-  mammothLoading=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/mammoth@1.13.0/mammoth.browser.min.js';s.onload=()=>window.mammoth?resolve(window.mammoth):reject(new Error('Mammoth indisponible'));s.onerror=()=>reject(new Error('Bibliothèque Word indisponible'));document.head.appendChild(s)});
-  return mammothLoading;
-}
-let ocrWorker=null,ocrWorkerPromise=null;
-async function getOcrWorker(status){
-  if(ocrWorker)return ocrWorker;
-  if(ocrWorkerPromise)return ocrWorkerPromise;
-  ocrWorkerPromise=(async()=>{
-    if(!window.Tesseract){
-      await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/tesseract.min.js';s.onload=resolve;s.onerror=()=>reject(new Error('OCR indisponible'));document.head.appendChild(s)});
-    }
-    if(!window.Tesseract)throw new Error('OCR indisponible');
-    ocrWorker=await window.Tesseract.createWorker('fra',1,{logger:m=>{if(m.status==='recognizing text'&&status)status.textContent='Lecture du document en français… '+Math.round((m.progress||0)*100)+' %'}});
-    return ocrWorker;
-  })();
-  try{return await ocrWorkerPromise}catch(e){ocrWorkerPromise=null;throw e}
-}
-async function releaseOcrWorker(){if(ocrWorker){await ocrWorker.terminate();ocrWorker=null;ocrWorkerPromise=null}}
-async function recognizeImage(source,status){const worker=await getOcrWorker(status),result=await worker.recognize(source);return result.data?.text||''}
-async function extractDocumentText(file,ext,status,category='plan'){
-  if(ext==='ics')return {events:icsEvents(await file.text(),file.name),classes:[],supported:true};
-  if(ext==='png'||ext==='jpg'||ext==='jpeg'||ext==='webp'){
-    const text=await recognizeImage(file,status),course=identifyDocumentCourse(text),classes=parseWeeklyClasses(text,course?.id);
-    return {events:documentEvents(text,file.name,course?.id,true,category==='calendrier'||!!calendarGridContext(text),classes),classes,supported:true,ocr:true};
-  }
-  if(ext==='docx'){
-    const mammoth=await getMammoth(),result=await mammoth.extractRawText({arrayBuffer:await file.arrayBuffer()}),text=result.value,course=identifyDocumentCourse(text),classes=parseWeeklyClasses(text,course?.id);
-    return {events:documentEvents(text,file.name,course?.id,category==='calendrier',category==='calendrier',classes),classes,supported:true};
-  }
-  if(ext==='pdf'){
-    if(!pdfLoading)pdfLoading=import('https://cdn.jsdelivr.net/npm/pdfjs-dist@6.3.289/build/pdf.mjs');
-    const pdfjs=await pdfLoading;pdfjs.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@6.3.289/build/pdf.worker.mjs';
-    const doc=await pdfjs.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise,lines=[];
-    for(let n=1;n<=doc.numPages;n++){
-      status.textContent='Lecture de la page '+n+' sur '+doc.numPages+'…';
-      const page=await doc.getPage(n),content=await page.getTextContent(),rows=[];
-      for(const item of content.items){if(!item.str?.trim())continue;const y=Math.round(item.transform?.[5]||0),x=Number(item.transform?.[4]||0);let row;
-        for(let j=rows.length-1;j>=0;j--){if(Math.abs(rows[j].y-y)<=3){row=rows[j];break}}
-        if(!row){row={y:y,items:[]};rows.push(row)}row.items.push({x,text:item.str.trim()})}
-      let pageText=rows.sort((a,b)=>b.y-a.y).map(r=>{const items=r.items.sort((a,b)=>a.x-b.x);let line='',lastX=null;for(const item of items){if(line)line+=(lastX!=null&&item.x-lastX>70?' | ':' ');line+=item.text;lastX=item.x+Math.max(1,item.text.length*4)}return line}).join('\n');
-      if(pageText.replace(/\s/g,'').length<160&&n<=40){
-        status.textContent='Lecture de la page '+n+' du PDF…';
-        const viewport=page.getViewport({scale:1.5}),canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
-        canvas.width=viewport.width;canvas.height=viewport.height;
-        await page.render({canvasContext:ctx,viewport}).promise;
-        pageText=await recognizeImage(canvas,status);canvas.width=0;canvas.height=0;
-      }
-      lines.push(pageText);
-    }
-    const text=lines.join('\n'),course=identifyDocumentCourse(text),classes=parseWeeklyClasses(text,course?.id);
-    return {events:documentEvents(text,file.name,course?.id,category==='calendrier',category==='calendrier',classes),classes,supported:true};
-  }
-  return {events:[],classes:[],supported:false};
-}
-function documentsView(){
-  if(!currentUser)return '<div class="card"><h2>Documents de cours</h2><p class="hint">Connecte-toi pour déposer et retrouver tes plans de cours et calendriers dans ton espace privé.</p><button class="btn pri" id="docsLogin">Se connecter</button></div>';
-  return '<div class="card"><div class="bar"><h2>Documents de cours</h2><button class="btn" type="button" data-doc-all-analyze>Ré-analyser tous les documents</button></div><p class="hint">Dépose un plan de cours ou un calendrier. Les examens, devoirs et événements datés seront ajoutés automatiquement à ton calendrier; les évaluations indiquées par semaine seront visibles avec une date à confirmer.</p><label>Type de document<select id="docCategory"><option value="plan">Plan de cours</option><option value="calendrier">Calendrier</option><option value="autre">Autre document</option></select></label><input id="docFiles" type="file" accept=".pdf,.doc,.docx,.ics,.png,.jpg,.jpeg,.webp" multiple hidden><div class="dropbox" id="dropZone" role="button" tabindex="0" aria-label="Choisir ou déposer des documents"><strong>Dépose tes fichiers ici</strong><p>ou choisis-les sur ton appareil · PDF, Word, calendrier .ics ou image · 20 Mo maximum par fichier</p><button class="btn pri" type="button" id="docChoose">Choisir des fichiers</button></div><p id="docStatus" class="hint" role="status"></p><h3 class="ct">Mes documents</h3><div id="docList" class="empty">Chargement…</div><p class="hint">Les photos JPG/PNG/WebP et les pages numérisées des PDF sont lues en français dans ton navigateur. Les évaluations datées, les évaluations indiquées par semaine dans un plan de cours, et les plages hebdomadaires avec jour et heures lisibles peuvent être ajoutées automatiquement. Les fichiers .doc sont conservés, mais ne sont pas analysés. Les documents déjà déposés peuvent être relus avec « Ré-analyser ». Vérifie les dates signalées « à confirmer » et les cours importés.</p></div>';
-}
-async function refreshDocuments(){
-  if(!sb||!currentUser||view!=='docs')return;
-  const box=$('#docList');if(!box)return;
-  box.textContent='Chargement…';
-  const folders=Object.keys(DOC_CATEGORIES);
-  const results=await Promise.all(folders.map(category=>sb.storage.from(DOC_BUCKET).list(currentUser.id+'/'+category,{limit:100,sortBy:{column:'created_at',order:'desc'}})));
-  if(!currentUser||view!=='docs')return;
-  const failed=results.find(x=>x.error);
-  if(failed){console.error(failed.error);box.innerHTML='<p class="hint">Le stockage de documents n’est pas configuré. Réessaie plus tard ou contacte la personne qui gère le site.</p>';return}
-  const files=results.flatMap((res,i)=>res.data.filter(f=>f.name&&!f.name.startsWith('.')).map(f=>({file:f,category:folders[i]}))).sort((a,b)=>(b.file.created_at||'').localeCompare(a.file.created_at||''));
-  if(!files.length){box.innerHTML='<div class="empty">Aucun document pour le moment.</div>';return}
-  box.innerHTML=files.map(({file,category})=>{
-    const label=file.name.replace(/^[^-]+-[^-]+-/,'').replace(/[-_]/g,' '),ext=(file.name.split('.').pop()||'DOC').toUpperCase(),date=file.created_at?new Date(file.created_at).toLocaleDateString('fr-CA'):'';
-    const canAnalyze=!!DOC_TYPES[ext.toLowerCase()]&&ext.toLowerCase()!=='doc';
-    return '<div class="docRow"><div class="docIcon">'+esc(ext.slice(0,4))+'</div><div class="docMeta"><b title="'+esc(label)+'">'+esc(label)+'</b><small>'+DOC_CATEGORIES[category]+' · '+date+(file.metadata?.size?' · '+(file.metadata.size/1048576).toFixed(1)+' Mo':'')+'</small></div>'+(canAnalyze?'<button class="btn" type="button" data-doc-analyze="'+esc(category+'/'+file.name)+'">Ré-analyser</button>':'')+'<button class="btn" type="button" data-doc-download="'+esc(category+'/'+file.name)+'">Ouvrir</button><button class="btn del" type="button" data-doc-delete="'+esc(category+'/'+file.name)+'">Supprimer</button></div>';
-  }).join('');
-}
-function assessmentIdentity(title){
+function assessmentIdentity(title,type=''){
   const s=foldText(title),exam=s.match(/\b(?:examen|exam)\s*(\d+)\b/);
   if(exam)return 'exam:'+exam[1];
-  if(/\bminitest\b/.test(s))return /\bhistorique\b/.test(s)?'minitest:historique':'minitest';
-  if(/\blaboratoire\b/.test(s)&&/\bexcel\b/.test(s))return 'laboratoire:excel';
+  if(/\bminitest\b/.test(s)){
+    if(/\bhistorique\b/.test(s))return 'minitest:historique';
+    const numbered=s.match(/\bminitest\s*(\d+)\b/);
+    return numbered?'minitest:'+numbered[1]:'minitest';
+  }
+  if(/\bexcel\b/.test(s)&&(/\b(?:labo|laboratoire)\b/.test(s)||type==='labo'||type==='devoir'||/\b\d+\s+excel\b/.test(s)))return 'laboratoire:excel';
   return s.replace(/^\s*\d+\s+/,'').replace(/\b\d+(?:[.,]\d+)?\s*%/g,'').replace(/[^a-z0-9]+/g,' ').trim();
-}
-function isImportedDocumentEvent(event){return /(?:repéré dans|ajouté depuis)\b/i.test(String(event?.notes||''))}
-function sourceDocumentName(event){
-  const match=String(event?.notes||'').match(/(?:repéré dans|ajouté depuis)\s+(.+?)(?:\s*[·|]|$)/i);
-  if(!match)return '';
-  return foldText(match[1].trim().replace(/\.[^.]+$/,'').replace(/\s*\(\s*\d+\s*\)$/,'').replace(/[-_]\d+[-_]$/,'').replace(/[-_]+$/,'')).replace(/[^a-z0-9]+/g,'');
-}
-function documentEventKey(event){
-  const source=sourceDocumentName(event),identity=assessmentIdentity(event?.title||'');
-  return source&&identity?source+'|'+String(event?.type||'')+'|'+identity:'';
-}
-function compatibleImportedCourse(a,b){return !a||!b||a===b||a==='autre'||b==='autre'}
-function isNoisyExamImport(event){
-  const text=foldText(String(event?.title||'')+' '+String(event?.notes||''));
-  return /\bajustement\b/.test(text)&&/\bjournees?\s+d(?:['’]?\s*)?/.test(text);
-}
-function syncCalendarExamsToNotes(){
-  let changed=false;
-  const before=st.ev.length;
-  st.ev=st.ev.filter(event=>!(isImportedDocumentEvent(event)&&isNoisyExamImport(event)));
-  if(st.ev.length!==before)changed=true;
-  const validEventIds=new Set(st.ev.map(event=>event.id));
-  for(const course of st.co){
-    const initial=course.ev.length;
-    course.ev=course.ev.filter(assessment=>{
-      const key=assessmentIdentity(assessment.name),blank=![assessment.w,assessment.grade,assessment.mean,assessment.sd].some(value=>String(value||'').trim());
-      if(!blank)return true;
-      if(isNoisyExamImport({title:assessment.name})){changed=true;return false}
-      if(!key)return true;
-      const duplicate=course.ev.some(other=>other!==assessment&&assessmentIdentity(other.name)===key&&(/^exam:\d+$/.test(key)||foldText(other.name)===foldText(assessment.name)));
-      if(duplicate){changed=true;return false}
-      if(!assessment.eventId||validEventIds.has(assessment.eventId))return true;
-      return true;
-    });
-    if(course.ev.length!==initial)changed=true;
-  }
-  for(const event of st.ev.filter(e=>e.type==='exam'&&e.course&&e.course!=='autre'&&e.date)){
-    const course=st.co.find(c=>c.id===event.course);if(!course)continue;
-    const identity=assessmentIdentity(event.title);
-    let assessment=course.ev.find(e=>e.eventId===event.id)||(identity&&course.ev.find(e=>assessmentIdentity(e.name)===identity))||course.ev.find(e=>matchingAssessmentEvents(course.id,e).includes(event));
-    if(!assessment){
-      assessment=course.ev.find(e=>!String(e.name||'').trim()&&!e.date&&!e.grade&&!e.mean&&!e.sd);
-      if(!assessment){assessment={id:uid(),name:event.title,w:'',grade:'',mean:'',sd:'',date:event.date,eventId:event.id};course.ev.push(assessment);changed=true}
-      else {assessment.name=event.title;assessment.date=event.date;assessment.eventId=event.id;changed=true}
-    }else if(assessment.date!==event.date||assessment.eventId!==event.id){assessment.date=event.date;assessment.eventId=event.id;changed=true}
-  }
-  return changed;
-}
-function mergeImportedData(imported,importedClasses,initialCourseCount){
-  const baseTitle=s=>foldText(s).replace(/\s*\(semaine\s+\d+\)\s*$/,'').trim(),wasImported=isImportedDocumentEvent;
-  let added=0,updated=0;
-  st.ev=st.ev.filter(event=>!(wasImported(event)&&isNoisyExamImport(event)));
-  const consumed=new Set();
-  for(const ev of imported){
-    const key=documentEventKey(ev);
-    const exact=st.ev.find(e=>foldText(e.title)===foldText(ev.title)&&e.date===ev.date&&e.type===ev.type&&(e.course===ev.course||e.course==='autre'||ev.course==='autre'));
-    if(exact){
-      if(wasImported(exact)){
-        const id=exact.id,done=exact.done,course=ev.course==='autre'?exact.course:ev.course;
-        const changed=exact.course!==course||exact.time!==ev.time||String(exact.notes||'')!==String(ev.notes||'')||!!exact.approx!==!!ev.approx;
-        if(changed){Object.assign(exact,ev,{id,done,course});updated++}
-        consumed.add(id);
-      }
-      continue;
-    }
-    let old=null;
-    if(key)old=st.ev.find(e=>wasImported(e)&&documentEventKey(e)===key&&compatibleImportedCourse(e.course,ev.course)&&!consumed.has(e.id))||null;
-    if(!old)old=st.ev.find(e=>wasImported(e)&&e.approx&&(e.course===ev.course||e.course==='autre')&&e.type===ev.type&&baseTitle(e.title)===baseTitle(ev.title));
-    if(old){const id=old.id,done=old.done,course=ev.course==='autre'?old.course:ev.course;Object.assign(old,ev,{id,done,course});consumed.add(id);updated++}
-    else {st.ev.push(ev);consumed.add(ev.id);added++}
-  }
-  let removedDuplicates=0;
-  st.ev=st.ev.filter(event=>{
-    if(!wasImported(event)||consumed.has(event.id))return true;
-    const key=documentEventKey(event);
-    if(!key)return true;
-    const replacement=imported.some(next=>documentEventKey(next)===key&&compatibleImportedCourse(event.course,next.course));
-    if(!replacement)return true;
-    removedDuplicates++;return false;
-  });
-  updated+=removedDuplicates;
-  const classKeys=new Set(st.bl.map(b=>b.day+'|'+b.start+'|'+b.end+'|'+b.course)),uniqueClasses=[];
-  for(const b of importedClasses){const key=b.day+'|'+b.start+'|'+b.end+'|'+b.course;if(!classKeys.has(key)){classKeys.add(key);uniqueClasses.push(b)}}
-  const coursesAdded=Math.max(0,st.co.length-initialCourseCount),assessmentsLinked=syncCalendarExamsToNotes();
-  if(added||updated||uniqueClasses.length||coursesAdded||assessmentsLinked){
-    st.bl.push(...uniqueClasses);
-    save({silent:true});
-    if(view!=='docs')render();
-  }
-  return {recognized:imported.length,added,updated,classesAdded:uniqueClasses.length,coursesAdded};
-}
-async function uploadDocuments(files){
-  if(!currentUser){$('#accountBtn').click();return}
-  const category=$('#docCategory').value,status=$('#docStatus'),imported=[],importedClasses=[],initialCourseCount=st.co.length,details=[];
-  for(const file of Array.from(files||[])){
-    const ext=(file.name.split('.').pop()||'').toLowerCase();
-    if(!DOC_TYPES[ext]){details.push('Format non pris en charge : '+file.name);continue}
-    if(file.size>20*1024*1024){details.push(file.name+' dépasse la limite de 20 Mo.');continue}
-    const safe=file.name.normalize('NFKD').replace(/[^a-zA-Z0-9._-]+/g,'-').replace(/-+/g,'-').slice(-100)||'document.'+ext;
-    const path=currentUser.id+'/'+category+'/'+Date.now()+'-'+uid()+'-'+safe;
-    if(status)status.textContent='Envoi de '+file.name+'…';
-    let uploadError=null;
-    try{const result=await sb.storage.from(DOC_BUCKET).upload(path,file,{contentType:DOC_TYPES[ext],upsert:false});uploadError=result.error}
-    catch(err){console.error(err);details.push('Échec de l’envoi de '+file.name+'. Réessaie lorsque ta connexion sera stable.');continue}
-    if(uploadError){console.error(uploadError);details.push('Échec de l’envoi de '+file.name+'. Vérifie la configuration du stockage.');continue}
-    try{
-      const result=await extractDocumentText(file,ext,status,category);
-      imported.push(...result.events);importedClasses.push(...(result.classes||[]));
-      if(!result.supported)details.push(file.name+' est conservé, mais son format n’est pas analysé automatiquement.');
-      else if(!result.events.length&&!(result.classes||[]).length)details.push('Fichier lu, mais aucune date, évaluation ou plage de cours reconnue dans '+file.name+'. Tu peux réessayer avec « Ré-analyser » après avoir choisi le bon type de document.');
-    }catch(err){
-      console.error(err);
-      details.push(file.name+' est conservé, mais la lecture a échoué ('+(err?.message||'erreur inconnue')+'). Essaie un PDF texte ou une photo plus nette.');
-    }
-  }
-  await releaseOcrWorker();
-  const merged=mergeImportedData(imported,importedClasses,initialCourseCount),added=[];
-  if(merged.added)added.push(merged.added+' nouvelle(s) évaluation(s)');
-  if(merged.updated)added.push(merged.updated+' date(s) mise(s) à jour');
-  if(merged.classesAdded)added.push(merged.classesAdded+' cours à l’horaire');
-  if(merged.coursesAdded)added.push(merged.coursesAdded+' cours ajouté(s)');
-  if(status){
-    status.textContent='Analyse terminée : '+merged.recognized+' évaluation(s) repérée(s), '+(merged.added+merged.updated)+' ajoutée(s) ou corrigée(s).'+(details.length?' '+details.join(' '):'');
-  }
-  if(added.length)toast(added.join(' · ')+' ✓');
-  else if(merged.recognized)toast('Les évaluations détectées étaient déjà dans ton agenda.');
-  else if(details.length)toast('Import terminé; consulte les détails.');
-  await refreshDocuments();
-}
-async function reanalyzeDocument(path,refresh=true){
-  if(!currentUser)return null;
-  const status=$('#docStatus'),parts=path.split('/'),category=parts.shift(),objectName=parts.join('/'),name=objectName.replace(/^\d+-[^-]+-/,'');
-  const ext=(name.split('.').pop()||'').toLowerCase();
-  if(!DOC_TYPES[ext]||ext==='doc'){if(status)status.textContent='Ce document ne peut pas être analysé automatiquement.';return null}
-  try{
-    if(status)status.textContent='Téléchargement de '+name+'…';
-    const {data,error}=await sb.storage.from(DOC_BUCKET).download(currentUser.id+'/'+path);
-    if(error)throw error;
-    const file=new File([data],name,{type:DOC_TYPES[ext]}),initialCourseCount=st.co.length;
-    if(status)status.textContent='Ré-analyse de '+name+'…';
-    const result=await extractDocumentText(file,ext,status,category);
-    await releaseOcrWorker();
-    if(!result.supported){if(status)status.textContent='Ce document ne peut pas être analysé automatiquement.';return null}
-    const merged=mergeImportedData(result.events,result.classes||[],initialCourseCount);
-    if(status)status.textContent='Ré-analyse terminée : '+merged.recognized+' évaluation(s) repérée(s), '+(merged.added+merged.updated)+' ajoutée(s) ou corrigée(s).';
-    if(merged.added||merged.updated)toast((merged.added+merged.updated)+' élément(s) ajouté(s) ou corrigé(s) ✓');
-    else toast(merged.recognized?'Les évaluations détectées étaient déjà dans ton agenda.':'Aucune évaluation reconnue dans ce document.');
-    return merged;
-  }catch(err){
-    console.error(err);await releaseOcrWorker();
-    if(status)status.textContent='La ré-analyse a échoué ('+(err?.message||'erreur inconnue')+'). Essaie un autre format ou une image plus nette.';
-    return null;
-  }finally{if(refresh)await refreshDocuments()}
-}
-async function reanalyzeAllDocuments(){
-  if(!currentUser||!sb)return;
-  const status=$('#docStatus'),folders=Object.keys(DOC_CATEGORIES);
-  if(status)status.textContent='Recherche des documents…';
-  const results=await Promise.all(folders.map(category=>sb.storage.from(DOC_BUCKET).list(currentUser.id+'/'+category,{limit:100,sortBy:{column:'created_at',order:'desc'}})));
-  const failed=results.find(x=>x.error);
-  if(failed){if(status)status.textContent='Impossible de charger la liste des documents.';return}
-  const files=results.flatMap((res,i)=>res.data.filter(f=>f.name&&!f.name.startsWith('.')).map(f=>({category:folders[i],name:f.name})));
-  let processed=0,recognized=0,added=0,updated=0,classesAdded=0,coursesAdded=0;
-  for(let i=0;i<files.length;i++){
-    const file=files[i];
-    if(status)status.textContent='Ré-analyse du document '+(i+1)+' sur '+files.length+'…';
-    const result=await reanalyzeDocument(file.category+'/'+file.name,false);
-    if(result){processed++;recognized+=result.recognized;added+=result.added;updated+=result.updated;classesAdded+=result.classesAdded||0;coursesAdded+=result.coursesAdded||0}
-  }
-  if(status)status.textContent='Ré-analyse terminée : '+processed+' document(s) relu(s), '+recognized+' évaluation(s) repérée(s), '+(added+updated)+' évaluation(s) ajoutée(s) ou corrigée(s), '+classesAdded+' plage(s) de cours récupérée(s).';
-  if(added||updated||classesAdded||coursesAdded)toast((added+updated)+' évaluation(s) et '+classesAdded+' plage(s) de cours récupérée(s) ✓');
-  await refreshDocuments();
-}
-async function openDocument(path){
-  const tab=window.open('about:blank','_blank');
-  if(!tab){toast('Autorise les fenêtres contextuelles pour ouvrir le document');return}
-  const {data,error}=await sb.storage.from(DOC_BUCKET).createSignedUrl(currentUser.id+'/'+path,60);
-  if(error){tab.close();toast('Impossible d’ouvrir le document');return}
-  tab.location=data.signedUrl;
-}
-async function deleteDocument(path){
-  if(!confirm('Supprimer ce document de ton espace ?'))return;
-  const {error}=await sb.storage.from(DOC_BUCKET).remove([currentUser.id+'/'+path]);
-  if(error){toast('Impossible de supprimer le document');return}
-  toast('Document supprimé');refreshDocuments();
 }
 function render(){
   const page=$('#view'),nav=document.querySelector('nav'),foot=document.querySelector('.foot');
   if(!currentUser){
     $('#hero').hidden=true;$('#hero').innerHTML='';nav.hidden=true;foot.hidden=true;$('#warn').hidden=true;
     $('#dayDetails').innerHTML='';fEv.reset();fBl.reset();fAuth.reset();fEv.course.innerHTML='';fBl.course.innerHTML='';
-    page.innerHTML='<section class="card authGate"><span class="tag">Espace privé</span><h1>Connecte-toi pour commencer</h1><p>Ton calendrier et tes cours sont privés. Après la connexion, dépose tes plans de cours ou ton calendrier pour y importer tes examens, devoirs et plages de cours.</p><div class="acts"><button class="btn pri" type="button" id="gateLogin">Se connecter</button><button class="btn" type="button" id="gateSignup">Créer un compte</button></div></section>';
+    page.innerHTML='<section class="card authGate"><span class="tag">Espace privé</span><h1>Connecte-toi pour commencer</h1><p>Ton calendrier, tes cours, tes examens et tes notes restent privés. Connecte-toi pour créer ton espace et entrer tes informations manuellement.</p><div class="acts"><button class="btn pri" type="button" id="gateLogin">Se connecter</button><button class="btn" type="button" id="gateSignup">Créer un compte</button></div></section>';
     $('#gateLogin')?.addEventListener('click',()=>$('#accountBtn').click());
     $('#gateSignup')?.addEventListener('click',()=>{$('#accountBtn').click();$('#authMode').click()});
     return;
@@ -1176,19 +687,12 @@ function render(){
   $('#hero').hidden=false;nav.hidden=false;foot.hidden=false;
   fEv.course.innerHTML=opts(CO);fBl.course.innerHTML=opts(CO);
   hero();
-  $('#hero').querySelector('[data-hero-add]')?.addEventListener('click',()=>openEv(null));
-  $('#hero').querySelector('[data-hero-doc]')?.addEventListener('click',()=>{view='docs';render()});
+  $('#hero').querySelector('[data-hero-add]')?.addEventListener('click',()=>{view='notes';render()});
+  $('#hero').querySelector('[data-hero-schedule]')?.addEventListener('click',()=>{view='sched';render()});
   document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.v===view));
-  paint();page.innerHTML=view==='cal'?calView():view==='list'?listView():view==='sched'?schedView():view==='study'?studyView():view==='docs'?documentsView():notesView();
+  paint();page.innerHTML=view==='cal'?calView():view==='list'?listView():view==='sched'?schedView():view==='study'?studyView():notesView();
   results();
-  if(view==='docs'&&currentUser)refreshDocuments();
-  if(view==='docs'){
-    const zone=$('#dropZone'),input=$('#docFiles');
-    if(zone){zone.onclick=e=>{if(e.target.closest('button'))return;input.click()};zone.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();input.click()}};zone.ondragover=e=>{e.preventDefault();zone.classList.add('over')};zone.ondragleave=()=>zone.classList.remove('over');zone.ondrop=e=>{e.preventDefault();zone.classList.remove('over');uploadDocuments(e.dataTransfer.files)}}
-    if(input)input.onchange=()=>{uploadDocuments(input.files);input.value=''};
-    $('#docChoose')?.addEventListener('click',e=>{e.stopPropagation();input.click()});
-    $('#docsLogin')?.addEventListener('click',()=>$('#accountBtn').click());
-  }
+
 }
 // Dialogs
 const dEv=$('#dEv'), fEv=$('#fEv'), dBl=$('#dBl'), fBl=$('#fBl');
@@ -1200,8 +704,8 @@ function openEv(id,date){
   editId=id; fEv.course.innerHTML=opts(CO); const e=id&&st.ev.find(x=>x.id===id);
   $('#evT').textContent=e?"Modifier l'élément":'Nouvel élément';
   $('#evDel').hidden=!e;
-  fEv.title.value=e?e.title:''; fEv.course.value=e?e.course:(fCourse||'alg'); fEv.type.value=e?e.type:'devoir';
-  fEv.date.value=e?e.date:(date||todayS()); fEv.time.value=e?e.time||'':''; fEv.notes.value=e?e.notes||'':''; fEv.approx.checked=e?!!e.approx:false;
+  fEv.title.value=e?e.title:''; fEv.course.value=e?e.course:(fCourse||'alg'); fEv.type.value=e?e.type:(date?'rdv':'exam');
+  fEv.date.value=e?e.date:(date||todayS()); fEv.time.value=e?e.time||'':''; fEv.endTime.value=e?e.endTime||'':''; fEv.notes.value=e?e.notes||'':''; fEv.approx.checked=e?!!e.approx:false;
   dEv.showModal();
 }
 function openBl(id){
@@ -1212,9 +716,10 @@ function openBl(id){
   fBl.start.value=b?b.start:'08:00'; fBl.end.value=b?b.end:'09:50'; fBl.room.value=b?b.room||'':'';
   dBl.showModal();
 }
-fEv.addEventListener('submit',()=>{
-  const v={title:fEv.title.value.trim(),course:fEv.course.value,type:fEv.type.value,date:fEv.date.value,time:fEv.time.value,notes:fEv.notes.value.trim(),approx:fEv.approx.checked};
+fEv.addEventListener('submit',e=>{
+  const v={title:fEv.title.value.trim(),course:fEv.course.value,type:fEv.type.value,date:fEv.date.value,time:fEv.time.value,endTime:fEv.endTime.value,notes:fEv.notes.value.trim(),approx:fEv.approx.checked};
   if(!v.title||!v.date)return;
+  if(v.time&&v.endTime&&tm(v.endTime)<=tm(v.time)){e.preventDefault();alert("L'heure de fin doit être après l'heure de début.");return}
   if(editId){Object.assign(st.ev.find(x=>x.id===editId),v)}else st.ev.push({...v,id:uid(),done:false});
   save();render();
 });
@@ -1272,15 +777,8 @@ fAuth.addEventListener('submit',async e=>{
 // Events
 document.addEventListener('click',e=>{
   const t=e.target;
-  const analyzeButton=t.closest('[data-doc-analyze]');
-  if(analyzeButton){reanalyzeDocument(analyzeButton.dataset.docAnalyze);return}
-  const downloadButton=t.closest('[data-doc-download]');
-  if(downloadButton){openDocument(downloadButton.dataset.docDownload);return}
-  const deleteButton=t.closest('[data-doc-delete]');
-  if(deleteButton){deleteDocument(deleteButton.dataset.docDelete);return}
-  const analyzeAllButton=t.closest('[data-doc-all-analyze]');
-  if(analyzeAllButton){reanalyzeAllDocuments();return}
-  if(t.closest('[data-schedule-reanalyze]')){view='docs';render();reanalyzeAllDocuments();return}
+  const addDay=t.closest('[data-add-day]');if(addDay){openEv(null,iso(addD(schedMonday,+addDay.dataset.addDay)));return}
+  if(t.closest('[data-add-week]')){openEv(null,iso(schedMonday));return}
   const tab=t.closest('.tab'); if(tab){view=tab.dataset.v;render();return}
   if(t.closest('#add')){openEv(null);return}
   if(t.closest('#addBl')){openBl(null);return}
@@ -1289,7 +787,8 @@ document.addEventListener('click',e=>{
   if(co){
     const c=st.co.find(x=>x.id===co.dataset.co);
     if(t.closest('[data-delco]')){if(confirm('Supprimer ce cours et ses notes ?')){st.co=st.co.filter(x=>x!==c);st.ev.concat(st.bl).forEach(z=>{if(z.course===c.id)z.course='autre'});save();render()}return}
-    if(t.closest('[data-addev]')){c.ev.push({id:uid(),name:'',w:'',grade:'',mean:'',sd:''});save();render();return}
+    if(t.closest('[data-add-exam]')){c.ev.push({id:uid(),name:'Examen',w:'',grade:'',mean:'',sd:'',date:''});save();render();return}
+    if(t.closest('[data-addev]')){c.ev.push({id:uid(),name:'',w:'',grade:'',mean:'',sd:'',date:''});save();render();return}
     const dv=t.closest('[data-delev]');
     if(dv){c.ev=c.ev.filter(x=>x.id!==dv.closest('[data-ev]').dataset.ev);save();render();return}
     return;
@@ -1311,12 +810,6 @@ document.addEventListener('click',e=>{
 document.addEventListener('change',e=>{
   const t=e.target;
   if(t.dataset.examDate){const card=t.closest('[data-co]');if(card)syncEvaluationDate(card.dataset.co,t.dataset.examDate,t.value);return}
-  if(t.dataset.dayExamCourse){
-    const course=t.dataset.dayExamCourse,date=dayDialogDate,matching=st.ev.filter(x=>x.date===date&&x.type==='exam'&&x.course===course);
-    if(t.checked){if(!matching.length)st.ev.push({...E('Examen — '+CO[course],course,'exam',date,'Ajouté depuis la journée'),id:uid()})}
-    else if(matching.length){if(!confirm('Retirer '+matching.length+' examen(s) de ce cours pour cette journée ?')){t.checked=true;return}const ids=new Set(matching.map(x=>x.id));st.ev=st.ev.filter(x=>!ids.has(x.id))}
-    save();render();openDay(date);return;
-  }
   if(t.dataset.done){const ev=st.ev.find(x=>x.id===t.dataset.done);ev.done=t.checked;save();render()}
   else if(t.dataset.date){const ev=st.ev.find(x=>x.id===t.dataset.date);if(ev&&t.value){ev.date=t.value;save();render()}}
   else if(t.id==='fPer'){fPer=t.value;render()}

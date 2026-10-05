@@ -108,6 +108,19 @@ table.ev{width:100%;border-collapse:collapse;min-width:560px}
 .ev td{padding:3px}
 .ev td:first-child{width:34%}
 .ev input{width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:6px}
+@media(max-width:700px){
+  table.ev{min-width:700px;table-layout:fixed}
+  .ev th:nth-child(1),.ev td:nth-child(1){width:30%}
+  .ev th:nth-child(2),.ev td:nth-child(2){width:19%}
+  .ev th:nth-child(3),.ev td:nth-child(3){width:7%}
+  .ev th:nth-child(4),.ev td:nth-child(4){width:9%}
+  .ev th:nth-child(5),.ev td:nth-child(5){width:11%}
+  .ev th:nth-child(6),.ev td:nth-child(6){width:9%}
+  .ev th:nth-child(7),.ev td:nth-child(7){width:7%}
+  .ev th:nth-child(8),.ev td:nth-child(8){width:8%}
+  .ev td{padding:2px 1px}
+  .ev input[type=date]{min-width:0;width:100%;padding:5px 2px;font-size:12px}
+}
 .kp{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-top:10px}
 .kp div{border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 .kp b{display:block;font-size:20px}
@@ -326,7 +339,7 @@ function updateAccountUI(){
 }
 function privateAccountData(value){
   const data=norm(value),starterIds=new Set(Object.keys(STARTER_COURSES));
-  data.bl=(data.bl||[]).filter(b=>!/^b\d+$/.test(String(b.id||'')));
+  data.bl=Array.isArray(data.bl)?data.bl:[];
   data.co=(data.co||[]).filter(c=>{
     if(!starterIds.has(c.id))return true;
     const referenced=(data.ev||[]).some(e=>e.course===c.id)||data.bl.some(b=>b.course===c.id);
@@ -457,7 +470,8 @@ function schedView(){
   const H0=8,PX=52,now=new Date(),monday=schedMonday;
   const study=plan().list.filter(l=>{const d=parse(l.date);return d>=monday&&d<addD(monday,5)});
   const end=addD(monday,4),label=fmtD(iso(monday),{day:'numeric',month:'long'})+' – '+fmtD(iso(end),{day:'numeric',month:'long',year:'numeric'});
-  let h='<div class="card"><div class="bar"><button class="btn" data-week="-1" aria-label="Semaine précédente">‹</button><button class="btn" data-week="0">Cette semaine</button><button class="btn" data-week="1" aria-label="Semaine suivante">›</button><h2>Horaire · '+label+'</h2><button class="btn pri" id="addBl">Ajouter un cours</button></div><p class="hint">Utilise les flèches pour parcourir les semaines. Les cours réguliers et les périodes d’étude apparaissent dans chaque journée.</p><div class="sw"><div class="sched"><div class="dh"></div>';
+  let h='<div class="card"><div class="bar"><button class="btn" data-week="-1" aria-label="Semaine précédente">‹</button><button class="btn" data-week="0">Cette semaine</button><button class="btn" data-week="1" aria-label="Semaine suivante">›</button><h2>Horaire · '+label+'</h2><button class="btn pri" id="addBl">Ajouter un cours</button></div><p class="hint">Utilise les flèches pour parcourir les semaines. Les cours réguliers et les périodes d’étude apparaissent dans chaque journée.</p>'+(!st.bl.length?'<div class="empty scheduleEmpty"><strong>Aucun cours régulier n’est enregistré.</strong><p>Ré-analyse tes documents déposés pour retrouver les cours indiqués, ou ajoute un cours avec le bouton ci-dessus.</p><button class="btn" type="button" data-schedule-reanalyze>Ré-analyser mes documents</button></div>':'')+'<div class="sw"><div class="sched"><div class="dh"></div>';
+  if(!st.bl.length&&!study.length)return h+'</div>';
   for(let i=0;i<5;i++){const date=addD(monday,i);h+='<div class="dh'+(iso(date)===todayS()?' today':'')+'"><b>'+DJ[i]+'</b><small>'+fmtD(iso(date),{day:'numeric',month:'short'})+'</small></div>'}
   h+='<div class="hrs">'+Array.from({length:15},(_,i)=>'<i style="top:'+(i*PX)+'px">'+(H0+i)+'h</i>').join('')+'</div>';
   for(let d=1;d<=5;d++){
@@ -1125,15 +1139,15 @@ async function reanalyzeAllDocuments(){
   const failed=results.find(x=>x.error);
   if(failed){if(status)status.textContent='Impossible de charger la liste des documents.';return}
   const files=results.flatMap((res,i)=>res.data.filter(f=>f.name&&!f.name.startsWith('.')).map(f=>({category:folders[i],name:f.name})));
-  let processed=0,recognized=0,added=0,updated=0;
+  let processed=0,recognized=0,added=0,updated=0,classesAdded=0,coursesAdded=0;
   for(let i=0;i<files.length;i++){
     const file=files[i];
     if(status)status.textContent='Ré-analyse du document '+(i+1)+' sur '+files.length+'…';
     const result=await reanalyzeDocument(file.category+'/'+file.name,false);
-    if(result){processed++;recognized+=result.recognized;added+=result.added;updated+=result.updated}
+    if(result){processed++;recognized+=result.recognized;added+=result.added;updated+=result.updated;classesAdded+=result.classesAdded||0;coursesAdded+=result.coursesAdded||0}
   }
-  if(status)status.textContent='Ré-analyse terminée : '+processed+' document(s) relu(s), '+recognized+' évaluation(s) repérée(s), '+(added+updated)+' ajoutée(s) ou corrigée(s).';
-  if(added||updated)toast((added+updated)+' évaluation(s) récupérée(s) ✓');
+  if(status)status.textContent='Ré-analyse terminée : '+processed+' document(s) relu(s), '+recognized+' évaluation(s) repérée(s), '+(added+updated)+' évaluation(s) ajoutée(s) ou corrigée(s), '+classesAdded+' plage(s) de cours récupérée(s).';
+  if(added||updated||classesAdded||coursesAdded)toast((added+updated)+' évaluation(s) et '+classesAdded+' plage(s) de cours récupérée(s) ✓');
   await refreshDocuments();
 }
 async function openDocument(path){
@@ -1266,6 +1280,7 @@ document.addEventListener('click',e=>{
   if(deleteButton){deleteDocument(deleteButton.dataset.docDelete);return}
   const analyzeAllButton=t.closest('[data-doc-all-analyze]');
   if(analyzeAllButton){reanalyzeAllDocuments();return}
+  if(t.closest('[data-schedule-reanalyze]')){view='docs';render();reanalyzeAllDocuments();return}
   const tab=t.closest('.tab'); if(tab){view=tab.dataset.v;render();return}
   if(t.closest('#add')){openEv(null);return}
   if(t.closest('#addBl')){openBl(null);return}
